@@ -1,0 +1,22 @@
+{
+  "name": "stream-deck-profile",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Stream Deck profile editor tooling",
+  "main": "src/index.js",
+  "scripts": {
+    "extract": "node src/index.js extract",
+    "pack": "node src/index.js pack",
+    "validate": "node src/index.js validate",
+    "list": "node src/index.js list",
+    "fix-typo": "node scripts/fix-typo.js",
+    "fill-grid": "node scripts/fill-grid.js",
+    "build:vs-code": "node src/index.js validate profiles/vs-code && node src/index.js pack profiles/vs-code \"builds/VS Code.streamDeckProfile\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "adm-zip": "^0.5.17"
+  }
+}
