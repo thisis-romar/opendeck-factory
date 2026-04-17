@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(du -sh '/c/Users/romar/projects/stream-deck-profile/profiles/'*)"
+    ]
+  }
+}
