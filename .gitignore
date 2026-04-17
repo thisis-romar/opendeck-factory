@@ -1,5 +1,3 @@
 node_modules/
-builds/*
-!builds/.gitkeep
 _extracted/
 *.log
