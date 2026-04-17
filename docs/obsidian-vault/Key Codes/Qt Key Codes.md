@@ -31,6 +31,24 @@ Used as `QTKeyCode` in hotkey definitions. For letters and numbers, QTKeyCode eq
 | PAGEDOWN | 16777239 |
 | F1-F12 | 16777264-16777275 |
 
+## Punctuation Keys (ASCII values)
+
+| Key | QTKeyCode | Character |
+|-----|-----------|-----------|
+| BACKTICK | 96 | ` |
+| MINUS | 45 | - |
+| EQUALS | 61 | = |
+| LBRACKET | 91 | [ |
+| RBRACKET | 93 | ] |
+| BACKSLASH | 92 | \ |
+| SEMICOLON | 59 | ; |
+| QUOTE | 39 | ' |
+| COMMA | 44 | , |
+| PERIOD | 46 | . |
+| SLASH | 47 | / |
+
+**Important:** Punctuation keys use ASCII values as QTKeyCode, NOT the Windows VKey code. Using NativeCode (e.g., 192 for BACKTICK) causes Stream Deck to display wrong characters (e.g., "À" instead of `` ` ``).
+
 ## Empty Sentinel
 When a hotkey slot is unused:
 ```json
