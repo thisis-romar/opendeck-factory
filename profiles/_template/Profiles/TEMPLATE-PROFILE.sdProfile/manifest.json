@@ -1,0 +1,14 @@
+{
+  "Device": {
+    "Model": "20GBA9901",
+    "Name": "Stream Deck MK.2",
+    "UUID": "00000000-0000-0000-0000-000000000000"
+  },
+  "Name": "Template",
+  "Pages": {
+    "Current": "00000000-0000-0000-0000-000000000000",
+    "Default": "PAGE-1",
+    "Pages": ["PAGE-2", "PAGE-3"]
+  },
+  "Version": "3.0"
+}

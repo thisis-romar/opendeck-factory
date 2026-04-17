@@ -1,0 +1,130 @@
+{
+  "collapse": {
+    "search": false,
+    "localJumps": false,
+    "colorGroups": false,
+    "display": false,
+    "forces": false
+  },
+  "search": "",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": true,
+  "showOrphans": false,
+  "collapse1": false,
+  "localJumps": 1,
+  "lineSizeMultiplier": 1,
+  "nodeSizeMultiplier": 1,
+  "textFadeMultiplier": 0,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "centerStrength": 0.4,
+  "colorGroups": [
+    {
+      "query": "path:\"Paths/Artificial Intelligence (AI)\"",
+      "color": {
+        "a": 1,
+        "rgb": 5142951
+      }
+    },
+    {
+      "query": "path:\"Paths/Cloud Computing\"",
+      "color": {
+        "a": 1,
+        "rgb": 15896107
+      }
+    },
+    {
+      "query": "path:\"Paths/Cybersecurity\"",
+      "color": {
+        "a": 1,
+        "rgb": 14767961
+      }
+    },
+    {
+      "query": "path:\"Paths/Data Science\"",
+      "color": {
+        "a": 1,
+        "rgb": 7780274
+      }
+    },
+    {
+      "query": "path:\"Paths/Database Management\"",
+      "color": {
+        "a": 1,
+        "rgb": 5873999
+      }
+    },
+    {
+      "query": "path:\"Paths/DevOps\"",
+      "color": {
+        "a": 1,
+        "rgb": 15583560
+      }
+    },
+    {
+      "query": "path:\"Paths/Hardware\"",
+      "color": {
+        "a": 1,
+        "rgb": 11565729
+      }
+    },
+    {
+      "query": "path:\"Paths/IT Help Desk\"",
+      "color": {
+        "a": 1,
+        "rgb": 16752039
+      }
+    },
+    {
+      "query": "path:\"Paths/Mobile Development\"",
+      "color": {
+        "a": 1,
+        "rgb": 10253663
+      }
+    },
+    {
+      "query": "path:\"Paths/Network and System Administration\"",
+      "color": {
+        "a": 1,
+        "rgb": 12234924
+      }
+    },
+    {
+      "query": "path:\"Paths/Software Development\"",
+      "color": {
+        "a": 1,
+        "rgb": 8830134
+      }
+    },
+    {
+      "query": "path:\"Paths/Web Development\"",
+      "color": {
+        "a": 1,
+        "rgb": 9228669
+      }
+    },
+    {
+      "query": "path:\"Courses\"",
+      "color": {
+        "a": 1,
+        "rgb": 6514417
+      }
+    },
+    {
+      "query": "path:\"Instructors\"",
+      "color": {
+        "a": 1,
+        "rgb": 11032055
+      }
+    },
+    {
+      "query": "path:\"Topics\"",
+      "color": {
+        "a": 1,
+        "rgb": 16096779
+      }
+    }
+  ]
+}

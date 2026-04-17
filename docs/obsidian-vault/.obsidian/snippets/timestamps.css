@@ -1,0 +1,12 @@
+/* Timestamp deep links in transcript callouts */
+a[href*="&t="] {
+  font-family: 'SF Mono', Menlo, monospace;
+  font-size: 0.85em;
+  color: #4E79A7;
+  text-decoration: none;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+a[href*="&t="]:hover {
+  background: rgba(78, 121, 167, 0.15);
+}
