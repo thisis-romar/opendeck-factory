@@ -9,12 +9,15 @@ Node.js ESM project using `adm-zip` for ZIP handling.
 | Directory | Purpose |
 |-----------|---------|
 | `src/` | Core modules: ProfileEditor, hotkey builder, extract/pack/validate |
-| `scripts/` | Automation scripts (batch add, generation, fixes) |
+| `scripts/` | Main generation scripts + one-off utilities (see `scripts/README.md`) |
 | `profiles/` | Extracted profile directories (editable JSON + images) |
+| `profiles/_template/` | Template profile cloned by `initFromTemplate()` for new apps |
 | `data/shortcuts/` | Structured shortcut data per application (JSON) |
-| `builds/` | Output `.streamDeckProfile` files (ZIP) |
+| `data/icons/` | Generated 144×144 button icon PNGs |
+| `builds/` | Output `.streamDeckProfile` files (versioned in git) |
 | `originals/` | Pristine backup profiles — **never overwrite** |
 | `docs/obsidian-vault/` | Technical documentation (file format, API, patterns) |
+| `.claude/skills/` | Claude Code skill definitions (e.g. `generate-profile`) |
 
 ## Commands
 
