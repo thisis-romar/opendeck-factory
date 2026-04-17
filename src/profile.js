@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, renameSync, cpSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { buildHotkey } from './hotkey.js';
@@ -21,6 +21,40 @@ export class ProfileEditor {
 
   get deviceInfo() {
     return DEVICE_MODELS[this.deviceModel] || { name: 'Unknown', cols: 5, rows: 3 };
+  }
+
+  static initFromTemplate(templateDir, targetDir, profileName) {
+    cpSync(templateDir, targetDir, { recursive: true });
+
+    // Generate UUIDs for profile and page folders
+    const profilesDir = join(targetDir, 'Profiles');
+    const oldProfileName = readdirSync(profilesDir).find(e => e.endsWith('.sdProfile')).replace('.sdProfile', '');
+    const oldProfileDir = join(profilesDir, `${oldProfileName}.sdProfile`);
+    const pagesDir = join(oldProfileDir, 'Profiles');
+    const oldPageNames = readdirSync(pagesDir);
+
+    // Rename page folders and build mapping
+    const uuidMap = {};
+    for (const oldPage of oldPageNames) {
+      const newUUID = randomUUID().toUpperCase();
+      uuidMap[oldPage] = newUUID;
+      renameSync(join(pagesDir, oldPage), join(pagesDir, newUUID));
+    }
+
+    // Rename profile folder
+    const newProfileUUID = randomUUID().toUpperCase();
+    const newProfileDir = join(profilesDir, `${newProfileUUID}.sdProfile`);
+    renameSync(oldProfileDir, newProfileDir);
+
+    // Update profile manifest
+    const manifestPath = join(newProfileDir, 'manifest.json');
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    manifest.Name = profileName;
+    manifest.Pages.Default = uuidMap[manifest.Pages.Default] || manifest.Pages.Default;
+    manifest.Pages.Pages = manifest.Pages.Pages.map(p => uuidMap[p] || p);
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+
+    return new ProfileEditor(targetDir);
   }
 
   _findProfileUUID() {
@@ -100,14 +134,24 @@ export class ProfileEditor {
    * @param {boolean} [opts.alt]
    * @param {boolean} [opts.win]
    * @param {string} [opts.imagePath] - Absolute path to icon image file
+   * @param {string} [opts.titleColor] - Title text color as "#RRGGBB"
+   * @param {string} [opts.titleAlignment] - "top", "middle", or "bottom"
+   * @param {number} [opts.fontSize] - Font size (e.g., 11, 12, 16)
+   * @param {string} [opts.fontStyle] - "Bold", "Italic", or "Bold Italic"
    */
-  addHotkeyButton(pageUUID, col, row, { label, key, ctrl, shift, alt, win, imagePath }) {
+  addHotkeyButton(pageUUID, col, row, { label, key, ctrl, shift, alt, win, imagePath, titleColor, titleAlignment, fontSize, fontStyle }) {
     let imageRef = '';
     if (imagePath) {
       imageRef = addImage(this.getPageDir(pageUUID), imagePath);
     }
 
     const hotkeys = buildHotkey({ key, ctrl, shift, alt, win });
+
+    const state = { Image: imageRef, Title: label };
+    if (titleColor) state.TitleColor = titleColor;
+    if (titleAlignment) state.TitleAlignment = titleAlignment;
+    if (fontSize) state.FontSize = fontSize;
+    if (fontStyle) state.FontStyle = fontStyle;
 
     const actionDef = {
       ActionID: randomUUID(),
@@ -120,7 +164,7 @@ export class ProfileEditor {
         Hotkeys: hotkeys,
       },
       State: 0,
-      States: [{ Image: imageRef, Title: label }],
+      States: [state],
       UUID: "com.elgato.streamdeck.system.hotkey",
     };
 

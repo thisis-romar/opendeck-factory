@@ -25,7 +25,7 @@ export function buildHotkey({ key, ctrl = false, shift = false, alt = false, win
   // For letter/number keys, QTKeyCode = ASCII code. For special keys, use lookup.
   const qtKeyCode = QT_KEY_CODES[key] ?? nativeCode;
 
-  // VKeyCode matches NativeCode for letter keys; -1 for special keys (arrows, etc.)
+  // VKeyCode matches NativeCode for letter/number keys only; -1 for all others
   const isLetterOrNumber = (nativeCode >= 48 && nativeCode <= 57) || (nativeCode >= 65 && nativeCode <= 90);
   const vKeyCode = isLetterOrNumber ? nativeCode : -1;
 
