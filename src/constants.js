@@ -34,6 +34,10 @@ export const QT_KEY_CODES = {
   END: 16777233,
   PAGEUP: 16777238,
   PAGEDOWN: 16777239,
+  // Punctuation (Qt uses ASCII values)
+  BACKTICK: 96, MINUS: 45, EQUALS: 61,
+  LBRACKET: 91, RBRACKET: 93, BACKSLASH: 92,
+  SEMICOLON: 59, QUOTE: 39, COMMA: 44, PERIOD: 46, SLASH: 47,
 };
 
 // Modifier bitmask flags
