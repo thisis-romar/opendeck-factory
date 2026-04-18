@@ -127,6 +127,11 @@ Notable single-keypress defaults omitted from the profile (candidates for future
 | Ctrl+Shift+Enter | Insert Line Above |
 | Ctrl+U | Undo Last Cursor |
 | Ctrl+F2 | Change All Occurrences |
+| Ctrl+Shift+\ | Jump to Matching Bracket |
+| Ctrl+Shift+A | Toggle Block Comment |
+| Shift+Alt+I | Insert Cursor at End of Each Line |
+| Ctrl+Alt+Down | Insert Cursor Below |
+| Ctrl+Alt+Up | Insert Cursor Above |
 
 ### Editor Management
 
@@ -153,10 +158,28 @@ Notable single-keypress defaults omitted from the profile (candidates for future
 
 ### Chord-based (unsupported by Stream Deck hotkey action)
 
+> **Note:** Chord shortcuts require two sequential keypresses (e.g., Ctrl+K *then* Ctrl+M).
+> The Stream Deck `com.elgato.streamdeck.system.hotkey` action only supports single-keypress
+> hotkeys, so these cannot be assigned directly. To use them, rebind to a single-keypress
+> shortcut in VS Code's keybindings.json or invoke via Command Palette (Ctrl+Shift+P).
+
 | Shortcut | Action |
 |----------|--------|
+| Ctrl+K Ctrl+M | Toggle Maximize Editor Group |
 | Ctrl+K Ctrl+F | Format Selection |
 | Ctrl+K F12 | Open Definition to Side |
 | Ctrl+K Z | Zen Mode |
 | Ctrl+K Ctrl+I | Show Hover |
 | Ctrl+K M | Change Language Mode |
+| Ctrl+K F | Close Folder |
+| Ctrl+K P | Copy Path of Active File |
+
+## 4. Sources
+
+| Source | Location |
+|--------|----------|
+| VS Code Default Keybindings Reference | https://code.visualstudio.com/docs/reference/default-keybindings |
+| VS Code Keyboard Shortcuts PDF (Windows) | https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf |
+| VS Code Keybindings Documentation | https://code.visualstudio.com/docs/configure/keybindings |
+| User Custom Keybindings | `C:\Users\romar\AppData\Roaming\Code\User\keybindings.json` |
+| Curated Stream Deck Shortcut Data | `data/shortcuts/vs-code.json` |
