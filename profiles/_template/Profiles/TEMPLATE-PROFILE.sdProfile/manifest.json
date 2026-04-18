@@ -8,7 +8,7 @@
   "Pages": {
     "Current": "00000000-0000-0000-0000-000000000000",
     "Default": "PAGE-1",
-    "Pages": ["PAGE-2", "PAGE-3"]
+    "Pages": ["PAGE-2", "PAGE-3", "PAGE-4", "PAGE-5", "PAGE-6"]
   },
   "Version": "3.0"
 }

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(file /c/Users/romar/projects/stream-deck-profile/_extracted/Profiles/8BE9D4FA-224E-4876-8827-26DBA435BBB6.sdProfile/Profiles/EBFEE41E-3C5E-450E-BA15-B4822FEC7631/Images/*.svg)",
+      "Bash(npm init -y)",
+      "Bash(npm install adm-zip)",
+      "Bash(node scripts/fix-typo.js)",
+      "Bash(node scripts/fill-grid.js)",
+      "Bash(node src/index.js list _extracted)",
+      "Bash(node src/index.js validate _extracted)",
+      "Bash(node src/index.js pack _extracted \"VS Code.streamDeckProfile\")",
+      "Bash(node -e \":*)"
+    ]
+  }
+}

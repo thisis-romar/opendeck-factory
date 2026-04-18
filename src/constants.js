@@ -67,6 +67,13 @@ export const PLUGIN_HOTKEY = {
   Version: "1.0",
 };
 
+// Multi-action plugin template
+export const PLUGIN_MULTIACTION = {
+  Name: "Multi Action",
+  UUID: "com.elgato.streamdeck.system.multiaction",
+  Version: "1.0",
+};
+
 // Device grid dimensions
 export const DEVICE_MODELS = {
   "20GBA9901": { name: "Stream Deck MK.2", cols: 5, rows: 3 },

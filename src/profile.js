@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, rename
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { buildHotkey } from './hotkey.js';
-import { PLUGIN_HOTKEY, DEVICE_MODELS } from './constants.js';
+import { PLUGIN_HOTKEY, PLUGIN_MULTIACTION, DEVICE_MODELS } from './constants.js';
 import { addImage } from './images.js';
 
 export class ProfileEditor {
@@ -170,6 +170,92 @@ export class ProfileEditor {
 
     this.setAction(pageUUID, col, row, actionDef);
     return actionDef;
+  }
+
+  /**
+   * Add a multi-action button that sends sequential hotkey presses (for chord shortcuts).
+   * @param {string} pageUUID
+   * @param {number} col
+   * @param {number} row
+   * @param {object} opts
+   * @param {string} opts.label - Button title
+   * @param {Array<{key: string, ctrl?: boolean, shift?: boolean, alt?: boolean, win?: boolean}>} opts.steps - Sequential hotkey presses
+   * @param {string} [opts.imagePath]
+   * @param {string} [opts.titleColor]
+   * @param {string} [opts.titleAlignment]
+   * @param {number} [opts.fontSize]
+   * @param {string} [opts.fontStyle]
+   */
+  addMultiActionButton(pageUUID, col, row, { label, steps, imagePath, titleColor, titleAlignment, fontSize, fontStyle }) {
+    let imageRef = '';
+    if (imagePath) {
+      imageRef = addImage(this.getPageDir(pageUUID), imagePath);
+    }
+
+    const state = { Image: imageRef, Title: label };
+    if (titleColor) state.TitleColor = titleColor;
+    if (titleAlignment) state.TitleAlignment = titleAlignment;
+    if (fontSize) state.FontSize = fontSize;
+    if (fontStyle) state.FontStyle = fontStyle;
+
+    // Build sub-actions: each step is a hotkey action
+    const subActions = steps.map(step => {
+      const hotkeys = buildHotkey(step);
+      return {
+        ActionID: randomUUID(),
+        LinkedTitle: false,
+        Name: "Hotkey",
+        Plugin: { ...PLUGIN_HOTKEY },
+        Resources: null,
+        Settings: {
+          Coalesce: true,
+          Hotkeys: hotkeys,
+        },
+        State: 0,
+        States: [{ Image: "", Title: "" }],
+        UUID: "com.elgato.streamdeck.system.hotkey",
+      };
+    });
+
+    const actionDef = {
+      ActionID: randomUUID(),
+      LinkedTitle: true,
+      Name: "Multi Action",
+      Plugin: { ...PLUGIN_MULTIACTION },
+      Resources: null,
+      Settings: {
+        Actions: subActions,
+      },
+      State: 0,
+      States: [state],
+      UUID: "com.elgato.streamdeck.system.multiaction",
+    };
+
+    this.setAction(pageUUID, col, row, actionDef);
+    return actionDef;
+  }
+
+  /**
+   * Add new pages to the profile.
+   * @param {number} count - Number of pages to add
+   * @returns {string[]} Array of new page UUIDs
+   */
+  addPages(count) {
+    const pagesDir = join(this.profileDir, 'Profiles');
+    const newUUIDs = [];
+    for (let i = 0; i < count; i++) {
+      const uuid = randomUUID().toUpperCase();
+      const pageDir = join(pagesDir, uuid);
+      mkdirSync(pageDir, { recursive: true });
+      const pageNum = this.profileManifest.Pages.Pages.length + 2; // +1 for Default, +1 for 1-indexed
+      writeFileSync(join(pageDir, 'manifest.json'), JSON.stringify({
+        Controllers: [{ Actions: {}, Type: "Keypad" }],
+        Name: `Page ${pageNum}`,
+      }));
+      this.profileManifest.Pages.Pages.push(uuid);
+      newUUIDs.push(uuid);
+    }
+    return newUUIDs;
   }
 
   updateTitle(pageUUID, col, row, newTitle) {

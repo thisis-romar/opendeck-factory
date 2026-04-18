@@ -72,7 +72,7 @@ console.log(`Pages available: ${pages.length}`);
 console.log(`Shortcuts to place: ${shortcuts.length}`);
 
 // Category → row mapping for MK.2 (5x3)
-const CATEGORY_ROW_ORDER = ['general', 'navigation', 'view', 'editing', 'debug', 'terminal'];
+const CATEGORY_ROW_ORDER = ['general', 'navigation', 'view', 'editing', 'debug', 'terminal', 'search', 'file', 'editor', 'chord'];
 
 // Load icons if available
 const iconsDir = resolve(`data/icons/${appName}`);
@@ -132,22 +132,38 @@ for (const shortcut of sorted) {
   try {
     const iconPath = getIconPath(shortcut._originalIndex);
     const style = shortcut.style || shortcutData.metadata?.categoryStyles?.[shortcut.category] || {};
-    editor.addHotkeyButton(currentPage, pos.col, pos.row, {
-      label: shortcut.label,
-      key: shortcut.key,
-      ctrl: shortcut.modifiers?.ctrl || false,
-      shift: shortcut.modifiers?.shift || false,
-      alt: shortcut.modifiers?.alt || false,
-      win: shortcut.modifiers?.win || false,
-      imagePath: iconPath,
-      titleColor: style.titleColor,
-      titleAlignment: style.titleAlignment,
-      fontSize: style.fontSize,
-      fontStyle: style.fontStyle,
-    });
+
+    if (shortcut.type === 'chord' && shortcut.chordKeys) {
+      // Multi-action for chord shortcuts
+      editor.addMultiActionButton(currentPage, pos.col, pos.row, {
+        label: shortcut.label,
+        steps: shortcut.chordKeys,
+        imagePath: iconPath,
+        titleColor: style.titleColor,
+        titleAlignment: style.titleAlignment,
+        fontSize: style.fontSize,
+        fontStyle: style.fontStyle,
+      });
+    } else {
+      // Standard hotkey
+      editor.addHotkeyButton(currentPage, pos.col, pos.row, {
+        label: shortcut.label,
+        key: shortcut.key,
+        ctrl: shortcut.modifiers?.ctrl || false,
+        shift: shortcut.modifiers?.shift || false,
+        alt: shortcut.modifiers?.alt || false,
+        win: shortcut.modifiers?.win || false,
+        imagePath: iconPath,
+        titleColor: style.titleColor,
+        titleAlignment: style.titleAlignment,
+        fontSize: style.fontSize,
+        fontStyle: style.fontStyle,
+      });
+    }
     placed++;
     const pageName = editor.getPageManifest(currentPage).Name;
-    console.log(`  [${pageName}] ${pos.col},${pos.row}: ${shortcut.label.replace(/\n/g, ' ').trim()} (${shortcut.key})`);
+    const keyDesc = shortcut.type === 'chord' ? shortcut.chordKeys.map(k => k.key).join('→') : shortcut.key;
+    console.log(`  [${pageName}] ${pos.col},${pos.row}: ${shortcut.label.replace(/\n/g, ' ').trim()} (${keyDesc})`);
   } catch (err) {
     console.log(`  SKIP: ${shortcut.label.replace(/\n/g, ' ').trim()} — ${err.message}`);
     skipped++;
