@@ -1,21 +1,25 @@
 {
-  "name": "stream-deck-profile",
-  "version": "1.0.0",
+  "name": "opendeck-factory",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Stream Deck profile editor tooling",
+  "description": "Open-source Stream Deck profile editor engine",
   "main": "src/index.js",
+  "license": "Apache-2.0",
+  "author": "Romar Johnson <thisis.romar+github@gmail.com> (https://github.com/thisis-romar)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thisis-romar/opendeck-factory.git"
+  },
+  "homepage": "https://github.com/thisis-romar/opendeck-factory#readme",
+  "bugs": {
+    "url": "https://github.com/thisis-romar/opendeck-factory/issues"
+  },
   "scripts": {
     "extract": "node src/index.js extract",
     "pack": "node src/index.js pack",
     "validate": "node src/index.js validate",
-    "list": "node src/index.js list",
-    "fix-typo": "node scripts/fix-typo.js",
-    "fill-grid": "node scripts/fill-grid.js",
-    "build:vs-code": "node src/index.js validate profiles/vs-code && node src/index.js pack profiles/vs-code \"builds/VS Code.streamDeckProfile\""
+    "list": "node src/index.js list"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.5.17"
   }

@@ -1,6 +1,6 @@
-# stream-deck-profile
+# OpenDeck Factory
 
-Programmatically create, edit, and repack Elgato Stream Deck `.streamDeckProfile` files. Define your shortcuts in JSON, generate icons, and produce ready-to-import profiles — no manual button-by-button setup required.
+Open-source engine for programmatically creating, editing, and repacking Elgato Stream Deck `.streamDeckProfile` files. Define your shortcuts in JSON, generate icons, and produce ready-to-import profiles — no manual button-by-button setup required.
 
 ## Features
 
@@ -108,7 +108,7 @@ Create `data/shortcuts/<app-name>.json`:
 ## Project Structure
 
 ```
-stream-deck-profile/
+opendeck-factory/
 ├── src/                    Core modules
 │   ├── index.js            CLI entry point
 │   ├── profile.js          ProfileEditor class
@@ -124,14 +124,8 @@ stream-deck-profile/
 │   ├── fill-grid.js                 Fill empty slots with placeholders
 │   └── fix-typo.js                  Fix label typos in profiles
 ├── profiles/               Extracted profile directories
-│   ├── _template/          Blank template (cloned for new profiles)
-│   ├── vs-code/            Basic VS Code profile
-│   └── vs-code-colored/    81 shortcuts across 6 pages with colored icons
-├── data/
-│   ├── shortcuts/          Shortcut definitions per app (JSON)
-│   └── icons/              Generated 144×144 button icons
-├── builds/                 Output .streamDeckProfile files
-├── originals/              Pristine backup profiles (never overwrite)
+│   └── _template/          Blank template (cloned for new profiles)
+├── data/                   Shortcut data and icon assets (see catalog repo)
 ├── docs/
 │   └── obsidian-vault/     Technical docs (file format, key codes, API, patterns)
 └── package.json            Node.js ESM, single dependency: adm-zip
@@ -223,21 +217,6 @@ editor.save();
 
 Full mappings in [`src/constants.js`](src/constants.js).
 
-## Included Profile: VS Code
-
-The repo ships with a ready-to-use VS Code profile containing 81 keyboard shortcuts across 6 pages:
-
-- **General** — Command Palette, Quick Open, Settings, Extensions
-- **Navigation** — Go to Line, Go to Symbol, Breadcrumbs, Problems
-- **View** — Toggle Sidebar, Terminal, Explorer, Zen Mode
-- **Editing** — Undo, Cut, Copy, Find, Replace, Format, Rename Symbol
-- **Debug** — Start, Step Over/Into/Out, Breakpoints
-- **Terminal** — New Terminal, Split, Focus, Clear
-- **Search & File** — Find in Files, Save, New File, Close
-- **Chord Shortcuts** — Maximize Group, Close All in Group, Open Preview, and more
-
-Import the pre-built profile: [`builds/VS Code Colored.streamDeckProfile`](builds/)
-
 ## Documentation
 
 Detailed technical documentation lives in [`docs/obsidian-vault/`](docs/obsidian-vault/) as an Obsidian vault:
@@ -250,12 +229,25 @@ Detailed technical documentation lives in [`docs/obsidian-vault/`](docs/obsidian
 
 ## Safety Rules
 
-- **Never overwrite** files in `originals/` — these are pristine backups
 - **Always validate** before packing: `node src/index.js validate <dir>`
 - Profile version must be `"3.0"` for Stream Deck app 7.1+
 - Positions are `"col,row"` format (column-first, 0-indexed)
 - Images should be 144×144 pixels (retina @2x for 72×72 display buttons)
 
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). All commits must be signed off under
+the [DCO 1.1](https://developercertificate.org/).
+
 ## License
 
-ISC
+The engine is released under the Apache License, Version 2.0. See
+[LICENSE](./LICENSE) and [NOTICE](./NOTICE) for terms and attributions.
+
+The commercial asset catalog (profiles, icon packs, templates) is maintained
+in a separate private repository under a proprietary commercial license. This
+repository contains only the open-source engine.
+
+"Stream Deck" and "Elgato" are trademarks of Corsair Memory, Inc. and are used
+nominatively to describe compatibility. This project is not affiliated with,
+endorsed by, or sponsored by Corsair Memory, Inc. or Elgato.

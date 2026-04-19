@@ -1,6 +1,6 @@
-# stream-deck-profile
+# OpenDeck Factory
 
-Programmatically extract, modify, and repack Elgato Stream Deck `.streamDeckProfile` files.
+Open-source engine for programmatically extracting, modifying, and repacking Elgato Stream Deck `.streamDeckProfile` files.
 
 ## Architecture
 
@@ -12,10 +12,6 @@ Node.js ESM project using `adm-zip` for ZIP handling.
 | `scripts/` | Main generation scripts + one-off utilities (see `scripts/README.md`) |
 | `profiles/` | Extracted profile directories (editable JSON + images) |
 | `profiles/_template/` | Template profile cloned by `initFromTemplate()` for new apps |
-| `data/shortcuts/` | Structured shortcut data per application (JSON) |
-| `data/icons/` | Generated 144×144 button icon PNGs |
-| `builds/` | Output `.streamDeckProfile` files (versioned in git) |
-| `originals/` | Pristine backup profiles — **never overwrite** |
 | `docs/obsidian-vault/` | Technical documentation (file format, API, patterns) |
 | `.claude/skills/` | Claude Code skill definitions (e.g. `generate-profile`) |
 
@@ -30,8 +26,8 @@ node src/index.js list <dir>                    # Show grid layout
 
 ## Key Constraints
 
-- **Single-keypress hotkeys only** — no chord shortcuts (Ctrl+K Ctrl+C)
 - All keys must exist in `src/constants.js` KEY_CODES
+- Multi-action buttons supported for chord shortcuts (Ctrl+K Ctrl+C)
 - Positions are `"col,row"` (column-first, 0-indexed)
 - Labels must end with `\n` — use `\n` for line breaks (max 3 lines)
 - Images are 144x144 pixels (retina @2x for 72x72 buttons)
@@ -39,9 +35,13 @@ node src/index.js list <dir>                    # Show grid layout
 
 ## Safety
 
-- Never overwrite files in `originals/`
 - Always run `validate` before `pack`
 - Profile version must be `"3.0"` for Stream Deck app 7.1+
+- Commercial assets (profiles, icons, shortcuts, builds) belong in the private catalog repo, not here
+
+## License
+
+Apache License, Version 2.0. See LICENSE and NOTICE.
 
 ## Skills
 

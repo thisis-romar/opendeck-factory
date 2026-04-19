@@ -1,0 +1,23 @@
+name: Path denylist
+on: [push, pull_request]
+
+jobs:
+  check-paths:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check denied paths
+        run: |
+          DENY='^(builds/|data/icons/generated/|.*\.streamDeckProfile$|profiles/[^/]+/private/|profiles/[^/]+-colored/|profiles/[^/]+-commercial/|originals/|data/shortcuts/.*\.paid\.json$)'
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}..HEAD)
+          else
+            CHANGED=$(git diff --name-only HEAD~1..HEAD 2>/dev/null || git ls-files)
+          fi
+          if echo "$CHANGED" | grep -qE "$DENY"; then
+            echo "::error::Commercial paths detected"
+            echo "$CHANGED" | grep -E "$DENY"
+            exit 1
+          fi

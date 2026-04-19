@@ -1,0 +1,23 @@
+OpenDeck Factory
+Copyright 2026 Romar Johnson
+
+This product includes software developed by Romar Johnson
+(https://github.com/thisis-romar/opendeck-factory).
+
+Licensed under the Apache License, Version 2.0. See LICENSE for terms.
+
+==============================================================================
+Third-party dependencies
+==============================================================================
+
+This software includes adm-zip (https://github.com/cthackers/adm-zip),
+Copyright (c) 2012 Nasca Iacob <sy@another-d-mention.ro>
+Licensed under the MIT License.
+
+==============================================================================
+Trademarks
+==============================================================================
+
+"Stream Deck" and "Elgato" are trademarks of Corsair Memory, Inc. and are used
+nominatively to describe compatibility. This project is not affiliated with,
+endorsed by, or sponsored by Corsair Memory, Inc. or Elgato.

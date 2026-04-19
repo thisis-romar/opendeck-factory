@@ -1,3 +1,19 @@
 node_modules/
 _extracted/
 *.log
+
+# Commercial catalog assets must never land here
+builds/
+*.streamDeckProfile
+data/icons/generated/
+data/shortcuts/*.paid.json
+profiles/*/private/
+profiles/vs-code-colored/
+profiles/*-colored/
+profiles/*-commercial/
+originals/
+
+# Local
+.env
+.env.local
+.DS_Store

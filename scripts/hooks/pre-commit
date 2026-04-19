@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+DENY='^(builds/|data/icons/generated/|.*\.streamDeckProfile$|profiles/[^/]+/private/|profiles/[^/]+-colored/|profiles/[^/]+-commercial/|originals/|data/shortcuts/.*\.paid\.json$)'
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+
+if echo "$STAGED" | grep -qE "$DENY"; then
+  echo "ERROR: Commercial catalog paths cannot be committed to the public engine repo."
+  echo ""
+  echo "Offending files:"
+  echo "$STAGED" | grep -E "$DENY" | sed 's/^/  - /'
+  echo ""
+  echo "Commit these to thisis-romar/stream-deck-catalog instead."
+  exit 1
+fi
