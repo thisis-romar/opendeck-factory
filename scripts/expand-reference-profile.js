@@ -208,7 +208,7 @@ addNavCorners(page2, imgDir2);
 // Row 0: Create Folder | Switch Profile | Prev Page | Next Page | Go to Page
 // Row 1: Page Indicator | Parent Folder
 // Row 2: (empty — no nav corners; this page IS about navigation, no redundant corners)
-const { actions: page3 } = buildPage(3, [
+const { actions: page3, imagesDir: imgDir3 } = buildPage(3, [
   [0, 0, 'createFolder',  'com.elgato.streamdeck.profile.openchild',    'com.elgato.streamdeck.profile.openchild',    'Create Folder',   {}, 'Create\nFolder'],
   [1, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate',       'com.elgato.streamdeck.profile.rotate',       'Switch Profile',  {}, 'Switch\nProfile'],
   [2, 0, 'prevPage',      'com.elgato.streamdeck.page.previous',        'com.elgato.streamdeck.page',                 'Pages',           {}, 'Prev\nPage'],
@@ -217,6 +217,7 @@ const { actions: page3 } = buildPage(3, [
   [0, 1, 'pageIndicator', 'com.elgato.streamdeck.page.indicator',       'com.elgato.streamdeck.page',                 'Pages',           {}, 'Page\nIndicator'],
   [1, 1, 'parentFolder',  'com.elgato.streamdeck.profile.backtoparent', 'com.elgato.streamdeck.profile.backtoparent', 'Parent Folder',   {}, 'Parent\nFolder'],
 ]);
+addNavCorners(page3, imgDir3);
 
 // ── Page 4 — Soundboard + Multi Action + Keys (vivid violet) ─────────────────
 // Row 0: Play Audio | Stop Audio | Multi Action | Multi Action Switch | Random Action
