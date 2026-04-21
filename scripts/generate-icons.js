@@ -20,37 +20,41 @@ const CATEGORY_COLORS = {
   editing:    { bg: '#F97316', text: '#FFFFFF' },  // orange
   debug:      { bg: '#EF4444', text: '#FFFFFF' },  // red
   terminal:   { bg: '#14B8A6', text: '#FFFFFF' },  // teal
+  search:     { bg: '#EAB308', text: '#1F2937' },  // amber (dark text for contrast)
+  file:       { bg: '#6366F1', text: '#FFFFFF' },  // indigo
+  editor:     { bg: '#0EA5E9', text: '#FFFFFF' },  // sky
+  chord:      { bg: '#EC4899', text: '#FFFFFF' },  // pink
 };
 
-function buildShortcutText(shortcut) {
+const KEY_DISPLAY_OVERRIDES = {
+  BACKTICK: '`',  MINUS: '-',  EQUALS: '=',
+  LBRACKET: '[', RBRACKET: ']', BACKSLASH: '\\',
+  SEMICOLON: ';', QUOTE: "'", COMMA: ',', PERIOD: '.', SLASH: '/',
+  SPACE: 'Space', ENTER: 'Enter', ESCAPE: 'Esc', TAB: 'Tab',
+  BACKSPACE: 'Bksp', DELETE: 'Del',
+};
+
+function formatKeyStep({ key, ctrl, shift, alt, win }) {
   const parts = [];
-  if (shortcut.modifiers.ctrl) parts.push('Ctrl');
-  if (shortcut.modifiers.shift) parts.push('Shift');
-  if (shortcut.modifiers.alt) parts.push('Alt');
-  if (shortcut.modifiers.win) parts.push('Win');
-
-  // Format key name for display
-  let keyDisplay = shortcut.key;
-  if (keyDisplay === 'BACKTICK') keyDisplay = '`';
-  else if (keyDisplay === 'MINUS') keyDisplay = '-';
-  else if (keyDisplay === 'EQUALS') keyDisplay = '=';
-  else if (keyDisplay === 'LBRACKET') keyDisplay = '[';
-  else if (keyDisplay === 'RBRACKET') keyDisplay = ']';
-  else if (keyDisplay === 'BACKSLASH') keyDisplay = '\\';
-  else if (keyDisplay === 'SEMICOLON') keyDisplay = ';';
-  else if (keyDisplay === 'QUOTE') keyDisplay = "'";
-  else if (keyDisplay === 'COMMA') keyDisplay = ',';
-  else if (keyDisplay === 'PERIOD') keyDisplay = '.';
-  else if (keyDisplay === 'SLASH') keyDisplay = '/';
-  else if (keyDisplay === 'SPACE') keyDisplay = 'Space';
-  else if (keyDisplay === 'ENTER') keyDisplay = 'Enter';
-  else if (keyDisplay === 'ESCAPE') keyDisplay = 'Esc';
-  else if (keyDisplay === 'TAB') keyDisplay = 'Tab';
-  else if (keyDisplay === 'BACKSPACE') keyDisplay = 'Bksp';
-  else if (keyDisplay === 'DELETE') keyDisplay = 'Del';
-
-  parts.push(keyDisplay);
+  if (ctrl) parts.push('Ctrl');
+  if (shift) parts.push('Shift');
+  if (alt) parts.push('Alt');
+  if (win) parts.push('Win');
+  parts.push(KEY_DISPLAY_OVERRIDES[key] ?? key);
   return parts.join('+');
+}
+
+function buildShortcutText(shortcut) {
+  if (shortcut.type === 'chord' && Array.isArray(shortcut.chordKeys)) {
+    return shortcut.chordKeys.map(formatKeyStep).join(' → ');
+  }
+  return formatKeyStep({
+    key: shortcut.key,
+    ctrl: shortcut.modifiers?.ctrl,
+    shift: shortcut.modifiers?.shift,
+    alt: shortcut.modifiers?.alt,
+    win: shortcut.modifiers?.win,
+  });
 }
 
 function escapeXml(str) {
