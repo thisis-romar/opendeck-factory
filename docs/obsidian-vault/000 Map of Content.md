@@ -7,17 +7,21 @@ tags: [moc, stream-deck, index]
 # Stream Deck Profile Operations
 
 Programmatic tooling for creating and modifying `.streamDeckProfile` files.
-**Project:** `C:\Users\romar\projects\stream-deck-profile` (Node.js ESM, `adm-zip` dependency)
+**Project:** `C:\Users\romar\projects\opendeck\opendeck-factory` (Node.js ESM, `adm-zip` dependency)
 
 ---
 
 ## Hardware
-- [[Stream Deck MK.2]] — Device specs, grid layout, image dimensions
+- [[Stream Deck MK.2]] — Device specs, grid layout, image dimensions (5×3, model `20GBA9901`)
+- Stream Deck XL — 8×4 grid, model `20GBA9911`
+- Stream Deck Mini — 3×2 grid, model `20GBA9903`
+- Stream Deck + — 4×2 grid, model `10GBD9901`
 
 ## File Format
 - [[streamDeckProfile ZIP Structure]] — ZIP archive layout and contents
 - [[Manifest JSON Schema]] — Profile and page manifest structure
 - [[Action Definition]] — Hotkey action JSON schema
+- [[Action Types]] — All known built-in action UUIDs, settings schemas, plugin IDs
 - [[Image Naming Convention]] — Base32 naming for button icons
 
 ## Key Codes & Modifiers
