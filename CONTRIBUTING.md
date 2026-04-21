@@ -1,7 +1,11 @@
 # Contributing to OpenDeck Factory
 
-Contributions accepted under the Apache License, Version 2.0 via the Developer
-Certificate of Origin (DCO).
+Contributions accepted under the Functional Source License, Version 1.1
+(FSL-1.1-ALv2) via the Developer Certificate of Origin (DCO).
+
+By contributing you agree that your contribution is licensed under FSL-1.1-ALv2
+and will auto-convert to Apache License, Version 2.0 two years after the
+version containing your contribution is first made available.
 
 ## Developer Certificate of Origin
 

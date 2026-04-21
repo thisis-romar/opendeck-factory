@@ -241,8 +241,11 @@ the [DCO 1.1](https://developercertificate.org/).
 
 ## License
 
-The engine is released under the Apache License, Version 2.0. See
-[LICENSE](./LICENSE) and [NOTICE](./NOTICE) for terms and attributions.
+The engine is released under the **Functional Source License, Version 1.1
+(FSL-1.1-ALv2)** — source-available with a non-compete restriction that
+auto-expires two years after each release, at which point the code becomes
+available under the Apache License, Version 2.0. See [LICENSE](./LICENSE) and
+[NOTICE](./NOTICE) for full terms.
 
 The commercial asset catalog (profiles, icon packs, templates) is maintained
 in a separate private repository under a proprietary commercial license. This

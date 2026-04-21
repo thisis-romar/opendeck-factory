@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Open-source Stream Deck profile editor engine",
   "main": "src/index.js",
-  "license": "Apache-2.0",
+  "license": "FSL-1.1-ALv2",
   "author": "Romar Johnson <thisis.romar+github@gmail.com> (https://github.com/thisis-romar)",
   "repository": {
     "type": "git",
