@@ -220,7 +220,7 @@ export class ProfileEditor {
     const actionDef = {
       ActionID: randomUUID(),
       LinkedTitle: true,
-      Name: "Multi Action",
+      Name: label,
       Plugin: { ...PLUGIN_MULTIACTION },
       Resources: null,
       Settings: {
@@ -228,7 +228,7 @@ export class ProfileEditor {
       },
       State: 0,
       States: [state],
-      UUID: "com.elgato.streamdeck.system.multiaction",
+      UUID: "com.elgato.streamdeck.multiactions.routine",
     };
 
     this.setAction(pageUUID, col, row, actionDef);

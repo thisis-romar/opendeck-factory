@@ -68,9 +68,12 @@ export const PLUGIN_HOTKEY = {
 };
 
 // Multi-action plugin template
+// Uses the dedicated Multi Actions plugin (not the legacy system.multiaction UUID).
+// The legacy UUID works for key-chord firing but the app ignores States[0].Image for it,
+// so custom icons never render. The multiactions plugin UUID renders correctly.
 export const PLUGIN_MULTIACTION = {
   Name: "Multi Action",
-  UUID: "com.elgato.streamdeck.system.multiaction",
+  UUID: "com.elgato.streamdeck.multiactions",
   Version: "1.0",
 };
 

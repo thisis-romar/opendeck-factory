@@ -34,13 +34,18 @@ Never run DESTRUCTIVE operations against the live `%APPDATA%\Elgato\StreamDeck\P
 
 ### Step 1: Verify Current State
 
-Read the existing profile's page manifests to see which action types are present:
+Read the page manifests directly to see which action types are present:
 
 ```bash
-node src/index.js list profiles/reference-all-actions
+# Note: list/validate commands do NOT work on profiles/reference-all-actions/
+# because that directory uses the live-app format (manifest.json + Profiles/<page-uuid>/)
+# not the ProfileEditor format (package.json + Profiles/<uuid>.sdProfile/...).
+# Read page manifests directly instead:
+ls profiles/reference-all-actions/Profiles/  # list page UUIDs
+cat profiles/reference-all-actions/Profiles/<page-uuid>/manifest.json
 ```
 
-Compare against the known action type inventory (see Reference section below).
+Compare the Actions keys against the known action type inventory (see Reference section below).
 
 ### Step 2: Regenerate via Script
 
@@ -59,11 +64,9 @@ This script:
 
 ### Step 3: Validate
 
-```bash
-node src/index.js validate profiles/reference-all-actions
-```
-
-Confirm 0 errors before proceeding.
+The `validate` command does not work on this profile (format mismatch — see Step 1 note). Validation is:
+1. The script ran without errors
+2. Visual inspection in the Stream Deck app — navigate all 4 pages and confirm buttons render correctly
 
 ### Step 4: Pack and Copy to Catalog
 
@@ -84,37 +87,66 @@ To add an action type not yet in the reference profile:
 
 ## Reference: Known Action Types
 
-### Page 1 — Navigation
+### Page 1 — System (electric blue)
 | Col | Row | Action ID | Label |
 |-----|-----|-----------|-------|
-| 0 | 0 | `com.elgato.streamdeck.profile.openchild` | Open Folder |
-| 1 | 0 | `com.elgato.streamdeck.profile.backtoparent` | Back to Parent |
-| 0 | 1 | `com.elgato.streamdeck.profile.rotate` | Switch Profile |
-| 1 | 1 | `com.elgato.streamdeck.profiles.previouspage` | Prev Page |
-| 2 | 1 | `com.elgato.streamdeck.profiles.nextpage` | Next Page |
-| 0 | 2 | `com.elgato.streamdeck.profiles.page` | Go to Page |
+| 0 | 0 | `com.elgato.streamdeck.system.website` | Website |
+| 1 | 0 | `com.elgato.streamdeck.system.hotkeyswitch` | Hotkey Switch |
+| 2 | 0 | `com.elgato.streamdeck.system.hotkey` | Hotkey Ctrl+A |
+| 3 | 0 | `com.elgato.streamdeck.system.open` | Open |
+| 4 | 0 | `com.elgato.streamdeck.system.openapp` | Open App |
+| 0 | 1 | `com.elgato.streamdeck.system.close` | Close |
+| 1 | 1 | `com.elgato.streamdeck.system.text` | Text |
+| 2 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:0) | Prev Track |
+| 3 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:1) | Play/Pause |
+| 4 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:2) | Next Track |
+| 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
+| 1 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:3) | Stop |
+| 2 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:4) | Mute |
+| 3 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:5) | Vol+ |
+| 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 
-### Page 2 — System
+### Page 2 — Stream Deck (vivid orange)
 | Col | Row | Action ID | Label |
 |-----|-----|-----------|-------|
-| 0 | 0 | `com.elgato.streamdeck.system.open` | Open/Run |
-| 1 | 0 | `com.elgato.streamdeck.system.webpage` | Open URL |
-| 0 | 1 | `com.elgato.streamdeck.system.text` | Text |
-| 1 | 1 | `com.elgato.streamdeck.hotkey` | Hotkey |
-| 0 | 2 | `com.elgato.streamdeck.system.mediaplayback` | Media Play/Pause |
-| 1 | 2 | `com.elgato.streamdeck.system.audioinputmute` | Mute Mic |
+| 0 | 0 | `com.elgato.streamdeck.system.timer` | Timer |
+| 1–4 | 0 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:0–3) | Brighter/Darker/Max/High |
+| 0–2 | 1 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:4–6) | Medium/Low/Minimum |
+| 3 | 1 | `com.elgato.streamdeck.system.sleep` | Sleep |
+| 4 | 1 | `com.elgato.streamdeck.vsdtoggle` | Toggle VSD |
+| 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
+| 1 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:6) | Vol- |
+| 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 
-### Page 3 — Profile/Display
+### Page 3 — Navigation (vivid emerald)
 | Col | Row | Action ID | Label |
 |-----|-----|-----------|-------|
-| 0 | 0 | `com.elgato.streamdeck.profile.openchild` | Open Folder |
-| 1 | 1 | `com.elgato.streamdeck.profile.backtoparent` | Back |
+| 0 | 0 | `com.elgato.streamdeck.profile.openchild` | Create Folder |
+| 1 | 0 | `com.elgato.streamdeck.profile.rotate` | Switch Profile |
+| 2 | 0 | `com.elgato.streamdeck.page.previous` | Prev Page |
+| 3 | 0 | `com.elgato.streamdeck.page.next` | Next Page |
+| 4 | 0 | `com.elgato.streamdeck.page.goto` | Go to Page |
+| 0 | 1 | `com.elgato.streamdeck.page.indicator` | Page Indicator |
+| 1 | 1 | `com.elgato.streamdeck.profile.backtoparent` | Parent Folder |
+| 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
+| 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 
-### Page 4 — Multi-Action
+### Page 4 — Soundboard + Multi Act + Keys (vivid violet)
 | Col | Row | Action ID | Label |
 |-----|-----|-----------|-------|
-| 0 | 0 | `com.elgato.streamdeck.multiactions` | Multi-Action |
+| 0 | 0 | `com.elgato.streamdeck.soundboard.playaudio` | Play Audio |
+| 1 | 0 | `com.elgato.streamdeck.soundboard.stopaudioplay` | Stop Audio |
+| 2 | 0 | `com.elgato.streamdeck.multiactions.routine` | Multi Action |
+| 3 | 0 | `com.elgato.streamdeck.multiactions.routine2` | Multi Switch |
+| 4 | 0 | `com.elgato.streamdeck.multiactions.random` | Random Action |
+| 0 | 1 | `com.elgato.streamdeck.keys.logic` | Key Logic |
 | 1 | 1 | `com.elgato.streamdeck.multiactions.delay` | Delay |
+| 2 | 1 | `com.elgato.streamdeck.system.digitaltime` | Digital Time |
+| 3 | 1 | `com.elgato.streamdeck.keys.adaptor` | Key Adaptor |
+| 4 | 1 | `com.elgato.streamdeck.keys.stack` | Key Stack |
+| 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
+| 1 | 2 | `com.elgato.streamdeck.system.pagination` | Pagination |
+| 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 
 ## Action Types Requiring GUI Capture
 

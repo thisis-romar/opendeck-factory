@@ -87,7 +87,8 @@ Supported: A-Z, 0-9, F1-F12, UP, DOWN, LEFT, RIGHT, ENTER, ESCAPE, SPACE, TAB,
 
 **Flag and skip:**
 - Keys not in KEY_CODES (e.g., Insert, PrintScreen, NumPad keys)
-- Chord shortcuts (multi-step like Ctrl+K Ctrl+C) — **not supported**
+
+**Chord shortcuts** (multi-step like Ctrl+K then Ctrl+C) — use `editor.addMultiActionButton()` instead of `addHotkeyButton()`. Pass `steps` array with each keypress.
 
 Report flagged shortcuts to the user.
 

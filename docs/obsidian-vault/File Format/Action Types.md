@@ -246,7 +246,67 @@ Settings:
 
 ---
 
-## Action UUID Quick Reference
+## Keys Actions
+
+Plugin namespace: `com.elgato.streamdeck.keys`
+
+All Keys actions share the same **Plugin UUID** (`com.elgato.streamdeck.keys`) but have distinct action UUIDs.
+
+### Key Logic
+
+Conditional logic gate — executes different actions based on a condition.
+
+| Field | Value |
+|-------|-------|
+| UUID | `com.elgato.streamdeck.keys.logic` |
+| Plugin UUID | `com.elgato.streamdeck.keys` |
+| Plugin Name | `Keys` |
+
+### Key Adaptor (Action Trigger)
+
+Triggers an action based on an external event or input.
+
+| Field | Value |
+|-------|-------|
+| UUID | `com.elgato.streamdeck.keys.adaptor` |
+| Plugin UUID | `com.elgato.streamdeck.keys` |
+
+### Key Stack (Action Wheel)
+
+Cycles through a stack of actions on successive presses.
+
+| Field | Value |
+|-------|-------|
+| UUID | `com.elgato.streamdeck.keys.stack` |
+| Plugin UUID | `com.elgato.streamdeck.keys` |
+
+---
+
+## Other System Actions
+
+### Digital Time
+
+Displays a live digital clock on the button.
+
+| Field | Value |
+|-------|-------|
+| UUID | `com.elgato.streamdeck.system.digitaltime` |
+| Plugin UUID | `com.elgato.streamdeck.system.digitaltime` |
+
+### Pagination
+
+Page indicator / pagination control.
+
+| Field | Value |
+|-------|-------|
+| UUID | `com.elgato.streamdeck.system.pagination` |
+| Plugin UUID | `com.elgato.streamdeck.system.pagination` |
+
+> Note: distinct from `com.elgato.streamdeck.page.indicator` (the Navigation plugin's page dots indicator).
+
+---
+
+## Action UUID Quick Reference (updated)
 
 | UUID | Description |
 |------|-------------|
@@ -258,6 +318,8 @@ Settings:
 | `com.elgato.streamdeck.system.text` | Type text |
 | `com.elgato.streamdeck.system.mediaplayback` | Media play/pause |
 | `com.elgato.streamdeck.system.audioinputmute` | Mute microphone |
+| `com.elgato.streamdeck.system.digitaltime` | Digital clock display |
+| `com.elgato.streamdeck.system.pagination` | Pagination control |
 | `com.elgato.streamdeck.profiles.nextpage` | Next page |
 | `com.elgato.streamdeck.profiles.previouspage` | Previous page |
 | `com.elgato.streamdeck.profiles.page` | Go to specific page |
@@ -267,9 +329,12 @@ Settings:
 | `com.elgato.streamdeck.multiactions.routine` | Multi-action sequence |
 | `com.elgato.streamdeck.multiactions.random` | Random action |
 | `com.elgato.streamdeck.multiactions.delay` | Delay step |
-| `com.elgato.streamdeck.system.multiaction` | Multi-action (legacy/core engine form) |
+| `com.elgato.streamdeck.system.multiaction` | Multi-action (legacy — app ignores custom icon) |
+| `com.elgato.streamdeck.keys.logic` | Key Logic |
+| `com.elgato.streamdeck.keys.adaptor` | Key Adaptor (Action Trigger) |
+| `com.elgato.streamdeck.keys.stack` | Key Stack (Action Wheel) |
 
-See also: [[Action Definition]], [[Hotkey Buttons]]
+---
 
 ## Sources
 
