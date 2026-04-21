@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "windows-mcp": {
+      "command": "cmd",
+      "args": ["/c", "uvx", "windows-mcp"]
+    }
+  }
+}

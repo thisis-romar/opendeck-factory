@@ -128,6 +128,11 @@ opendeck-factory/
 ├── data/                   Shortcut data and icon assets (see catalog repo)
 ├── docs/
 │   └── obsidian-vault/     Technical docs (file format, key codes, API, patterns)
+├── .claude/
+│   ├── skills/             Claude Code skill definitions (workflow playbooks)
+│   ├── agents/             Subagent definitions (e.g., streamdeck-driver)
+│   └── settings.json       Project-level Claude Code settings
+├── .mcp.json               Project-scoped MCP server config (Windows-MCP)
 └── package.json            Node.js ESM, single dependency: adm-zip
 ```
 
@@ -227,12 +232,63 @@ Detailed technical documentation lives in [`docs/obsidian-vault/`](docs/obsidian
 - **Patterns** — Extract-Modify-Pack, Batch Add, Find and Fix
 - **Hardware** — Stream Deck MK.2 specifications
 
+## Computer-Use Integration (optional)
+
+This branch adds an opt-in integration with the [Windows-MCP](https://github.com/CursorTouch/Windows-MCP) server, enabling Claude Code sessions to drive the Elgato Stream Deck Windows app GUI directly. This is useful when capturing reference profiles for action types whose JSON schema is not yet known to the engine (e.g., Pinned Action, Wallpaper, Multi Action with custom title+icon — all of which require right-click gestures or visual feedback the engine can't reproduce from disk alone).
+
+**JSON-injection-first principle.** GUI driving is the slow, fragile path — every click costs a model decision. The engine should always be the primary authoring surface. Use computer-use only for the irreducibly-GUI parts.
+
+### Prerequisites
+
+- Windows 10 or 11
+- Elgato Stream Deck app 6.6+ installed
+- [`uv`](https://docs.astral.sh/uv/) installed (`winget install astral-sh.uv`) — provides the `uvx` runner
+- Claude Code CLI authenticated
+
+### Setup
+
+The repo ships a project-scoped `.mcp.json` that registers Windows-MCP. On first session start in this directory, Claude Code prompts to approve the new MCP server. Confirm.
+
+```bash
+# From this directory:
+claude
+# Then approve `windows-mcp` when prompted, and verify:
+/mcp
+# Should show: windows-mcp ✓ connected
+```
+
+### Conflict with Claude Desktop
+
+If Claude Desktop on the same machine has Windows-MCP installed as a **DXT extension** (most common install path), **disable it** before driving the GUI from Claude Code. Two clients sharing one OS input queue will race on cursor state with no coordination primitive available.
+
+```powershell
+# Disable Windows-MCP DXT in Claude Desktop:
+$p = "$env:APPDATA\Claude\Claude Extensions Settings\ant.dir.cursortouch.windows-mcp.json"
+'{"isEnabled": false}' | Set-Content -Path $p -Encoding utf8
+# Re-enable later by setting it back to true.
+```
+
+### Subagent
+
+A purpose-built subagent at `.claude/agents/streamdeck-driver.md` provides a narrow tool surface (Windows-MCP tools + read-only filesystem). Invoke from a parent session for GUI tasks. The subagent has no Bash/Edit/Write — it cannot commit, install, or modify code; it only drives the app.
+
+### When to use what
+
+| Task | Authoring surface |
+|------|-------------------|
+| Hotkey buttons, multi-action chord shortcuts | `ProfileEditor` (engine) |
+| Page layout, icons, titles, colors | `ProfileEditor` + `generate-icons.js` |
+| Pinned Action, Wallpaper (right-click gestures) | `streamdeck-driver` subagent |
+| Multi Action display with custom title+icon (broken in engine — TODO) | `streamdeck-driver` subagent until fixed |
+| Profile export | Either: write `originals/` directly, or right-click → Export via subagent |
+
 ## Safety Rules
 
 - **Always validate** before packing: `node src/index.js validate <dir>`
 - Profile version must be `"3.0"` for Stream Deck app 7.1+
 - Positions are `"col,row"` format (column-first, 0-indexed)
 - Images should be 144×144 pixels (retina @2x for 72×72 display buttons)
+- **Computer-use safety:** disable Claude Desktop's Windows-MCP before driving from Code; verify foreground window before each click; cap retries at 2 and surface a screenshot on failure (see `streamdeck-driver` agent operating principles)
 
 ## Contributing
 
