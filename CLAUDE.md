@@ -47,3 +47,5 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 ## Skills
 
 - Profile generation workflow: `.claude/skills/generate-profile/SKILL.md`
+- Capture reference profile (all action types): `.claude/skills/capture-streamdeck-reference/SKILL.md`
+- Drive Windows GUI (Stream Deck app): `.claude/skills/drive-windows-gui/SKILL.md`
