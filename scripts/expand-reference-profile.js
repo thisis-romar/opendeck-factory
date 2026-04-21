@@ -30,6 +30,8 @@ const PAGE_COLORS = {
   4: '#8B2BE2', // Vivid violet     — Soundboard + Multi Action
 };
 
+const NAV_COLOR = '#374151'; // neutral graphite — consistent across all pages
+
 // Icon map: key → { plugin directory base, icon filename }
 const ICON = {
   website:          { p: 'com.elgato.streamdeck.system.website',      f: 'btn_website.svg' },
@@ -60,6 +62,8 @@ const ICON = {
   switchProfile:    { p: 'com.elgato.streamdeck.profile.rotate',       f: 'btn_switchProfile.svg' },
   prevPage:         { p: 'com.elgato.streamdeck.page',                 f: 'btn_previousPage.svg' },
   nextPage:         { p: 'com.elgato.streamdeck.page',                 f: 'btn_nextPage.svg' },
+  navPrev:          { p: 'com.elgato.streamdeck.page',                 f: 'btn_previousPage.svg' },
+  navNext:          { p: 'com.elgato.streamdeck.page',                 f: 'btn_nextPage.svg' },
   gotoPage:         { p: 'com.elgato.streamdeck.page',                 f: 'btn_goToPage.svg' },
   pageIndicator:    { p: 'com.elgato.streamdeck.page',                 f: 'btn_pageIndicator.svg' },
   playAudio:        { p: 'com.elgato.streamdeck.soundboard',           f: 'btn_playAudio.svg' },
@@ -68,8 +72,13 @@ const ICON = {
   multiSwitch:      { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_toggleMultiActionOn.svg' },
   randomAction:     { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_randomAction.svg' },
   keyLogic:         { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyLogic.svg' },
+  keyAdaptor:       { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyAdaptor.svg' },
+  keyStack:         { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyStack.svg' },
   parentFolder:     { p: 'com.elgato.streamdeck.profile.backtoparent', f: 'btn_backtoParent.svg' },
   delay:            { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_duration.svg' },
+  digitalTime:      { p: 'com.elgato.streamdeck.system.digitaltime',   f: 'btn_digitalTime.svg' },
+  pagination:       { p: 'com.elgato.streamdeck.system.pagination',    f: 'btn_pagination.svg' },
+  // mmEject / mmRewind: icons exist but actionIdx values unknown — need live capture to verify
 };
 
 // Extract inner SVG elements from an icon file (strips <svg> wrapper and XML decl)
@@ -139,7 +148,14 @@ function buildPage(pageNum, defs) {
     const image = writeComposite(imagesDir, iconKey, color);
     actions[`${col},${row}`] = btn(aUUID, pUUID, pName, settings, label, image);
   }
-  return actions;
+  return { actions, imagesDir };
+}
+
+function addNavCorners(actions, imagesDir) {
+  const prevImage = writeComposite(imagesDir, 'navPrev', NAV_COLOR);
+  const nextImage = writeComposite(imagesDir, 'navNext', NAV_COLOR);
+  actions['0,2'] = btn(...NAV.prev, prevImage);
+  actions['4,2'] = btn(...NAV.next, nextImage);
 }
 
 // Shared nav button definitions (same action UUID / plugin for all pages)
@@ -151,8 +167,8 @@ const NAV = {
 // ── Page 1 — System (electric blue) ──────────────────────────────────────────
 // Row 0: Website | Hotkey Switch | Hotkey | Open | Open App
 // Row 1: Close | Text | Prev Track | Play/Pause | Next Track
-// Row 2: << Prev | Stop | Mute | Vol+ | Next >>  (Vol- sacrificed for nav corners)
-const page1 = buildPage(1, [
+// Row 2: << nav | Stop | Mute | Vol+ | nav >>  (nav corners added via addNavCorners)
+const { actions: page1, imagesDir: imgDir1 } = buildPage(1, [
   [0, 0, 'website',      'com.elgato.streamdeck.system.website',      'com.elgato.streamdeck.system.website',      'Website',               { openInBrowser: true, path: 'https://elgato.com' }, 'Website'],
   [1, 0, 'hotkeySwitch', 'com.elgato.streamdeck.system.hotkeyswitch', 'com.elgato.streamdeck.system.hotkeyswitch', 'Hotkey Switch',          {}, 'Hotkey\nSwitch'],
   [2, 0, 'hotkey',       'com.elgato.streamdeck.system.hotkey',       'com.elgato.streamdeck.system.hotkey',       'Activate a Key Command', { Coalesce: true, Hotkeys: [{ KeyCmd: false, KeyCtrl: true, KeyModifiers: 2, KeyOption: false, KeyShift: false, NativeCode: 65, QTKeyCode: 65, VKeyCode: 65 }] }, 'Hotkey\nCtrl+A'],
@@ -163,19 +179,17 @@ const page1 = buildPage(1, [
   [2, 1, 'mmPrev',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 0 }, 'Prev\nTrack'],
   [3, 1, 'mmPlay',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 1 }, 'Play /\nPause'],
   [4, 1, 'mmNext',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 2 }, 'Next\nTrack'],
-  [0, 2, 'prevPage',     ...NAV.prev],
   [1, 2, 'mmStop',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 3 }, 'Stop'],
   [2, 2, 'mmMute',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 4 }, 'Mute'],
   [3, 2, 'mmVolUp',      'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 5 }, 'Vol+'],
-  [4, 2, 'nextPage',     ...NAV.next],
 ]);
+addNavCorners(page1, imgDir1);
 
 // ── Page 2 — Stream Deck (vivid orange) ──────────────────────────────────────
 // Row 0: Timer | Brighter | Darker | Max | High
 // Row 1: Medium | Low | Minimum | Sleep | Toggle VSD
-// Row 2: << Prev | (Vol- restore) | · | · | Next >>
-// Vol- (Multimedia actionIdx=6) placed at (1,2) — it belongs here as overflow
-const page2 = buildPage(2, [
+// Row 2: << nav | Vol- | · | · | nav >>
+const { actions: page2, imagesDir: imgDir2 } = buildPage(2, [
   [0, 0, 'timer',         'com.elgato.streamdeck.system.timer',         'com.elgato.streamdeck.timer',               'Timer',      { actionIdx: 0, duration: 30, lastUserFile: '' }, 'Timer'],
   [1, 0, 'brighter',      'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 0 }, 'Brighter'],
   [2, 0, 'darker',        'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 1 }, 'Darker'],
@@ -186,16 +200,15 @@ const page2 = buildPage(2, [
   [2, 1, 'brightnessMin', 'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 6 }, 'Minimum'],
   [3, 1, 'sleep',         'com.elgato.streamdeck.system.sleep',         'com.elgato.streamdeck.system.sleep',         'Sleep',      {}, 'Sleep'],
   [4, 1, 'vsdToggle',     'com.elgato.streamdeck.system.vsdtoggle',     'com.elgato.streamdeck.vsdtoggle',            'Toggle Virtual Stream Deck', { DeviceID: '', ProfileID: '00000000-0000-0000-0000-000000000000' }, 'Toggle\nVSD'],
-  [0, 2, 'prevPage',      ...NAV.prev],
   [1, 2, 'mmVolDown',     'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',  { actionIdx: 6 }, 'Vol-'],
-  [4, 2, 'nextPage',      ...NAV.next],
 ]);
+addNavCorners(page2, imgDir2);
 
 // ── Page 3 — Navigation (vivid emerald) ──────────────────────────────────────
 // Row 0: Create Folder | Switch Profile | Prev Page | Next Page | Go to Page
 // Row 1: Page Indicator | Parent Folder
-// Row 2: << Prev nav | · | · | · | Next nav >>
-const page3 = buildPage(3, [
+// Row 2: (empty — no nav corners; this page IS about navigation, no redundant corners)
+const { actions: page3 } = buildPage(3, [
   [0, 0, 'createFolder',  'com.elgato.streamdeck.profile.openchild',    'com.elgato.streamdeck.profile.openchild',    'Create Folder',   {}, 'Create\nFolder'],
   [1, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate',       'com.elgato.streamdeck.profile.rotate',       'Switch Profile',  {}, 'Switch\nProfile'],
   [2, 0, 'prevPage',      'com.elgato.streamdeck.page.previous',        'com.elgato.streamdeck.page',                 'Pages',           {}, 'Prev\nPage'],
@@ -203,32 +216,33 @@ const page3 = buildPage(3, [
   [4, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',            'com.elgato.streamdeck.page',                 'Pages',           { page: 0 }, 'Go to\nPage'],
   [0, 1, 'pageIndicator', 'com.elgato.streamdeck.page.indicator',       'com.elgato.streamdeck.page',                 'Pages',           {}, 'Page\nIndicator'],
   [1, 1, 'parentFolder',  'com.elgato.streamdeck.profile.backtoparent', 'com.elgato.streamdeck.profile.backtoparent', 'Parent Folder',   {}, 'Parent\nFolder'],
-  [0, 2, 'prevPage',      ...NAV.prev],
-  [4, 2, 'nextPage',      ...NAV.next],
 ]);
 
-// ── Page 4 — Soundboard + Multi Action (vivid violet) ────────────────────────
+// ── Page 4 — Soundboard + Multi Action + Keys (vivid violet) ─────────────────
 // Row 0: Play Audio | Stop Audio | Multi Action | Multi Action Switch | Random Action
-// Row 1: Key Logic | Delay
-// Row 2: << Prev nav | · | · | · | Next nav >>
-const page4 = buildPage(4, [
-  [0, 0, 'playAudio',    'com.elgato.streamdeck.soundboard.playaudio',       'com.elgato.streamdeck.soundboard',   'Soundboard',   {}, 'Play\nAudio'],
-  [1, 0, 'stopAudio',   'com.elgato.streamdeck.soundboard.stopaudioplay',    'com.elgato.streamdeck.soundboard',   'Soundboard',   {}, 'Stop\nAudio'],
-  [2, 0, 'multiAction', 'com.elgato.streamdeck.multiactions.routine',        'com.elgato.streamdeck.multiactions', 'Multi Action', { Actions: [] }, 'Multi\nAction'],
-  [3, 0, 'multiSwitch', 'com.elgato.streamdeck.multiactions.routine2',       'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Multi\nSwitch'],
-  [4, 0, 'randomAction','com.elgato.streamdeck.multiactions.random',         'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Random\nAction'],
-  [0, 1, 'keyLogic',    'com.elgato.streamdeck.keys.logic',                  'com.elgato.streamdeck.keys',         'Keys',         {}, 'Key\nLogic'],
-  [1, 1, 'delay',       'com.elgato.streamdeck.multiactions.delay',          'com.elgato.streamdeck.multiactions', 'Multi Action', { duration: 1000 }, 'Delay'],
-  [0, 2, 'prevPage',    ...NAV.prev],
-  [4, 2, 'nextPage',    ...NAV.next],
+// Row 1: Key Logic | Delay | Digital Time | Key Adaptor | Key Stack
+// Row 2: << nav | Pagination | · | · | nav >>
+const { actions: page4, imagesDir: imgDir4 } = buildPage(4, [
+  [0, 0, 'playAudio',    'com.elgato.streamdeck.soundboard.playaudio',       'com.elgato.streamdeck.soundboard',             'Soundboard',    {}, 'Play\nAudio'],
+  [1, 0, 'stopAudio',    'com.elgato.streamdeck.soundboard.stopaudioplay',   'com.elgato.streamdeck.soundboard',             'Soundboard',    {}, 'Stop\nAudio'],
+  [2, 0, 'multiAction',  'com.elgato.streamdeck.multiactions.routine',       'com.elgato.streamdeck.multiactions',           'Multi Action',  { Actions: [] }, 'Multi\nAction'],
+  [3, 0, 'multiSwitch',  'com.elgato.streamdeck.multiactions.routine2',      'com.elgato.streamdeck.multiactions',           'Multi Action',  {}, 'Multi\nSwitch'],
+  [4, 0, 'randomAction', 'com.elgato.streamdeck.multiactions.random',        'com.elgato.streamdeck.multiactions',           'Multi Action',  {}, 'Random\nAction'],
+  [0, 1, 'keyLogic',     'com.elgato.streamdeck.keys.logic',                 'com.elgato.streamdeck.keys',                   'Keys',          {}, 'Key\nLogic'],
+  [1, 1, 'delay',        'com.elgato.streamdeck.multiactions.delay',         'com.elgato.streamdeck.multiactions',           'Multi Action',  { duration: 1000 }, 'Delay'],
+  [2, 1, 'digitalTime',  'com.elgato.streamdeck.system.digitaltime',         'com.elgato.streamdeck.system.digitaltime',     'Digital Time',  {}, 'Digital\nTime'],
+  [3, 1, 'keyAdaptor',   'com.elgato.streamdeck.keys.adaptor',               'com.elgato.streamdeck.keys',                   'Keys',          {}, 'Key\nAdaptor'],
+  [4, 1, 'keyStack',     'com.elgato.streamdeck.keys.stack',                 'com.elgato.streamdeck.keys',                   'Keys',          {}, 'Key\nStack'],
+  [1, 2, 'pagination',   'com.elgato.streamdeck.system.pagination',          'com.elgato.streamdeck.system.pagination',      'Pagination',    {}, 'Pagination'],
 ]);
+addNavCorners(page4, imgDir4);
 
 // ── Write page manifests ──────────────────────────────────────────────────────
 const pageData = [
-  { n: 1, uuid: PAGE_UUIDS[1], name: 'System',                  actions: page1 },
-  { n: 2, uuid: PAGE_UUIDS[2], name: 'Stream Deck',             actions: page2 },
-  { n: 3, uuid: PAGE_UUIDS[3], name: 'Navigation',              actions: page3 },
-  { n: 4, uuid: PAGE_UUIDS[4], name: 'Soundboard + Multi Act',  actions: page4 },
+  { n: 1, uuid: PAGE_UUIDS[1], name: 'System',                       actions: page1 },
+  { n: 2, uuid: PAGE_UUIDS[2], name: 'Stream Deck',                  actions: page2 },
+  { n: 3, uuid: PAGE_UUIDS[3], name: 'Navigation',                   actions: page3 },
+  { n: 4, uuid: PAGE_UUIDS[4], name: 'Soundboard + Multi Act + Keys', actions: page4 },
 ];
 
 for (const { n, uuid, name, actions } of pageData) {
