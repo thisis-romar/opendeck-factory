@@ -1,4 +1,5 @@
 {
+  "enabledMcpjsonServers": ["windows-mcp"],
   "permissions": {
     "allow": [
       "Bash(file /c/Users/romar/projects/stream-deck-profile/_extracted/Profiles/8BE9D4FA-224E-4876-8827-26DBA435BBB6.sdProfile/Profiles/EBFEE41E-3C5E-450E-BA15-B4822FEC7631/Images/*.svg)",
