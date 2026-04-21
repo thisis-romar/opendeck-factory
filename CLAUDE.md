@@ -46,3 +46,25 @@ Apache License, Version 2.0. See LICENSE and NOTICE.
 ## Skills
 
 - Profile generation workflow: `.claude/skills/generate-profile/SKILL.md`
+
+## Computer-Use Integration (this branch only — `feat/windows-mcp-computer-use`)
+
+This branch adds opt-in integration with [Windows-MCP](https://github.com/CursorTouch/Windows-MCP) for driving the Stream Deck Windows app GUI when JSON injection is insufficient.
+
+**Surface:**
+- `.mcp.json` — project-scoped Windows-MCP registration (loads on next session start; approve when prompted)
+- `.claude/agents/streamdeck-driver.md` — narrow-surface subagent (Windows-MCP tools + Read only; no Bash/Edit/Write)
+
+**JSON-injection-first principle.** GUI driving costs one model decision per click (~2 min/action observed in prior runs). Always prefer writing directly to `%APPDATA%\Elgato\StreamDeck\ProfilesV3\<uuid>.sdProfile\Profiles\<page-uuid>\manifest.json` when the action's schema is known. Use the subagent only for irreducibly-GUI parts (Pin gesture, Wallpaper, Multi Action display capture, Export dialog).
+
+**Concurrency safety.** If Claude Desktop has the Windows-MCP DXT installed, **disable it** before driving the GUI from Code — two clients sharing the OS input queue race with no coordination primitive available. Toggle via:
+```
+%APPDATA%\Claude\Claude Extensions Settings\ant.dir.cursortouch.windows-mcp.json → {"isEnabled": false}
+```
+
+**Pre-flight before any GUI session:**
+1. `Get-Process StreamDeck` confirms app running
+2. `/mcp` confirms `windows-mcp ✓ connected`
+3. The Desktop DXT JSON above shows `isEnabled: false`
+
+**If session resumes after `claude -c`:** check `C:\tmp\session-resume-streamdeck-mcp.md` for in-flight workflow state.
