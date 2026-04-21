@@ -68,6 +68,8 @@ const ICON = {
   multiSwitch:      { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_toggleMultiActionOn.svg' },
   randomAction:     { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_randomAction.svg' },
   keyLogic:         { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyLogic.svg' },
+  parentFolder:     { p: 'com.elgato.streamdeck.profile.backtoparent', f: 'btn_backtoParent.svg' },
+  delay:            { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_duration.svg' },
 };
 
 // Extract inner SVG elements from an icon file (strips <svg> wrapper and XML decl)
@@ -78,11 +80,25 @@ function iconPaths(key) {
   return m ? m[1].trim() : '';
 }
 
-// Write composite SVG (colored rect + icon paths) into a page's Images/ dir
-// Returns the relative image path for the button States entry
+// Write composite SVG (colored rect + icon) into a page's Images/ dir.
+// Detects the source icon's viewBox and wraps it in a nested <svg> if needed,
+// so icons of any size (20px, 24px, 72px, 144px) all scale to fill the button.
+// Returns the relative image path for the button States entry.
 function writeComposite(imagesDir, key, color) {
-  const paths = iconPaths(key);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n<rect width="144" height="144" fill="${color}"/>\n${paths}\n</svg>`;
+  const { p, f } = ICON[key];
+  const src = readFileSync(join(PLUGINS, `${p}.sdPlugin/Images/${f}`), 'utf8');
+  const vbMatch = src.match(/viewBox="([^"]+)"/);
+  const viewBox = vbMatch ? vbMatch[1] : '0 0 144 144';
+  const innerMatch = src.match(/<svg[^>]*>([\s\S]*?)<\/svg>/);
+  const inner = innerMatch ? innerMatch[1].trim() : '';
+
+  // If the icon's viewBox matches our canvas, inline directly.
+  // Otherwise nest it so SVG's own scaling maps the viewBox to 144×144.
+  const iconLayer = (viewBox === '0 0 144 144')
+    ? inner
+    : `<svg x="0" y="0" width="144" height="144" viewBox="${viewBox}">${inner}</svg>`;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n<rect width="144" height="144" fill="${color}"/>\n${iconLayer}\n</svg>`;
   writeFileSync(join(imagesDir, `${key}.svg`), svg);
   return `Images/${key}.svg`;
 }
@@ -177,22 +193,23 @@ const page2 = buildPage(2, [
 
 // ── Page 3 — Navigation (vivid emerald) ──────────────────────────────────────
 // Row 0: Create Folder | Switch Profile | Prev Page | Next Page | Go to Page
-// Row 1: Page Indicator
+// Row 1: Page Indicator | Parent Folder
 // Row 2: << Prev nav | · | · | · | Next nav >>
 const page3 = buildPage(3, [
-  [0, 0, 'createFolder',  'com.elgato.streamdeck.profile.openchild', 'com.elgato.streamdeck.profile.openchild', 'Create Folder',   {}, 'Create\nFolder'],
-  [1, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate',    'com.elgato.streamdeck.profile.rotate',    'Switch Profile',  {}, 'Switch\nProfile'],
-  [2, 0, 'prevPage',      'com.elgato.streamdeck.page.previous',     'com.elgato.streamdeck.page',              'Pages',           {}, 'Prev\nPage'],
-  [3, 0, 'nextPage',      'com.elgato.streamdeck.page.next',         'com.elgato.streamdeck.page',              'Pages',           {}, 'Next\nPage'],
-  [4, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',         'com.elgato.streamdeck.page',              'Pages',           { page: 0 }, 'Go to\nPage'],
-  [0, 1, 'pageIndicator', 'com.elgato.streamdeck.page.indicator',    'com.elgato.streamdeck.page',              'Pages',           {}, 'Page\nIndicator'],
+  [0, 0, 'createFolder',  'com.elgato.streamdeck.profile.openchild',    'com.elgato.streamdeck.profile.openchild',    'Create Folder',   {}, 'Create\nFolder'],
+  [1, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate',       'com.elgato.streamdeck.profile.rotate',       'Switch Profile',  {}, 'Switch\nProfile'],
+  [2, 0, 'prevPage',      'com.elgato.streamdeck.page.previous',        'com.elgato.streamdeck.page',                 'Pages',           {}, 'Prev\nPage'],
+  [3, 0, 'nextPage',      'com.elgato.streamdeck.page.next',            'com.elgato.streamdeck.page',                 'Pages',           {}, 'Next\nPage'],
+  [4, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',            'com.elgato.streamdeck.page',                 'Pages',           { page: 0 }, 'Go to\nPage'],
+  [0, 1, 'pageIndicator', 'com.elgato.streamdeck.page.indicator',       'com.elgato.streamdeck.page',                 'Pages',           {}, 'Page\nIndicator'],
+  [1, 1, 'parentFolder',  'com.elgato.streamdeck.profile.backtoparent', 'com.elgato.streamdeck.profile.backtoparent', 'Parent Folder',   {}, 'Parent\nFolder'],
   [0, 2, 'prevPage',      ...NAV.prev],
   [4, 2, 'nextPage',      ...NAV.next],
 ]);
 
 // ── Page 4 — Soundboard + Multi Action (vivid violet) ────────────────────────
 // Row 0: Play Audio | Stop Audio | Multi Action | Multi Action Switch | Random Action
-// Row 1: Key Logic
+// Row 1: Key Logic | Delay
 // Row 2: << Prev nav | · | · | · | Next nav >>
 const page4 = buildPage(4, [
   [0, 0, 'playAudio',    'com.elgato.streamdeck.soundboard.playaudio',       'com.elgato.streamdeck.soundboard',   'Soundboard',   {}, 'Play\nAudio'],
@@ -201,6 +218,7 @@ const page4 = buildPage(4, [
   [3, 0, 'multiSwitch', 'com.elgato.streamdeck.multiactions.routine2',       'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Multi\nSwitch'],
   [4, 0, 'randomAction','com.elgato.streamdeck.multiactions.random',         'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Random\nAction'],
   [0, 1, 'keyLogic',    'com.elgato.streamdeck.keys.logic',                  'com.elgato.streamdeck.keys',         'Keys',         {}, 'Key\nLogic'],
+  [1, 1, 'delay',       'com.elgato.streamdeck.multiactions.delay',          'com.elgato.streamdeck.multiactions', 'Multi Action', { duration: 1000 }, 'Delay'],
   [0, 2, 'prevPage',    ...NAV.prev],
   [4, 2, 'nextPage',    ...NAV.next],
 ]);
@@ -223,5 +241,11 @@ for (const { n, uuid, name, actions } of pageData) {
   writeFileSync(manifestPath, JSON.stringify(manifest));
   console.log(`Page ${n} (${name}): ${Object.keys(actions).length} buttons → ${manifestPath}`);
 }
+
+// Clear stray content from old page 5 (D9C12A0B)
+const PAGE5_UUID = 'D9C12A0B-08CC-43F0-8922-CFFC663B18B1';
+const page5Path = join(PROFILE_ROOT, 'Profiles', PAGE5_UUID, 'manifest.json');
+writeFileSync(page5Path, JSON.stringify({ Controllers: [{ Actions: null, Type: 'Keypad' }], Icon: '', Name: '' }));
+console.log('Page 5 (blank): cleared stray buttons');
 
 console.log('\nDone. Start Stream Deck app and validate the profile.');
