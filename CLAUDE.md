@@ -41,7 +41,8 @@ node src/index.js list <dir>                    # Show grid layout
 
 ## License
 
-Apache License, Version 2.0. See LICENSE and NOTICE.
+Functional Source License, Version 1.1 (FSL-1.1-ALv2). Source-available;
+auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE.
 
 ## Skills
 
