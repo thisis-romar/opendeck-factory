@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-// Expands the reference profile with variant buttons and per-page color coding.
+// Expands the reference profile: per-variant buttons, composite plugin icons tinted
+// with vibrant per-page colors, and Prev/Next nav at every page's bottom corners.
 // Run: node scripts/expand-reference-profile.js
 // IMPORTANT: Stop Stream Deck app before running this script.
 
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 
 const APPDATA = process.env.APPDATA;
+const PLUGINS = 'C:/Program Files/Elgato/StreamDeck/plugins';
 const PROFILE_ROOT = join(
   APPDATA,
   'Elgato/StreamDeck/ProfilesV3/692919F2-4A89-4E00-B263-8488434CB04A.sdProfile'
@@ -20,24 +22,73 @@ const PAGE_UUIDS = {
   4: '9BF4637A-6E09-4FFB-A1E4-E7AA22066883',
 };
 
+// Vibrant colors chosen to represent each group's function
 const PAGE_COLORS = {
-  1: '#0d2240', // Navy blue  — System
-  2: '#0a2410', // Forest green — Stream Deck
-  3: '#2a1400', // Dark amber — Navigation
-  4: '#1a0a2e', // Deep purple — Soundboard + Multi
+  1: '#1464F4', // Electric blue    — System / OS control
+  2: '#F07800', // Vivid orange     — Stream Deck hardware
+  3: '#00B84A', // Vivid emerald    — Navigation / wayfinding
+  4: '#8B2BE2', // Vivid violet     — Soundboard + Multi Action
 };
 
-// Write colored SVG backgrounds into each page's Images/ directory
-for (const [page, color] of Object.entries(PAGE_COLORS)) {
-  const imagesDir = join(PROFILE_ROOT, 'Profiles', PAGE_UUIDS[page], 'Images');
-  mkdirSync(imagesDir, { recursive: true });
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144"><rect width="144" height="144" fill="${color}"/></svg>`;
-  writeFileSync(join(imagesDir, 'bg.svg'), svg);
-  console.log(`Wrote bg.svg for page ${page} (${color})`);
+// Icon map: key → { plugin directory base, icon filename }
+const ICON = {
+  website:          { p: 'com.elgato.streamdeck.system.website',      f: 'btn_website.svg' },
+  hotkeySwitch:     { p: 'com.elgato.streamdeck.system.hotkeyswitch', f: 'btn_toggleHotkeyOn.svg' },
+  hotkey:           { p: 'com.elgato.streamdeck.system.hotkey',       f: 'btn_hotkey.svg' },
+  open:             { p: 'com.elgato.streamdeck.system.open',         f: 'btn_open.svg' },
+  openApp:          { p: 'com.elgato.streamdeck.system.openapp',      f: 'btn_open.svg' },
+  close:            { p: 'com.elgato.streamdeck.system.close',        f: 'btn_close.svg' },
+  text:             { p: 'com.elgato.streamdeck.system.text',         f: 'btn_text.svg' },
+  mmPrev:           { p: 'com.elgato.streamdeck.system.multimedia',   f: 'btn_media_prev_track.svg' },
+  mmPlay:           { p: 'com.elgato.streamdeck.system.multimedia',   f: 'btn_media_play_pause.svg' },
+  mmNext:           { p: 'com.elgato.streamdeck.system.multimedia',   f: 'btn_media_next_track.svg' },
+  mmStop:           { p: 'com.elgato.streamdeck.system.multimedia',   f: 'btn_media_stop.svg' },
+  mmMute:           { p: 'com.elgato.streamdeck.system.multimedia',   f: 'btn_media_mute.svg' },
+  mmVolUp:          { p: 'com.elgato.streamdeck.system.multimedia',   f: 'btn_media_volume_up.svg' },
+  mmVolDown:        { p: 'com.elgato.streamdeck.system.multimedia',   f: 'btn_media_volume_down.svg' },
+  timer:            { p: 'com.elgato.streamdeck.timer',               f: 'btn_timer.svg' },
+  brighter:         { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_increase.svg' },
+  darker:           { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_decrease.svg' },
+  brightnessMax:    { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_max.svg' },
+  brightnessHigh:   { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_high.svg' },
+  brightnessMed:    { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_medium.svg' },
+  brightnessLow:    { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_low.svg' },
+  brightnessMin:    { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_min.svg' },
+  sleep:            { p: 'com.elgato.streamdeck.system.sleep',         f: 'btn_sleep.svg' },
+  vsdToggle:        { p: 'com.elgato.streamdeck.vsdtoggle',            f: 'btn_vsdtoggle.svg' },
+  createFolder:     { p: 'com.elgato.streamdeck.profile.openchild',    f: 'btn_folder.svg' },
+  switchProfile:    { p: 'com.elgato.streamdeck.profile.rotate',       f: 'btn_switchProfile.svg' },
+  prevPage:         { p: 'com.elgato.streamdeck.page',                 f: 'btn_previousPage.svg' },
+  nextPage:         { p: 'com.elgato.streamdeck.page',                 f: 'btn_nextPage.svg' },
+  gotoPage:         { p: 'com.elgato.streamdeck.page',                 f: 'btn_goToPage.svg' },
+  pageIndicator:    { p: 'com.elgato.streamdeck.page',                 f: 'btn_pageIndicator.svg' },
+  playAudio:        { p: 'com.elgato.streamdeck.soundboard',           f: 'btn_playAudio.svg' },
+  stopAudio:        { p: 'com.elgato.streamdeck.soundboard',           f: 'btn_stopAudio.svg' },
+  multiAction:      { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_multiAction.svg' },
+  multiSwitch:      { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_toggleMultiActionOn.svg' },
+  randomAction:     { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_randomAction.svg' },
+  keyLogic:         { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyLogic.svg' },
+};
+
+// Extract inner SVG elements from an icon file (strips <svg> wrapper and XML decl)
+function iconPaths(key) {
+  const { p, f } = ICON[key];
+  const src = readFileSync(join(PLUGINS, `${p}.sdPlugin/Images/${f}`), 'utf8');
+  const m = src.match(/<svg[^>]*>([\s\S]*?)<\/svg>/);
+  return m ? m[1].trim() : '';
 }
 
-// Helper: build a single button action entry
-function btn(actionUUID, pluginUUID, pluginName, settings, label) {
+// Write composite SVG (colored rect + icon paths) into a page's Images/ dir
+// Returns the relative image path for the button States entry
+function writeComposite(imagesDir, key, color) {
+  const paths = iconPaths(key);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n<rect width="144" height="144" fill="${color}"/>\n${paths}\n</svg>`;
+  writeFileSync(join(imagesDir, `${key}.svg`), svg);
+  return `Images/${key}.svg`;
+}
+
+// Build a button object
+function btn(actionUUID, pluginUUID, pluginName, settings, label, image) {
   return {
     ActionID: randomUUID(),
     LinkedTitle: true,
@@ -47,7 +98,7 @@ function btn(actionUUID, pluginUUID, pluginName, settings, label) {
     Settings: settings,
     State: 0,
     States: [{
-      Image: 'Images/bg.svg',
+      Image: image || '',
       ShowTitle: true,
       Title: label + '\n',
       TitleAlignment: 'bottom',
@@ -58,118 +109,119 @@ function btn(actionUUID, pluginUUID, pluginName, settings, label) {
   };
 }
 
-// Shorthand helpers for common plugins
-const B = {
-  website: (s = {}) => btn('com.elgato.streamdeck.system.website', 'com.elgato.streamdeck.system.website', 'Website', { openInBrowser: true, path: 'https://elgato.com', ...s }, 'Website'),
-  hotkeySwitch: () => btn('com.elgato.streamdeck.system.hotkeyswitch', 'com.elgato.streamdeck.system.hotkeyswitch', 'Hotkey Switch', {}, 'Hotkey\nSwitch'),
-  hotkey: () => btn('com.elgato.streamdeck.system.hotkey', 'com.elgato.streamdeck.system.hotkey', 'Activate a Key Command', { Coalesce: true, Hotkeys: [{ KeyCmd: false, KeyCtrl: true, KeyModifiers: 2, KeyOption: false, KeyShift: false, NativeCode: 65, QTKeyCode: 65, VKeyCode: 65 }] }, 'Hotkey\nCtrl+A'),
-  open: () => btn('com.elgato.streamdeck.system.open', 'com.elgato.streamdeck.system.open', 'Open', { path: 'C:\\Windows\\System32\\notepad.exe' }, 'Open'),
-  openApp: () => btn('com.elgato.streamdeck.system.openapp', 'com.elgato.streamdeck.system.openapp', 'Open Application', { app_name: '', args: '', bring_to_front: true, bundle_id: '', bundle_path: '', exec: '', is_bundle: false, long_press: 'quit', source: '' }, 'Open App'),
-  close: () => btn('com.elgato.streamdeck.system.close', 'com.elgato.streamdeck.system.close', 'Close', {}, 'Close'),
-  text: () => btn('com.elgato.streamdeck.system.text', 'com.elgato.streamdeck.system.text', 'Text', { Hotkey: { KeyModifiers: 0, QTKeyCode: 33554431, VKeyCode: -1 }, isSendingEnter: false, isTypingMode: true, pastedText: 'Hello World' }, 'Text'),
-  multimedia: (idx, label) => btn('com.elgato.streamdeck.system.multimedia', 'com.elgato.streamdeck.system.multimedia', 'Multimedia', { actionIdx: idx }, label),
-  timer: () => btn('com.elgato.streamdeck.system.timer', 'com.elgato.streamdeck.timer', 'Timer', { actionIdx: 0, duration: 30, lastUserFile: '' }, 'Timer'),
-  brightness: (idx, label) => btn('com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: idx }, label),
-  sleep: () => btn('com.elgato.streamdeck.system.sleep', 'com.elgato.streamdeck.system.sleep', 'Sleep', {}, 'Sleep'),
-  vsdToggle: () => btn('com.elgato.streamdeck.system.vsdtoggle', 'com.elgato.streamdeck.vsdtoggle', 'Toggle Virtual Stream Deck', { DeviceID: '', ProfileID: '00000000-0000-0000-0000-000000000000' }, 'Toggle\nVSD'),
-  createFolder: () => btn('com.elgato.streamdeck.profile.openchild', 'com.elgato.streamdeck.profile.openchild', 'Create Folder', {}, 'Create\nFolder'),
-  switchProfile: () => btn('com.elgato.streamdeck.profile.rotate', 'com.elgato.streamdeck.profile.rotate', 'Switch Profile', {}, 'Switch\nProfile'),
-  prevPage: () => btn('com.elgato.streamdeck.page.previous', 'com.elgato.streamdeck.page', 'Pages', {}, 'Prev\nPage'),
-  nextPage: () => btn('com.elgato.streamdeck.page.next', 'com.elgato.streamdeck.page', 'Pages', {}, 'Next\nPage'),
-  gotoPage: () => btn('com.elgato.streamdeck.page.goto', 'com.elgato.streamdeck.page', 'Pages', { page: 0 }, 'Go to\nPage'),
-  pageIndicator: () => btn('com.elgato.streamdeck.page.indicator', 'com.elgato.streamdeck.page', 'Pages', {}, 'Page\nIndicator'),
-  playAudio: () => btn('com.elgato.streamdeck.soundboard.playaudio', 'com.elgato.streamdeck.soundboard', 'Soundboard', {}, 'Play\nAudio'),
-  stopAudio: () => btn('com.elgato.streamdeck.soundboard.stopaudioplay', 'com.elgato.streamdeck.soundboard', 'Soundboard', {}, 'Stop\nAudio'),
-  multiAction: () => btn('com.elgato.streamdeck.multiactions.routine', 'com.elgato.streamdeck.multiactions', 'Multi Action', { Actions: [] }, 'Multi\nAction'),
-  multiActionSwitch: () => btn('com.elgato.streamdeck.multiactions.routine2', 'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Multi\nAction\nSwitch'),
-  randomAction: () => btn('com.elgato.streamdeck.multiactions.random', 'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Random\nAction'),
-  keyLogic: () => btn('com.elgato.streamdeck.keys.logic', 'com.elgato.streamdeck.keys', 'Keys', {}, 'Key\nLogic'),
+// ── Page factory ──────────────────────────────────────────────────────────────
+// Returns { actions, imagesDir } for a page.
+// Each entry in defs: [col, row, iconKey, actionUUID, pluginUUID, pluginName, settings, label]
+function buildPage(pageNum, defs) {
+  const uuid = PAGE_UUIDS[pageNum];
+  const color = PAGE_COLORS[pageNum];
+  const imagesDir = join(PROFILE_ROOT, 'Profiles', uuid, 'Images');
+  mkdirSync(imagesDir, { recursive: true });
+
+  const actions = {};
+  for (const [col, row, iconKey, aUUID, pUUID, pName, settings, label] of defs) {
+    const image = writeComposite(imagesDir, iconKey, color);
+    actions[`${col},${row}`] = btn(aUUID, pUUID, pName, settings, label, image);
+  }
+  return actions;
+}
+
+// Shared nav button definitions (same action UUID / plugin for all pages)
+const NAV = {
+  prev: ['com.elgato.streamdeck.page.previous', 'com.elgato.streamdeck.page', 'Pages', {}, 'Prev\nPage'],
+  next: ['com.elgato.streamdeck.page.next',     'com.elgato.streamdeck.page', 'Pages', {}, 'Next\nPage'],
 };
 
-// ── Page layouts ──────────────────────────────────────────────────────────────
-
-// Page 1 — System (navy blue)
+// ── Page 1 — System (electric blue) ──────────────────────────────────────────
 // Row 0: Website | Hotkey Switch | Hotkey | Open | Open App
-// Row 1: Close | Text | Multimedia ×3 (Prev / Play / Next)
-// Row 2: Multimedia ×4 (Stop / Mute / Vol+ / Vol-) | empty
-const page1 = {
-  '0,0': B.website(),
-  '1,0': B.hotkeySwitch(),
-  '2,0': B.hotkey(),
-  '3,0': B.open(),
-  '4,0': B.openApp(),
-  '0,1': B.close(),
-  '1,1': B.text(),
-  '2,1': B.multimedia(0, 'Prev\nTrack'),
-  '3,1': B.multimedia(1, 'Play /\nPause'),
-  '4,1': B.multimedia(2, 'Next\nTrack'),
-  '0,2': B.multimedia(3, 'Stop'),
-  '1,2': B.multimedia(4, 'Mute'),
-  '2,2': B.multimedia(5, 'Vol+'),
-  '3,2': B.multimedia(6, 'Vol-'),
-};
+// Row 1: Close | Text | Prev Track | Play/Pause | Next Track
+// Row 2: << Prev | Stop | Mute | Vol+ | Next >>  (Vol- sacrificed for nav corners)
+const page1 = buildPage(1, [
+  [0, 0, 'website',      'com.elgato.streamdeck.system.website',      'com.elgato.streamdeck.system.website',      'Website',               { openInBrowser: true, path: 'https://elgato.com' }, 'Website'],
+  [1, 0, 'hotkeySwitch', 'com.elgato.streamdeck.system.hotkeyswitch', 'com.elgato.streamdeck.system.hotkeyswitch', 'Hotkey Switch',          {}, 'Hotkey\nSwitch'],
+  [2, 0, 'hotkey',       'com.elgato.streamdeck.system.hotkey',       'com.elgato.streamdeck.system.hotkey',       'Activate a Key Command', { Coalesce: true, Hotkeys: [{ KeyCmd: false, KeyCtrl: true, KeyModifiers: 2, KeyOption: false, KeyShift: false, NativeCode: 65, QTKeyCode: 65, VKeyCode: 65 }] }, 'Hotkey\nCtrl+A'],
+  [3, 0, 'open',         'com.elgato.streamdeck.system.open',         'com.elgato.streamdeck.system.open',         'Open',                   { path: 'C:\\Windows\\System32\\notepad.exe' }, 'Open'],
+  [4, 0, 'openApp',      'com.elgato.streamdeck.system.openapp',      'com.elgato.streamdeck.system.openapp',      'Open Application',       { app_name: '', args: '', bring_to_front: true, bundle_id: '', bundle_path: '', exec: '', is_bundle: false, long_press: 'quit', source: '' }, 'Open App'],
+  [0, 1, 'close',        'com.elgato.streamdeck.system.close',        'com.elgato.streamdeck.system.close',        'Close',                  {}, 'Close'],
+  [1, 1, 'text',         'com.elgato.streamdeck.system.text',         'com.elgato.streamdeck.system.text',         'Text',                   { Hotkey: { KeyModifiers: 0, QTKeyCode: 33554431, VKeyCode: -1 }, isSendingEnter: false, isTypingMode: true, pastedText: 'Hello World' }, 'Text'],
+  [2, 1, 'mmPrev',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 0 }, 'Prev\nTrack'],
+  [3, 1, 'mmPlay',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 1 }, 'Play /\nPause'],
+  [4, 1, 'mmNext',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 2 }, 'Next\nTrack'],
+  [0, 2, 'prevPage',     ...NAV.prev],
+  [1, 2, 'mmStop',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 3 }, 'Stop'],
+  [2, 2, 'mmMute',       'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 4 }, 'Mute'],
+  [3, 2, 'mmVolUp',      'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',             { actionIdx: 5 }, 'Vol+'],
+  [4, 2, 'nextPage',     ...NAV.next],
+]);
 
-// Page 2 — Stream Deck (forest green)
-// Row 0: Timer | Brightness ×4 (Brighter / Darker / Max / High)
-// Row 1: Brightness ×3 (Med / Low / Min) | Sleep | Toggle VSD
-const page2 = {
-  '0,0': B.timer(),
-  '1,0': B.brightness(0, 'Brighter'),
-  '2,0': B.brightness(1, 'Darker'),
-  '3,0': B.brightness(2, 'Max'),
-  '4,0': B.brightness(3, 'High'),
-  '0,1': B.brightness(4, 'Medium'),
-  '1,1': B.brightness(5, 'Low'),
-  '2,1': B.brightness(6, 'Minimum'),
-  '3,1': B.sleep(),
-  '4,1': B.vsdToggle(),
-};
+// ── Page 2 — Stream Deck (vivid orange) ──────────────────────────────────────
+// Row 0: Timer | Brighter | Darker | Max | High
+// Row 1: Medium | Low | Minimum | Sleep | Toggle VSD
+// Row 2: << Prev | (Vol- restore) | · | · | Next >>
+// Vol- (Multimedia actionIdx=6) placed at (1,2) — it belongs here as overflow
+const page2 = buildPage(2, [
+  [0, 0, 'timer',         'com.elgato.streamdeck.system.timer',         'com.elgato.streamdeck.timer',               'Timer',      { actionIdx: 0, duration: 30, lastUserFile: '' }, 'Timer'],
+  [1, 0, 'brighter',      'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 0 }, 'Brighter'],
+  [2, 0, 'darker',        'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 1 }, 'Darker'],
+  [3, 0, 'brightnessMax', 'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 2 }, 'Max'],
+  [4, 0, 'brightnessHigh','com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 3 }, 'High'],
+  [0, 1, 'brightnessMed', 'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 4 }, 'Medium'],
+  [1, 1, 'brightnessLow', 'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 5 }, 'Low'],
+  [2, 1, 'brightnessMin', 'com.elgato.streamdeck.system.keybrightness', 'com.elgato.streamdeck.system.keybrightness', 'Brightness', { actionIdx: 6 }, 'Minimum'],
+  [3, 1, 'sleep',         'com.elgato.streamdeck.system.sleep',         'com.elgato.streamdeck.system.sleep',         'Sleep',      {}, 'Sleep'],
+  [4, 1, 'vsdToggle',     'com.elgato.streamdeck.system.vsdtoggle',     'com.elgato.streamdeck.vsdtoggle',            'Toggle Virtual Stream Deck', { DeviceID: '', ProfileID: '00000000-0000-0000-0000-000000000000' }, 'Toggle\nVSD'],
+  [0, 2, 'prevPage',      ...NAV.prev],
+  [1, 2, 'mmVolDown',     'com.elgato.streamdeck.system.multimedia',   'com.elgato.streamdeck.system.multimedia',   'Multimedia',  { actionIdx: 6 }, 'Vol-'],
+  [4, 2, 'nextPage',      ...NAV.next],
+]);
 
-// Page 3 — Navigation (dark amber)
+// ── Page 3 — Navigation (vivid emerald) ──────────────────────────────────────
 // Row 0: Create Folder | Switch Profile | Prev Page | Next Page | Go to Page
 // Row 1: Page Indicator
-const page3 = {
-  '0,0': B.createFolder(),
-  '1,0': B.switchProfile(),
-  '2,0': B.prevPage(),
-  '3,0': B.nextPage(),
-  '4,0': B.gotoPage(),
-  '0,1': B.pageIndicator(),
-};
+// Row 2: << Prev nav | · | · | · | Next nav >>
+const page3 = buildPage(3, [
+  [0, 0, 'createFolder',  'com.elgato.streamdeck.profile.openchild', 'com.elgato.streamdeck.profile.openchild', 'Create Folder',   {}, 'Create\nFolder'],
+  [1, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate',    'com.elgato.streamdeck.profile.rotate',    'Switch Profile',  {}, 'Switch\nProfile'],
+  [2, 0, 'prevPage',      'com.elgato.streamdeck.page.previous',     'com.elgato.streamdeck.page',              'Pages',           {}, 'Prev\nPage'],
+  [3, 0, 'nextPage',      'com.elgato.streamdeck.page.next',         'com.elgato.streamdeck.page',              'Pages',           {}, 'Next\nPage'],
+  [4, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',         'com.elgato.streamdeck.page',              'Pages',           { page: 0 }, 'Go to\nPage'],
+  [0, 1, 'pageIndicator', 'com.elgato.streamdeck.page.indicator',    'com.elgato.streamdeck.page',              'Pages',           {}, 'Page\nIndicator'],
+  [0, 2, 'prevPage',      ...NAV.prev],
+  [4, 2, 'nextPage',      ...NAV.next],
+]);
 
-// Page 4 — Soundboard + Multi Action (deep purple)
+// ── Page 4 — Soundboard + Multi Action (vivid violet) ────────────────────────
 // Row 0: Play Audio | Stop Audio | Multi Action | Multi Action Switch | Random Action
 // Row 1: Key Logic
-const page4 = {
-  '0,0': B.playAudio(),
-  '1,0': B.stopAudio(),
-  '2,0': B.multiAction(),
-  '3,0': B.multiActionSwitch(),
-  '4,0': B.randomAction(),
-  '0,1': B.keyLogic(),
-};
+// Row 2: << Prev nav | · | · | · | Next nav >>
+const page4 = buildPage(4, [
+  [0, 0, 'playAudio',    'com.elgato.streamdeck.soundboard.playaudio',       'com.elgato.streamdeck.soundboard',   'Soundboard',   {}, 'Play\nAudio'],
+  [1, 0, 'stopAudio',   'com.elgato.streamdeck.soundboard.stopaudioplay',    'com.elgato.streamdeck.soundboard',   'Soundboard',   {}, 'Stop\nAudio'],
+  [2, 0, 'multiAction', 'com.elgato.streamdeck.multiactions.routine',        'com.elgato.streamdeck.multiactions', 'Multi Action', { Actions: [] }, 'Multi\nAction'],
+  [3, 0, 'multiSwitch', 'com.elgato.streamdeck.multiactions.routine2',       'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Multi\nSwitch'],
+  [4, 0, 'randomAction','com.elgato.streamdeck.multiactions.random',         'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Random\nAction'],
+  [0, 1, 'keyLogic',    'com.elgato.streamdeck.keys.logic',                  'com.elgato.streamdeck.keys',         'Keys',         {}, 'Key\nLogic'],
+  [0, 2, 'prevPage',    ...NAV.prev],
+  [4, 2, 'nextPage',    ...NAV.next],
+]);
 
 // ── Write page manifests ──────────────────────────────────────────────────────
-
 const pageData = [
-  { n: 1, uuid: PAGE_UUIDS[1], name: 'System', actions: page1 },
-  { n: 2, uuid: PAGE_UUIDS[2], name: 'Stream Deck', actions: page2 },
-  { n: 3, uuid: PAGE_UUIDS[3], name: 'Navigation', actions: page3 },
-  { n: 4, uuid: PAGE_UUIDS[4], name: 'Soundboard + Multi Act', actions: page4 },
+  { n: 1, uuid: PAGE_UUIDS[1], name: 'System',                  actions: page1 },
+  { n: 2, uuid: PAGE_UUIDS[2], name: 'Stream Deck',             actions: page2 },
+  { n: 3, uuid: PAGE_UUIDS[3], name: 'Navigation',              actions: page3 },
+  { n: 4, uuid: PAGE_UUIDS[4], name: 'Soundboard + Multi Act',  actions: page4 },
 ];
 
 for (const { n, uuid, name, actions } of pageData) {
   const manifest = {
-    Controllers: [{
-      Actions: actions,
-      Type: 'Keypad',
-    }],
+    Controllers: [{ Actions: actions, Type: 'Keypad' }],
     Icon: '',
     Name: name,
   };
   const manifestPath = join(PROFILE_ROOT, 'Profiles', uuid, 'manifest.json');
   writeFileSync(manifestPath, JSON.stringify(manifest));
-  console.log(`Wrote page ${n} (${name}): ${Object.keys(actions).length} buttons → ${manifestPath}`);
+  console.log(`Page ${n} (${name}): ${Object.keys(actions).length} buttons → ${manifestPath}`);
 }
 
 console.log('\nDone. Start Stream Deck app and validate the profile.');
