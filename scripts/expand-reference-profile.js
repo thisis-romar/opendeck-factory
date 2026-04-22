@@ -104,10 +104,12 @@ function writeComposite(imagesDir, key, color) {
   const inner = innerMatch ? innerMatch[1].trim() : '';
 
   // If the icon's viewBox matches our canvas, inline directly.
-  // Otherwise nest it so SVG's own scaling maps the viewBox to 144×144.
-  const iconLayer = (viewBox === '0 0 144 144')
+  // Otherwise use a scale transform — nested <svg viewBox> is ignored by the Stream Deck renderer.
+  const [,, vbW] = viewBox.split(' ').map(Number);
+  const scale = 144 / vbW;
+  const iconLayer = (scale === 1)
     ? inner
-    : `<svg x="0" y="0" width="144" height="144" viewBox="${viewBox}">${inner}</svg>`;
+    : `<g transform="scale(${scale})">${inner}</g>`;
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n<rect width="144" height="144" fill="${color}"/>\n${iconLayer}\n</svg>`;
   writeFileSync(join(imagesDir, `${key}.svg`), svg);

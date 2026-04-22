@@ -60,7 +60,7 @@ This script:
 - Generates composite SVG icons (colored background + plugin icon) for every button
 - Uses viewBox-aware wrapping to normalize icons from different plugin coordinate spaces to 144×144
 
-**viewBox handling:** icons from different plugins use inconsistent SVG coordinate spaces (20px, 24px, 72px, 144px). The script wraps non-144×144 viewBoxes with `<svg x="0" y="0" width="144" height="144" viewBox="...">` to scale them to fill the button canvas.
+**viewBox handling:** icons from different plugins use inconsistent SVG coordinate spaces (24px, 72px, 144px). For non-144×144 viewBoxes, the script uses `<g transform="scale(N)">` where N = 144/viewBoxWidth. Note: nested `<svg viewBox>` was tried but the Stream Deck app ignores nested SVG elements — `<g transform>` is the correct approach.
 
 ### Step 3: Validate
 
