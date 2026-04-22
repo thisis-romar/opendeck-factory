@@ -4,7 +4,7 @@
 // Run: node scripts/expand-reference-profile.js
 // IMPORTANT: Stop Stream Deck app before running this script.
 
-import { writeFileSync, mkdirSync, readFileSync } from 'fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { deflateSync } from 'zlib';
@@ -337,10 +337,12 @@ for (const { n, uuid, name, actions } of pageData) {
   console.log(`Page ${n} (${name}): ${Object.keys(actions).length} buttons → ${manifestPath}`);
 }
 
-// Clear stray content from old page 5 (D9C12A0B)
+// Clear stray content from old page 5 (D9C12A0B) if the directory still exists
 const PAGE5_UUID = 'D9C12A0B-08CC-43F0-8922-CFFC663B18B1';
-const page5Path = join(PROFILE_ROOT, 'Profiles', PAGE5_UUID, 'manifest.json');
-writeFileSync(page5Path, JSON.stringify({ Controllers: [{ Actions: null, Type: 'Keypad' }], Icon: '', Name: '' }));
-console.log('Page 5 (blank): cleared stray buttons');
+const page5Dir = join(PROFILE_ROOT, 'Profiles', PAGE5_UUID);
+if (existsSync(page5Dir)) {
+  writeFileSync(join(page5Dir, 'manifest.json'), JSON.stringify({ Controllers: [{ Actions: null, Type: 'Keypad' }], Icon: '', Name: '' }));
+  console.log('Page 5 (blank): cleared stray buttons');
+}
 
 console.log('\nDone. Start Stream Deck app and validate the profile.');
