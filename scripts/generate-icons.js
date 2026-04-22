@@ -12,19 +12,7 @@
 
 import { resolve, join } from 'node:path';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-
-const CATEGORY_COLORS = {
-  general:    { bg: '#3B82F6', text: '#FFFFFF' },  // blue
-  navigation: { bg: '#22C55E', text: '#FFFFFF' },  // green
-  view:       { bg: '#A855F7', text: '#FFFFFF' },  // purple
-  editing:    { bg: '#F97316', text: '#FFFFFF' },  // orange
-  debug:      { bg: '#EF4444', text: '#FFFFFF' },  // red
-  terminal:   { bg: '#14B8A6', text: '#FFFFFF' },  // teal
-  search:     { bg: '#EAB308', text: '#1F2937' },  // amber (dark text for contrast)
-  file:       { bg: '#6366F1', text: '#FFFFFF' },  // indigo
-  editor:     { bg: '#0EA5E9', text: '#FFFFFF' },  // sky
-  chord:      { bg: '#EC4899', text: '#FFFFFF' },  // pink
-};
+import { CATEGORY_COLORS, contrastColor } from '../src/colors.js';
 
 const KEY_DISPLAY_OVERRIDES = {
   BACKTICK: '`',  MINUS: '-',  EQUALS: '=',
@@ -98,7 +86,8 @@ mkdirSync(outDir, { recursive: true });
 let count = 0;
 for (let i = 0; i < data.shortcuts.length; i++) {
   const shortcut = data.shortcuts[i];
-  const colors = CATEGORY_COLORS[shortcut.category] || CATEGORY_COLORS.general;
+  const bg = CATEGORY_COLORS[shortcut.category] || CATEGORY_COLORS.general;
+  const colors = { bg, text: contrastColor(bg) };
   const svg = generateSvgIcon(shortcut, colors);
   const filename = `${String(i).padStart(3, '0')}-${shortcut.command.replace(/[^a-zA-Z0-9.]/g, '-')}.svg`;
   writeFileSync(join(outDir, filename), svg);

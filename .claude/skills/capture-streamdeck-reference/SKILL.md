@@ -121,15 +121,13 @@ To add an action type not yet in the reference profile:
 ### Page 3 — Navigation (vivid emerald)
 | Col | Row | Action ID | Label |
 |-----|-----|-----------|-------|
-| 0 | 0 | `com.elgato.streamdeck.profile.openchild` | Create Folder |
-| 1 | 0 | `com.elgato.streamdeck.profile.rotate` | Switch Profile |
-| 2 | 0 | `com.elgato.streamdeck.page.previous` | Prev Page |
-| 3 | 0 | `com.elgato.streamdeck.page.next` | Next Page |
-| 4 | 0 | `com.elgato.streamdeck.page.goto` | Go to Page |
-| 0 | 1 | `com.elgato.streamdeck.page.indicator` | Page Indicator |
-| 1 | 1 | `com.elgato.streamdeck.profile.backtoparent` | Parent Folder |
+| 0 | 0 | `com.elgato.streamdeck.profile.rotate` | Switch Profile |
+| 1 | 0 | `com.elgato.streamdeck.page.goto` | Go to Page |
+| 0 | 1 | `com.elgato.streamdeck.profile.backtoparent` | Parent Folder |
 | 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
 | 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
+| GUI only | — | `com.elgato.streamdeck.profile.openchild` | Create Folder (see GUI Capture table) |
+| GUI only | — | `com.elgato.streamdeck.page.indicator` | Page Indicator (see GUI Capture table) |
 
 ### Page 4 — Soundboard + Multi Act + Keys (vivid violet)
 | Col | Row | Action ID | Label |
@@ -154,6 +152,7 @@ These action types cannot be placed via JSON injection alone — their schema is
 
 | Action | Reason | Subagent task |
 |--------|--------|---------------|
+| Create Folder | Requires sub-profile structure the app creates on placement; JSON-only placement is silently dropped by the app on save-back | Drag-drop via streamdeck-driver, export, diff manifest |
 | Pinned Action | Right-click → Pin gesture only | Capture manifest after pinning |
 | Wallpaper | Right-click → Set from file | Capture manifest after set |
 | Multi Action with custom title+icon | Engine sets display incorrectly | Compare GUI-placed vs engine-placed manifests |
