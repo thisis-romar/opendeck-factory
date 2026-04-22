@@ -94,28 +94,35 @@ To add an action type not yet in the reference profile:
 | 1 | 0 | `com.elgato.streamdeck.system.hotkeyswitch` | Hotkey Switch |
 | 2 | 0 | `com.elgato.streamdeck.system.hotkey` | Hotkey Ctrl+A |
 | 3 | 0 | `com.elgato.streamdeck.system.open` | Open |
-| 4 | 0 | `com.elgato.streamdeck.system.openapp` | Open App |
+| 4 | 0 | `com.elgato.streamdeck.page.indicator` (app-rendered) | Page Indicator |
 | 0 | 1 | `com.elgato.streamdeck.system.close` | Close |
 | 1 | 1 | `com.elgato.streamdeck.system.text` | Text |
-| 2 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:0) | Prev Track |
-| 3 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:1) | Play/Pause |
-| 4 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:2) | Next Track |
+| 2 | 1 | `com.elgato.streamdeck.system.openapp` | Open App |
+| 3 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:0) | Prev Track |
+| 4 | 1 | `com.elgato.streamdeck.system.multimedia` (actionIdx:1) | Play/Pause |
 | 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
-| 1 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:3) | Stop |
-| 2 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:4) | Mute |
-| 3 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:5) | Vol+ |
+| 1 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:2) | Next Track |
+| 2 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:3) | Stop |
+| 3 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:4) | Mute |
 | 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 
 ### Page 2 — Stream Deck (vivid orange)
 | Col | Row | Action ID | Label |
 |-----|-----|-----------|-------|
 | 0 | 0 | `com.elgato.streamdeck.system.timer` | Timer |
-| 1–4 | 0 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:0–3) | Brighter/Darker/Max/High |
-| 0–2 | 1 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:4–6) | Medium/Low/Minimum |
+| 1 | 0 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:0) | Brighter |
+| 2 | 0 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:1) | Darker |
+| 3 | 0 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:2) | Max |
+| 4 | 0 | `com.elgato.streamdeck.page.indicator` (app-rendered) | Page Indicator |
+| 0 | 1 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:4) | Medium |
+| 1 | 1 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:5) | Low |
+| 2 | 1 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:6) | Minimum |
 | 3 | 1 | `com.elgato.streamdeck.system.sleep` | Sleep |
 | 4 | 1 | `com.elgato.streamdeck.vsdtoggle` | Toggle VSD |
 | 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
-| 1 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:6) | Vol- |
+| 1 | 2 | `com.elgato.streamdeck.system.keybrightness` (actionIdx:3) | High |
+| 2 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:6) | Vol- |
+| 3 | 2 | `com.elgato.streamdeck.system.multimedia` (actionIdx:5) | Vol+ |
 | 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 
 ### Page 3 — Navigation (vivid emerald)
@@ -123,11 +130,11 @@ To add an action type not yet in the reference profile:
 |-----|-----|-----------|-------|
 | 0 | 0 | `com.elgato.streamdeck.profile.rotate` | Switch Profile |
 | 1 | 0 | `com.elgato.streamdeck.page.goto` | Go to Page |
+| 4 | 0 | `com.elgato.streamdeck.page.indicator` (app-rendered) | Page Indicator |
 | 0 | 1 | `com.elgato.streamdeck.profile.backtoparent` | Parent Folder |
 | 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
 | 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 | GUI only | — | `com.elgato.streamdeck.profile.openchild` | Create Folder (see GUI Capture table) |
-| GUI only | — | `com.elgato.streamdeck.page.indicator` | Page Indicator (see GUI Capture table) |
 
 ### Page 4 — Soundboard + Multi Act + Keys (vivid violet)
 | Col | Row | Action ID | Label |
@@ -136,26 +143,29 @@ To add an action type not yet in the reference profile:
 | 1 | 0 | `com.elgato.streamdeck.soundboard.stopaudioplay` | Stop Audio |
 | 2 | 0 | `com.elgato.streamdeck.multiactions.routine` | Multi Action |
 | 3 | 0 | `com.elgato.streamdeck.multiactions.routine2` | Multi Switch |
-| 4 | 0 | `com.elgato.streamdeck.multiactions.random` | Random Action |
+| 4 | 0 | `com.elgato.streamdeck.page.indicator` (app-rendered) | Page Indicator |
 | 0 | 1 | `com.elgato.streamdeck.keys.logic` | Key Logic |
 | 1 | 1 | `com.elgato.streamdeck.multiactions.delay` | Delay |
 | 2 | 1 | `com.elgato.streamdeck.system.digitaltime` | Digital Time |
 | 3 | 1 | `com.elgato.streamdeck.keys.adaptor` | Key Adaptor |
 | 4 | 1 | `com.elgato.streamdeck.keys.stack` | Key Stack |
 | 0 | 2 | `com.elgato.streamdeck.page` (nav) | ← Prev Page |
-| 1 | 2 | `com.elgato.streamdeck.system.pagination` | Pagination |
+| 1 | 2 | `com.elgato.streamdeck.multiactions.random` | Random Action |
+| 2 | 2 | `com.elgato.streamdeck.system.pagination` | Pagination |
 | 4 | 2 | `com.elgato.streamdeck.page` (nav) | Next Page → |
 
 ## Action Types Requiring GUI Capture
 
-These action types cannot be placed via JSON injection alone — their schema is incomplete or they require right-click gestures:
+These action types cannot be placed via JSON injection alone — their schema is incomplete or they require right-click gestures. Use the `drive-windows-gui` skill for all of these.
 
-| Action | Reason | Subagent task |
-|--------|--------|---------------|
-| Create Folder | Requires sub-profile structure the app creates on placement; JSON-only placement is silently dropped by the app on save-back | Drag-drop via streamdeck-driver, export, diff manifest |
-| Pinned Action | Right-click → Pin gesture only | Capture manifest after pinning |
-| Wallpaper | Right-click → Set from file | Capture manifest after set |
-| Multi Action with custom title+icon | Engine sets display incorrectly | Compare GUI-placed vs engine-placed manifests |
+| Action | UUID | Status | Reason | Subagent task |
+|--------|------|--------|--------|---------------|
+| Create Folder | `com.elgato.streamdeck.profile.openchild` | ❌ Not captured | Requires sub-profile structure the app creates on placement; JSON-only placement is silently dropped | Drag-drop onto Page 3, export manifest, diff against engine-generated |
+| Pinned Action | unknown | ❌ Not captured | Right-click → Pin gesture only; no JSON equivalent | Right-click any button → Pin, export, read manifest |
+| Wallpaper | unknown | ❌ Not captured | Right-click → Set Wallpaper from file | Right-click canvas → Set Wallpaper, export, read manifest |
+| Multi Action title+icon | `com.elgato.streamdeck.multiactions.routine` | ❌ Not captured | Engine-placed Multi Action renders display incorrectly vs GUI-placed | Place via GUI, export, diff `States` and `Settings` vs engine output |
+
+After capturing each schema, document the discovered fields in `docs/obsidian-vault/` and add to `expand-reference-profile.js` where applicable.
 
 Use the `streamdeck-driver` subagent for these. After capture, diff the exported manifest against an engine-generated one to identify the missing fields.
 
