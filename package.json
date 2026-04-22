@@ -1,6 +1,6 @@
 {
   "name": "opendeck-factory",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "description": "Open-source Stream Deck profile editor engine",
   "main": "src/index.js",
@@ -22,6 +22,7 @@
     "prepare": "make install-hooks"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "adm-zip": "^0.5.17"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 ---
 title: Changelog
 description: All notable changes to opendeck-factory
-version: 2.0.0
+version: 2.1.0
 created: 2026-04-22T00:00:00Z
 last_updated: 2026-04-22T00:00:00Z
 ---
@@ -14,6 +14,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 ---
 
 ## [Unreleased]
+
+## [2.1.0] — 2026-04-22
+
+### Features
+- MCP server (`src/mcp-server.js`) with 7 tools via stdio transport: `extract_profile`, `pack_profile`, `validate_profile`, `list_profile`, `add_shortcut`, `generate_icons`, `list_shortcuts`
+- Claude Code plugin scaffold (`.claude-plugin/`): `plugin.json`, `marketplace.json`, pre-pack-validate hook
+- Reference profile: white border ring (square outer, rounded inner corners via SVG evenodd), Page 5 for Neo & Plus device-specific actions, brighter page colors across all 5 pages
+
+### Documentation
+- Sync SKILL.md reference tables to live 5-page profile layout
+
+### Bug Fixes
+- Guard `PAGE5_UUID` write with `existsSync` to prevent ENOENT on missing page directory
+
+---
 
 ## [2.0.0] — 2026-04-22
 

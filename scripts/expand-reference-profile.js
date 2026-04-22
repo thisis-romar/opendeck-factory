@@ -8,7 +8,6 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { deflateSync } from 'zlib';
-import { contrastColor } from '../src/colors.js';
 
 const APPDATA = process.env.APPDATA;
 const PLUGINS = 'C:/Program Files/Elgato/StreamDeck/plugins';
@@ -22,21 +21,24 @@ const PAGE_UUIDS = {
   2: '564D9B5B-CFDC-4129-95CF-5B3961B283BA',
   3: 'C3F9ED85-4D3E-4E56-96AD-148975110E6D',
   4: '9BF4637A-6E09-4FFB-A1E4-E7AA22066883',
+  5: 'D9C12A0B-08CC-43F0-8922-CFFC663B18B1',
 };
 
 const PAGE_COLORS = {
-  1: '#1464F4', // Electric blue    — System / OS control
-  2: '#F07800', // Vivid orange     — Stream Deck hardware
-  3: '#00B84A', // Vivid emerald    — Navigation / wayfinding
-  4: '#8B2BE2', // Vivid violet     — Soundboard + Multi Action
+  1: '#1A6EFF', // Electric blue    — System / OS control
+  2: '#FF8800', // Vivid orange     — Stream Deck hardware
+  3: '#00CC52', // Vivid emerald    — Navigation / wayfinding
+  4: '#A535F5', // Vivid violet     — Soundboard + Multi Action
+  5: '#64748B', // Slate gray       — Neo & Plus (Stream Deck Neo + Stream Deck Plus/Plus XL)
 };
 
 // Nav corners use the adjacent page's color so you can see where you're going
 const ADJACENT = {
-  1: { prev: PAGE_COLORS[4], next: PAGE_COLORS[2], prevN: 4, nextN: 2 },
+  1: { prev: PAGE_COLORS[5], next: PAGE_COLORS[2], prevN: 5, nextN: 2 },
   2: { prev: PAGE_COLORS[1], next: PAGE_COLORS[3], prevN: 1, nextN: 3 },
   3: { prev: PAGE_COLORS[2], next: PAGE_COLORS[4], prevN: 2, nextN: 4 },
-  4: { prev: PAGE_COLORS[3], next: PAGE_COLORS[1], prevN: 3, nextN: 1 },
+  4: { prev: PAGE_COLORS[3], next: PAGE_COLORS[5], prevN: 3, nextN: 5 },
+  5: { prev: PAGE_COLORS[4], next: PAGE_COLORS[1], prevN: 4, nextN: 1 },
 };
 
 // Icon map: key → { plugin directory base, icon filename }
@@ -79,7 +81,6 @@ const ICON = {
   keyLogic:         { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyLogic.svg' },
   keyAdaptor:       { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyAdaptor.svg' },
   keyStack:         { p: 'com.elgato.streamdeck.keys',                 f: 'btn_keyStack.svg' },
-  parentFolder:     { p: 'com.elgato.streamdeck.profile.backtoparent', f: 'btn_backtoParent.svg' },
   delay:            { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_duration.svg' },
   digitalTime:      { p: 'com.elgato.streamdeck.system.digitaltime',   f: 'btn_digitalTime.svg' },
   pagination:       { p: 'com.elgato.streamdeck.system.pagination',    f: 'btn_pagination.svg' },
@@ -158,21 +159,49 @@ function buildIconLayer(key) {
   return `<g ${attrs.join(' ')}>${inner}</g>`;
 }
 
-// Icon-only SVG: no background rect — page background provides the color.
-// Used for all content buttons.
-function writeIconOnly(imagesDir, key) {
+const RX = 18;
+const BORDER_W = 5;
+const INNER = 144 - BORDER_W * 2; // 134px inner area
+
+function darkenColor(hex, amount = 0.3) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const dr = Math.max(0, Math.round(r * (1 - amount)));
+  const dg = Math.max(0, Math.round(g * (1 - amount)));
+  const db = Math.max(0, Math.round(b * (1 - amount)));
+  return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
+}
+
+// Gradient fills the entire 144×144 canvas (app clips outer corners).
+// White ring drawn on top of gradient, under the icon — visible inside the app's own mask.
+// BORDER_W controls ring thickness; half the stroke falls outside SVG edge and gets clipped.
+function buttonDefs(color) {
+  const top = lightenColor(color, 0.35);
+  const bot = darkenColor(color, 0.30);
+  return `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${top}"/><stop offset="100%" stop-color="${bot}"/></linearGradient></defs>`;
+}
+
+// Square outer corners, rounded inner corners.
+// Outer path fills full 144×144; inner path (with rx arcs) punches out the center via evenodd.
+function borderRing() {
+  const bw = BORDER_W, r = RX;
+  const x0 = bw, y0 = bw, x1 = 144 - bw, y1 = 144 - bw;
+  const inner = `M${x0+r} ${y0} L${x1-r} ${y0} A${r} ${r} 0 0 1 ${x1} ${y0+r} L${x1} ${y1-r} A${r} ${r} 0 0 1 ${x1-r} ${y1} L${x0+r} ${y1} A${r} ${r} 0 0 1 ${x0} ${y1-r} L${x0} ${y0+r} A${r} ${r} 0 0 1 ${x0+r} ${y0} Z`;
+  return `<path fill="white" fill-rule="evenodd" d="M0 0 H144 V144 H0 Z ${inner}"/>`;
+}
+
+function writeIconOnly(imagesDir, key, bgColor) {
   const layer = buildIconLayer(key);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n${layer}\n</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n${buttonDefs(bgColor)}\n<rect width="144" height="144" fill="url(#g)"/>\n${borderRing()}\n${layer}\n</svg>`;
   writeFileSync(join(imagesDir, `${key}.svg`), svg);
   return `Images/${key}.svg`;
 }
 
-// Nav composite: solid adjacent-page-color rect + icon.
-// Filename encodes color so prev (e.g. violet) and next (e.g. orange) don't collide.
 function writeNavComposite(imagesDir, key, color) {
   const layer = buildIconLayer(key);
   const slug = color.replace('#', '');
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n<rect width="144" height="144" fill="${color}"/>\n${layer}\n</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n${buttonDefs(color)}\n<rect width="144" height="144" fill="url(#g)"/>\n${borderRing()}\n${layer}\n</svg>`;
   writeFileSync(join(imagesDir, `nav-${key}-${slug}.svg`), svg);
   return `Images/nav-${key}-${slug}.svg`;
 }
@@ -193,7 +222,7 @@ function btn(actionUUID, pluginUUID, pluginName, settings, label, image, bgColor
       ShowTitle: true,
       Title: label + '\n',
       TitleAlignment: 'bottom',
-      TitleColor: contrastColor(bgColor),
+      TitleColor: '#ffffff',
       FontSize: 9,
     }],
     UUID: actionUUID,
@@ -201,7 +230,7 @@ function btn(actionUUID, pluginUUID, pluginName, settings, label, image, bgColor
 }
 
 // Page Indicator: fully dynamic — app draws live page number on page background color.
-// No composite image; States:[{}] lets the page background show through.
+// ShowTitle:false + Title:'' suppresses any user-label text below the dynamic number.
 function makePageIndicator() {
   return {
     ActionID: randomUUID(),
@@ -211,9 +240,20 @@ function makePageIndicator() {
     Resources: null,
     Settings: {},
     State: 0,
-    States: [{}],
+    States: [{ ShowTitle: false, Title: '' }],
     UUID: 'com.elgato.streamdeck.page.indicator',
   };
+}
+
+// Returns a lighter (more vivid on dark background) version of a hex color.
+function lightenColor(hex, amount = 0.35) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const lr = Math.min(255, Math.round(r + (255 - r) * amount));
+  const lg = Math.min(255, Math.round(g + (255 - g) * amount));
+  const lb = Math.min(255, Math.round(b + (255 - b) * amount));
+  return `#${lr.toString(16).padStart(2, '0')}${lg.toString(16).padStart(2, '0')}${lb.toString(16).padStart(2, '0')}`;
 }
 
 // ── Page factory ──────────────────────────────────────────────────────────────
@@ -227,7 +267,7 @@ function buildPage(pageNum, defs) {
 
   const actions = {};
   for (const [col, row, iconKey, aUUID, pUUID, pName, settings, label] of defs) {
-    const image = writeIconOnly(imagesDir, iconKey);
+    const image = writeIconOnly(imagesDir, iconKey, color);
     actions[`${col},${row}`] = btn(aUUID, pUUID, pName, settings, label, image, color);
   }
 
@@ -237,13 +277,15 @@ function buildPage(pageNum, defs) {
   return { actions, imagesDir };
 }
 
-// Nav corners colored with the adjacent page's color (circular).
+// Nav corners: adjacent page color lightened so they pop against the current page background.
 function addNavCorners(actions, imagesDir, pageNum) {
   const { prev, next, prevN, nextN } = ADJACENT[pageNum];
-  const prevImage = writeNavComposite(imagesDir, 'navPrev', prev);
-  const nextImage = writeNavComposite(imagesDir, 'navNext', next);
-  actions['0,2'] = btn('com.elgato.streamdeck.page.previous', 'com.elgato.streamdeck.page', 'Pages', {}, `← ${prevN}`, prevImage, prev);
-  actions['4,2'] = btn('com.elgato.streamdeck.page.next',     'com.elgato.streamdeck.page', 'Pages', {}, `${nextN} →`, nextImage, next);
+  const prevLight = lightenColor(prev);
+  const nextLight = lightenColor(next);
+  const prevImage = writeNavComposite(imagesDir, 'navPrev', prevLight);
+  const nextImage = writeNavComposite(imagesDir, 'navNext', nextLight);
+  actions['0,2'] = btn('com.elgato.streamdeck.page.previous', 'com.elgato.streamdeck.page', 'Pages', {}, `← ${prevN}`, prevImage, prevLight);
+  actions['4,2'] = btn('com.elgato.streamdeck.page.next',     'com.elgato.streamdeck.page', 'Pages', {}, `${nextN} →`, nextImage, nextLight);
 }
 
 // ── Page 1 — System (electric blue) ──────────────────────────────────────────
@@ -289,34 +331,41 @@ addNavCorners(page2, imgDir2, 2);
 
 // ── Page 3 — Navigation (vivid emerald) ──────────────────────────────────────
 // Row 0: Switch Profile | Go to Page | · | · | [Page Indicator]
-// Row 1: Parent Folder
 // Row 2: [← 2:orange] | · | · | · | [4→:violet]
 // Create Folder: GUI-only (sub-profile structure required)
+// Parent Folder: removed — only valid inside a sub-folder, confusing at root level
 const { actions: page3, imagesDir: imgDir3 } = buildPage(3, [
-  [0, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate',       'com.elgato.streamdeck.profile.rotate',       'Switch Profile', {}, 'Switch\nProfile'],
-  [1, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',            'com.elgato.streamdeck.page',                 'Pages',          { page: 0 }, 'Go to\nPage'],
-  [0, 1, 'parentFolder',  'com.elgato.streamdeck.profile.backtoparent', 'com.elgato.streamdeck.profile.backtoparent', 'Parent Folder',  {}, 'Parent\nFolder'],
+  [0, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate', 'com.elgato.streamdeck.profile.rotate', 'Switch Profile', {}, 'Switch\nProfile'],
+  [1, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',      'com.elgato.streamdeck.page',           'Pages',          { page: 0 }, 'Go to\nPage'],
 ]);
 addNavCorners(page3, imgDir3, 3);
 
 // ── Page 4 — Soundboard + Multi Action + Keys (vivid violet) ─────────────────
 // Row 0: Play Audio | Stop Audio | Multi Action | Multi Switch | [Page Indicator]
-// Row 1: Key Logic | Delay | Digital Time | Key Adaptor | Key Stack
-// Row 2: [← 3:green] | Random Action | Pagination | · | [1→:blue]
+// Row 1: Key Logic | Delay | · | · | ·
+// Row 2: [← 3:green] | Random Action | · | · | [5→:slate]
 const { actions: page4, imagesDir: imgDir4 } = buildPage(4, [
-  [0, 0, 'playAudio',    'com.elgato.streamdeck.soundboard.playaudio',     'com.elgato.streamdeck.soundboard',         'Soundboard',   {}, 'Play\nAudio'],
-  [1, 0, 'stopAudio',    'com.elgato.streamdeck.soundboard.stopaudioplay', 'com.elgato.streamdeck.soundboard',         'Soundboard',   {}, 'Stop\nAudio'],
-  [2, 0, 'multiAction',  'com.elgato.streamdeck.multiactions.routine',     'com.elgato.streamdeck.multiactions',       'Multi Action', { Actions: [] }, 'Multi\nAction'],
-  [3, 0, 'multiSwitch',  'com.elgato.streamdeck.multiactions.routine2',    'com.elgato.streamdeck.multiactions',       'Multi Action', {}, 'Multi\nSwitch'],
-  [0, 1, 'keyLogic',     'com.elgato.streamdeck.keys.logic',               'com.elgato.streamdeck.keys',               'Keys',         {}, 'Key\nLogic'],
-  [1, 1, 'delay',        'com.elgato.streamdeck.multiactions.delay',       'com.elgato.streamdeck.multiactions',       'Multi Action', { duration: 1000 }, 'Delay'],
-  [2, 1, 'digitalTime',  'com.elgato.streamdeck.system.digitaltime',       'com.elgato.streamdeck.system.digitaltime', 'Digital Time', {}, 'Digital\nTime'],
-  [3, 1, 'keyAdaptor',   'com.elgato.streamdeck.keys.adaptor',             'com.elgato.streamdeck.keys',               'Keys',         {}, 'Key\nAdaptor'],
-  [4, 1, 'keyStack',     'com.elgato.streamdeck.keys.stack',               'com.elgato.streamdeck.keys',               'Keys',         {}, 'Key\nStack'],
-  [1, 2, 'randomAction', 'com.elgato.streamdeck.multiactions.random',      'com.elgato.streamdeck.multiactions',       'Multi Action', {}, 'Random\nAction'],
-  [2, 2, 'pagination',   'com.elgato.streamdeck.system.pagination',        'com.elgato.streamdeck.system.pagination',  'Pagination',   {}, 'Pagination'],
+  [0, 0, 'playAudio',    'com.elgato.streamdeck.soundboard.playaudio',     'com.elgato.streamdeck.soundboard',   'Soundboard',   {}, 'Play\nAudio'],
+  [1, 0, 'stopAudio',    'com.elgato.streamdeck.soundboard.stopaudioplay', 'com.elgato.streamdeck.soundboard',   'Soundboard',   {}, 'Stop\nAudio'],
+  [2, 0, 'multiAction',  'com.elgato.streamdeck.multiactions.routine',     'com.elgato.streamdeck.multiactions', 'Multi Action', { Actions: [] }, 'Multi\nAction'],
+  [3, 0, 'multiSwitch',  'com.elgato.streamdeck.multiactions.routine2',    'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Multi\nSwitch'],
+  [0, 1, 'keyLogic',     'com.elgato.streamdeck.keys.logic',               'com.elgato.streamdeck.keys',         'Keys',         {}, 'Key\nLogic'],
+  [1, 1, 'delay',        'com.elgato.streamdeck.multiactions.delay',       'com.elgato.streamdeck.multiactions', 'Multi Action', { duration: 1000 }, 'Delay'],
+  [1, 2, 'randomAction', 'com.elgato.streamdeck.multiactions.random',      'com.elgato.streamdeck.multiactions', 'Multi Action', {}, 'Random\nAction'],
 ]);
 addNavCorners(page4, imgDir4, 4);
+
+// ── Page 5 — Neo & Plus (slate gray) ─────────────────────────────────────────
+// Row 0: Digital Time (Neo) | Pagination (Neo) | · | · | [Page Indicator]
+// Row 1: Key Adaptor (SD+/Plus XL) | Key Stack (SD+/Plus XL) | · | · | ·
+// Row 2: [← 4:violet] | · | · | · | [1→:blue]
+const { actions: page5, imagesDir: imgDir5 } = buildPage(5, [
+  [0, 0, 'digitalTime', 'com.elgato.streamdeck.system.digitaltime',      'com.elgato.streamdeck.system.digitaltime', 'Digital Time', {}, 'Digital\nTime'],
+  [1, 0, 'pagination',  'com.elgato.streamdeck.system.pagination',       'com.elgato.streamdeck.system.pagination',  'Pagination',   {}, 'Pagination'],
+  [0, 1, 'keyAdaptor',  'com.elgato.streamdeck.keys.adaptor',            'com.elgato.streamdeck.keys',               'Keys',         {}, 'Key\nAdaptor'],
+  [1, 1, 'keyStack',    'com.elgato.streamdeck.keys.stack',              'com.elgato.streamdeck.keys',               'Keys',         {}, 'Key\nStack'],
+]);
+addNavCorners(page5, imgDir5, 5);
 
 // ── Write page manifests ──────────────────────────────────────────────────────
 const pageData = [
@@ -324,6 +373,7 @@ const pageData = [
   { n: 2, uuid: PAGE_UUIDS[2], name: 'Stream Deck',                   actions: page2 },
   { n: 3, uuid: PAGE_UUIDS[3], name: 'Navigation',                    actions: page3 },
   { n: 4, uuid: PAGE_UUIDS[4], name: 'Soundboard + Multi Act + Keys', actions: page4 },
+  { n: 5, uuid: PAGE_UUIDS[5], name: 'Neo & Plus',                     actions: page5 },
 ];
 
 for (const { n, uuid, name, actions } of pageData) {
@@ -337,12 +387,11 @@ for (const { n, uuid, name, actions } of pageData) {
   console.log(`Page ${n} (${name}): ${Object.keys(actions).length} buttons → ${manifestPath}`);
 }
 
-// Clear stray content from old page 5 (D9C12A0B) if the directory still exists
-const PAGE5_UUID = 'D9C12A0B-08CC-43F0-8922-CFFC663B18B1';
-const page5Dir = join(PROFILE_ROOT, 'Profiles', PAGE5_UUID);
-if (existsSync(page5Dir)) {
-  writeFileSync(join(page5Dir, 'manifest.json'), JSON.stringify({ Controllers: [{ Actions: null, Type: 'Keypad' }], Icon: '', Name: '' }));
-  console.log('Page 5 (blank): cleared stray buttons');
-}
+// Update root manifest — register all 5 pages in order
+const rootPath = join(PROFILE_ROOT, 'manifest.json');
+const root = JSON.parse(readFileSync(rootPath, 'utf8'));
+root.Pages.Pages = Object.values(PAGE_UUIDS).map(u => u.toLowerCase());
+writeFileSync(rootPath, JSON.stringify(root));
+console.log('Root manifest: updated to 5 pages');
 
 console.log('\nDone. Start Stream Deck app and validate the profile.');
