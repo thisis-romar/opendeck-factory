@@ -32,6 +32,7 @@ node src/index.js list <dir>                    # Show grid layout
 - Labels must end with `\n` — use `\n` for line breaks (max 3 lines)
 - Images are 144x144 pixels (retina @2x for 72x72 buttons)
 - Always validate before packing
+- `extract` produces live format; `validate`/`list` accept both live and normalized format
 
 ## Safety
 

@@ -10,58 +10,71 @@ import { DEVICE_MODELS } from './constants.js';
 export function validate(extractedDir) {
   const errors = [];
 
-  // Check package.json
   const pkgPath = join(extractedDir, 'package.json');
-  if (!existsSync(pkgPath)) {
-    errors.push('Missing package.json at root');
+  const rootManifestPath = join(extractedDir, 'manifest.json');
+  const liveFormat = !existsSync(pkgPath) && existsSync(rootManifestPath);
+
+  let deviceModel, pagesDir, pageUUIDs;
+
+  if (liveFormat) {
+    // Live format: root manifest.json + Profiles/<page-uuid>/ directly
+    const manifest = JSON.parse(readFileSync(rootManifestPath, 'utf8'));
+    if (!manifest.Name) errors.push('manifest.json: missing Name');
+    if (!manifest.Version) errors.push('manifest.json: missing Version');
+    if (!manifest.Device) errors.push('manifest.json: missing Device');
+    if (!manifest.Pages) errors.push('manifest.json: missing Pages');
+    deviceModel = manifest.Device?.Model || '20GBA9901';
+    pagesDir = join(extractedDir, 'Profiles');
+    pageUUIDs = manifest.Pages?.Pages || readdirSync(pagesDir);
   } else {
-    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-    if (!pkg.AppVersion) errors.push('package.json: missing AppVersion');
-    if (!pkg.DeviceModel) errors.push('package.json: missing DeviceModel');
+    // Normalized format: package.json + Profiles/<uuid>.sdProfile/Profiles/<page-uuid>/
+    if (!existsSync(pkgPath)) {
+      errors.push('Missing package.json at root');
+    } else {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+      if (!pkg.AppVersion) errors.push('package.json: missing AppVersion');
+      if (!pkg.DeviceModel) errors.push('package.json: missing DeviceModel');
+      deviceModel = pkg.DeviceModel;
+    }
+
+    const profilesDir = join(extractedDir, 'Profiles');
+    if (!existsSync(profilesDir)) {
+      errors.push('Missing Profiles/ directory');
+      return { valid: false, errors };
+    }
+
+    const sdProfiles = readdirSync(profilesDir).filter(e => e.endsWith('.sdProfile'));
+    if (sdProfiles.length === 0) {
+      errors.push('No .sdProfile directory found under Profiles/');
+      return { valid: false, errors };
+    }
+    if (sdProfiles.length > 1) {
+      errors.push(`Multiple .sdProfile directories found: ${sdProfiles.join(', ')}`);
+    }
+
+    const sdProfileDir = join(profilesDir, sdProfiles[0]);
+    const manifestPath = join(sdProfileDir, 'manifest.json');
+    if (!existsSync(manifestPath)) {
+      errors.push('Missing profile manifest.json');
+      return { valid: false, errors };
+    }
+
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    if (!manifest.Name) errors.push('Profile manifest: missing Name');
+    if (!manifest.Version) errors.push('Profile manifest: missing Version');
+    if (!manifest.Device) errors.push('Profile manifest: missing Device');
+    if (!manifest.Pages) errors.push('Profile manifest: missing Pages');
+
+    pagesDir = join(sdProfileDir, 'Profiles');
+    if (!existsSync(pagesDir)) {
+      errors.push('Missing page Profiles/ directory inside .sdProfile');
+      return { valid: false, errors };
+    }
+    pageUUIDs = readdirSync(pagesDir);
+    if (!deviceModel) deviceModel = '20GBA9901';
   }
 
-  // Check Profiles directory
-  const profilesDir = join(extractedDir, 'Profiles');
-  if (!existsSync(profilesDir)) {
-    errors.push('Missing Profiles/ directory');
-    return { valid: false, errors };
-  }
-
-  // Find .sdProfile directory
-  const sdProfiles = readdirSync(profilesDir).filter(e => e.endsWith('.sdProfile'));
-  if (sdProfiles.length === 0) {
-    errors.push('No .sdProfile directory found under Profiles/');
-    return { valid: false, errors };
-  }
-  if (sdProfiles.length > 1) {
-    errors.push(`Multiple .sdProfile directories found: ${sdProfiles.join(', ')}`);
-  }
-
-  const sdProfileDir = join(profilesDir, sdProfiles[0]);
-  const manifestPath = join(sdProfileDir, 'manifest.json');
-  if (!existsSync(manifestPath)) {
-    errors.push('Missing profile manifest.json');
-    return { valid: false, errors };
-  }
-
-  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-  if (!manifest.Name) errors.push('Profile manifest: missing Name');
-  if (!manifest.Version) errors.push('Profile manifest: missing Version');
-  if (!manifest.Device) errors.push('Profile manifest: missing Device');
-  if (!manifest.Pages) errors.push('Profile manifest: missing Pages');
-
-  // Check page directories
-  const pagesDir = join(sdProfileDir, 'Profiles');
-  if (!existsSync(pagesDir)) {
-    errors.push('Missing page Profiles/ directory inside .sdProfile');
-    return { valid: false, errors };
-  }
-
-  const pageUUIDs = readdirSync(pagesDir);
-
-  // Get device grid dimensions
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-  const device = DEVICE_MODELS[pkg.DeviceModel] || { cols: 5, rows: 3 };
+  const device = DEVICE_MODELS[deviceModel] || { cols: 5, rows: 3 };
 
   for (const pageUUID of pageUUIDs) {
     const pageDir = join(pagesDir, pageUUID);

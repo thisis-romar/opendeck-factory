@@ -8,10 +8,27 @@ import { addImage } from './images.js';
 export class ProfileEditor {
   constructor(extractedDir) {
     this.extractedDir = extractedDir;
-    this.packageJson = JSON.parse(readFileSync(join(extractedDir, 'package.json'), 'utf8'));
-    this.profileUUID = this._findProfileUUID();
-    this.profileDir = join(extractedDir, 'Profiles', `${this.profileUUID}.sdProfile`);
-    this.profileManifest = JSON.parse(readFileSync(join(this.profileDir, 'manifest.json'), 'utf8'));
+    const pkgPath = join(extractedDir, 'package.json');
+    const manifestPath = join(extractedDir, 'manifest.json');
+
+    if (existsSync(pkgPath)) {
+      // Normalized format: package.json + Profiles/<uuid>.sdProfile/
+      this._liveFormat = false;
+      this.packageJson = JSON.parse(readFileSync(pkgPath, 'utf8'));
+      this.profileUUID = this._findProfileUUID();
+      this.profileDir = join(extractedDir, 'Profiles', `${this.profileUUID}.sdProfile`);
+      this.profileManifest = JSON.parse(readFileSync(join(this.profileDir, 'manifest.json'), 'utf8'));
+    } else if (existsSync(manifestPath)) {
+      // Live format: root manifest.json + Profiles/<page-uuid>/ (extracted from .streamDeckProfile)
+      this._liveFormat = true;
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+      this.packageJson = { DeviceModel: manifest.Device?.Model || '20GBA9901', AppVersion: '7.0.0' };
+      this.profileDir = extractedDir;
+      this.profileManifest = manifest;
+    } else {
+      throw new Error(`No package.json or manifest.json found in: ${extractedDir}`);
+    }
+
     this._pageManifests = new Map();
   }
 
@@ -66,6 +83,9 @@ export class ProfileEditor {
   }
 
   getPageUUIDs() {
+    if (this._liveFormat) {
+      return this.profileManifest.Pages?.Pages || readdirSync(join(this.extractedDir, 'Profiles'));
+    }
     const pagesDir = join(this.profileDir, 'Profiles');
     return readdirSync(pagesDir);
   }
