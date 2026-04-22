@@ -78,7 +78,9 @@ const ICON = {
   delay:            { p: 'com.elgato.streamdeck.multiactions',         f: 'btn_duration.svg' },
   digitalTime:      { p: 'com.elgato.streamdeck.system.digitaltime',   f: 'btn_digitalTime.svg' },
   pagination:       { p: 'com.elgato.streamdeck.system.pagination',    f: 'btn_pagination.svg' },
-  // mmEject / mmRewind: icons exist but actionIdx values unknown — need live capture to verify
+  // mmEject / mmRewind / mmFwd: icon files exist in the multimedia plugin Images/ dir
+  // but these variants do NOT appear in the app's Action dropdown (only 7 options: 0–6).
+  // They were removed from or never exposed in the Stream Deck app UI. Not addable via JSON.
 };
 
 // Extract inner SVG elements from an icon file (strips <svg> wrapper and XML decl)
