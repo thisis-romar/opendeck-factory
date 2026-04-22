@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# .githooks/commit-msg
+# Enforces Conventional Commits via commitlint.
+# Install with: make install-hooks
+
+npx --no -- commitlint --edit "$1"

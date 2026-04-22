@@ -18,9 +18,15 @@
     "extract": "node src/index.js extract",
     "pack": "node src/index.js pack",
     "validate": "node src/index.js validate",
-    "list": "node src/index.js list"
+    "list": "node src/index.js list",
+    "prepare": "make install-hooks"
   },
   "dependencies": {
     "adm-zip": "^0.5.17"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "husky": "^9.1.7"
   }
 }
