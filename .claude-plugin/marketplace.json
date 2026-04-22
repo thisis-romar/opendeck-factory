@@ -1,0 +1,18 @@
+{
+  "name": "opendeck-factory",
+  "tagline": "Generate Stream Deck profiles from code — no manual button setup",
+  "categories": ["developer-tools", "productivity", "stream-deck"],
+  "tags": ["stream-deck", "elgato", "profile-generator", "automation"],
+  "homepage": "https://github.com/thisis-romar/opendeck-factory",
+  "license": "FSL-1.1-ALv2",
+  "upsell": {
+    "text": "Premium icon packs and pre-built app profiles available in the catalog",
+    "url": "https://github.com/thisis-romar/stream-deck-catalog"
+  },
+  "distribution": [
+    "claudemarketplaces.com",
+    "claudeskills.info",
+    "skillsmp.com",
+    "awesome-claude-skills"
+  ]
+}

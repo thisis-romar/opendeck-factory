@@ -22,6 +22,7 @@
     "prepare": "make install-hooks"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "adm-zip": "^0.5.17"
   },
   "devDependencies": {

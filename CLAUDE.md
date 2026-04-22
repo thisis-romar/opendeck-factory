@@ -50,3 +50,23 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 - Profile generation workflow: `.claude/skills/generate-profile/SKILL.md`
 - Capture reference profile (all action types): `.claude/skills/capture-streamdeck-reference/SKILL.md`
 - Drive Windows GUI (Stream Deck app): `.claude/skills/drive-windows-gui/SKILL.md`
+
+## MCP Server
+
+`src/mcp-server.js` — 7 tools: `extract_profile`, `pack_profile`, `validate_profile`, `list_profile`, `add_shortcut`, `generate_icons`, `list_shortcuts`.
+
+**Claude Desktop config** (`claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "opendeck": {
+      "command": "node",
+      "args": ["C:/Users/romar/projects/opendeck/opendeck-factory/src/mcp-server.js"]
+    }
+  }
+}
+```
+
+## Claude Code Plugin
+
+`.claude-plugin/plugin.json` — bundles MCP server + skills for Claude Code plugin marketplace distribution.
