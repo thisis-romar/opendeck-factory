@@ -3,7 +3,7 @@ title: Changelog
 description: All notable changes to opendeck-factory
 version: 2.1.0
 created: 2026-04-22T00:00:00Z
-last_updated: 2026-04-22T00:00:00Z
+lastmod: 2026-04-22T00:00:00Z
 ---
 
 # Changelog
