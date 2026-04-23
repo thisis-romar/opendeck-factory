@@ -24,6 +24,11 @@ const PAGE_UUIDS = {
   5: 'D9C12A0B-08CC-43F0-8922-CFFC663B18B1',
 };
 
+// Pinned Actions page — stored in Pages.Default (not in Pages.Pages).
+// Captured by live diff: pinning a button MOVES it here from its source page.
+// The pinned strip appears below the page tab bar in the Stream Deck app UI.
+const PINNED_UUID = '125C64BA-5E12-44C3-BA71-EF8300992863';
+
 const PAGE_COLORS = {
   1: '#1A6EFF', // Electric blue    — System / OS control
   2: '#FF8800', // Vivid orange     — Stream Deck hardware
@@ -239,12 +244,18 @@ function btn(actionUUID, pluginUUID, pluginName, settings, label, image, bgColor
     Settings: settings,
     State: 0,
     States: [{
+      // FontFamily/Style/Underline/OutlineThickness: app normalises these on first load.
+      // Including them here keeps generated JSON byte-for-byte stable across regenerations.
+      FontFamily: '',
+      FontSize: 9,
+      FontStyle: '',
+      FontUnderline: false,
       Image: image || '',
+      OutlineThickness: 2,
       ShowTitle: true,
       Title: label + '\n',
       TitleAlignment: 'bottom',
       TitleColor: '#ffffff',
-      FontSize: 9,
     }],
     UUID: actionUUID,
   };
@@ -383,11 +394,11 @@ const { actions: page2, imagesDir: imgDir2 } = buildPage(2, [
 addNavCorners(page2, imgDir2, 2);
 
 // ── Page 3 — Navigation (vivid emerald) ──────────────────────────────────────
-// Row 0: Switch Profile | Go to Page | Create Folder | · | [Page Indicator]
+// Row 0: Go to Page | Create Folder | · | · | [Page Indicator]
 // Row 2: [← 2:orange] | · | · | · | [4→:violet]
+// Note: Switch Profile lives on the Pinned Actions page (below), not here.
 const { actions: page3, imagesDir: imgDir3 } = buildPage(3, [
-  [0, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate', 'com.elgato.streamdeck.profile.rotate', 'Switch Profile', {}, 'Switch\nProfile'],
-  [1, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',      'com.elgato.streamdeck.page',           'Pages',          { page: 0 }, 'Go to\nPage'],
+  [0, 0, 'gotoPage', 'com.elgato.streamdeck.page.goto', 'com.elgato.streamdeck.page', 'Pages', { page: 0 }, 'Go to\nPage'],
 ]);
 page3['2,0'] = makeCreateFolder(imgDir3, 3);
 addNavCorners(page3, imgDir3, 3);
@@ -419,13 +430,41 @@ const { actions: page5, imagesDir: imgDir5 } = buildPage(5, [
 ]);
 addNavCorners(page5, imgDir5, 5);
 
+// ── Pinned Actions page ───────────────────────────────────────────────────────
+// Schema source: live diff — pinning moves a button from its page to the Default page.
+// The Default page has no Background field (no page-bg.png) and no Name.
+// It does NOT appear in Pages.Pages; it's referenced only via Pages.Default.
+const pinnedImagesDir = join(PROFILE_ROOT, 'Profiles', PINNED_UUID, 'Images');
+mkdirSync(pinnedImagesDir, { recursive: true });
+const pinnedActions = {
+  // Switch Profile — canonical example of a pinned action.
+  // Settings schema: DeviceUUID + PageIndex + ProfileUUID captured from live profile.
+  '0,0': btn(
+    'com.elgato.streamdeck.profile.rotate',
+    'com.elgato.streamdeck.profile.rotate',
+    'Switch Profile',
+    { DeviceUUID: '', PageIndex: 1, ProfileUUID: '' },
+    'Switch\nProfile',
+    writeIconOnly(pinnedImagesDir, 'switchProfile'),
+  ),
+};
+writeFileSync(
+  join(PROFILE_ROOT, 'Profiles', PINNED_UUID, 'manifest.json'),
+  JSON.stringify({
+    Controllers: [{ Actions: pinnedActions, Type: 'Keypad' }], // no Background — pinned strip has no page-bg
+    Icon: '',
+    Name: '',
+  }),
+);
+console.log(`Pinned Actions page: ${Object.keys(pinnedActions).length} button → Profiles/${PINNED_UUID}/manifest.json`);
+
 // ── Write page manifests ──────────────────────────────────────────────────────
 const pageData = [
   { n: 1, uuid: PAGE_UUIDS[1], name: 'System',                        actions: page1 },
   { n: 2, uuid: PAGE_UUIDS[2], name: 'Stream Deck',                   actions: page2 },
   { n: 3, uuid: PAGE_UUIDS[3], name: 'Navigation',                    actions: page3 },
   { n: 4, uuid: PAGE_UUIDS[4], name: 'Soundboard + Multi Act + Keys', actions: page4 },
-  { n: 5, uuid: PAGE_UUIDS[5], name: 'Neo & Plus',                     actions: page5 },
+  { n: 5, uuid: PAGE_UUIDS[5], name: 'Neo & Plus',                    actions: page5 },
 ];
 
 for (const { n, uuid, name, actions } of pageData) {
@@ -439,11 +478,13 @@ for (const { n, uuid, name, actions } of pageData) {
   console.log(`Page ${n} (${name}): ${Object.keys(actions).length} buttons → ${manifestPath}`);
 }
 
-// Update root manifest — register all 5 pages in order
+// Update root manifest — 5 regular pages + Pinned Actions as Default
 const rootPath = join(PROFILE_ROOT, 'manifest.json');
 const root = JSON.parse(readFileSync(rootPath, 'utf8'));
 root.Pages.Pages = Object.values(PAGE_UUIDS).map(u => u.toLowerCase());
+// Pages.Default points to the Pinned Actions page (separate from Pages.Pages).
+root.Pages.Default = PINNED_UUID.toLowerCase();
 writeFileSync(rootPath, JSON.stringify(root));
-console.log('Root manifest: updated to 5 pages');
+console.log('Root manifest: updated to 5 pages + Pinned Actions default');
 
 console.log('\nDone. Start Stream Deck app and validate the profile.');
