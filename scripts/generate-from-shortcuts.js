@@ -66,7 +66,15 @@ if (!existsSync(profileDir)) {
 }
 const { cols, rows } = editor.deviceInfo;
 const keysPerPage = cols * rows;
-const pages = editor.getPageUUIDs();
+let pages = editor.getPageUUIDs();
+
+// Auto-expand: add pages until there's room for all shortcuts
+const pagesNeeded = Math.ceil(shortcuts.length / keysPerPage);
+if (pagesNeeded > pages.length) {
+  const newPages = editor.addPages(pagesNeeded - pages.length);
+  pages = editor.getPageUUIDs();
+  console.log(`Added ${newPages.length} pages (total: ${pages.length})`);
+}
 
 console.log(`Device: ${editor.deviceInfo.name} (${cols}x${rows} = ${keysPerPage} keys/page)`);
 console.log(`Pages available: ${pages.length}`);
@@ -123,8 +131,6 @@ for (const shortcut of sorted) {
       console.log(`  No more pages available, stopping at ${placed} shortcuts.`);
       break;
     }
-    const nextEmpty = editor.getEmptyPositions(pages[pageIdx]);
-    if (nextEmpty.length === 0) break;
   }
 
   const currentPage = pages[pageIdx];
