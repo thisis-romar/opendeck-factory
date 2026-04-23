@@ -1,0 +1,241 @@
+{
+  "project": {
+    "title": "OpenDeck Roadmap",
+    "owner": "thisis-romar",
+    "repo": "opendeck-factory"
+  },
+  "fields": [
+    {
+      "name": "Status",
+      "type": "SINGLE_SELECT",
+      "options": ["Backlog", "Ready", "In Progress", "Blocked", "Done"]
+    },
+    {
+      "name": "Priority",
+      "type": "SINGLE_SELECT",
+      "options": ["P0-Critical", "P1-High", "P2-Normal", "P3-Low"]
+    },
+    {
+      "name": "Area",
+      "type": "SINGLE_SELECT",
+      "options": ["Engine", "MCP", "Skills", "Marketplace", "Catalog", "Docs", "DevOps"]
+    },
+    {
+      "name": "Target",
+      "type": "SINGLE_SELECT",
+      "options": ["v2.2.x", "v2.3.0", "v3.0.0", "Future"]
+    }
+  ],
+  "items": [
+    {
+      "title": "MCP server — 9 tools shipped",
+      "body": "All 9 MCP tools live: extract_profile, pack_profile, validate_profile, list_profile, add_shortcut, generate_icons, list_shortcuts, quality_check, live_test_profile.",
+      "labels": ["enhancement"],
+      "status": "Done",
+      "priority": "P1-High",
+      "area": "MCP",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Agent 3: install-profile.js",
+      "body": "Filesystem copy to ProfilesV3/, match by Name, UUID backup collision handling. Ships as part of the live_test_profile MCP tool flow.",
+      "labels": ["enhancement"],
+      "status": "Done",
+      "priority": "P1-High",
+      "area": "Engine",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Agent 3: verify-profile.js",
+      "body": "Kill/relaunch Stream Deck app, verify file structure and button count, emit test-report.json.",
+      "labels": ["enhancement"],
+      "status": "Done",
+      "priority": "P1-High",
+      "area": "Engine",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Agent 3: live_test_profile MCP tool (tool 9)",
+      "body": "Wraps install + verify, returns structured verdict + button count + mismatches. Ninth MCP tool.",
+      "labels": ["enhancement"],
+      "status": "Done",
+      "priority": "P1-High",
+      "area": "MCP",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "v2.2.0 GitHub Release",
+      "body": "Tagged v2.2.0, GitHub Release created with full release notes. Includes 9-tool MCP server, 3 skills, plugin manifest, marketplace distribution prep.",
+      "labels": ["release"],
+      "status": "Done",
+      "priority": "P1-High",
+      "area": "DevOps",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Claude Code plugin manifest (marketplace.json + plugin.json)",
+      "body": "`.claude-plugin/marketplace.json` and `plugin.json` at v2.2.0. Five distribution channels listed. Ready for Claude Code plugin marketplace.",
+      "labels": ["enhancement"],
+      "status": "Done",
+      "priority": "P1-High",
+      "area": "Marketplace",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "3 Claude Code skills with correct SKILL.md frontmatter",
+      "body": "generate-profile, capture-streamdeck-reference, drive-windows-gui — all have `name:` + `description:` fields for vercel-labs/skills auto-discovery.",
+      "labels": ["enhancement"],
+      "status": "Done",
+      "priority": "P1-High",
+      "area": "Skills",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Reference profile — all action type schemas captured",
+      "body": "5-page reference profile covering all known Stream Deck built-in action types. Includes Pinned Actions page (Pages.Default), transparent gradient button shading, white border ring, page-colored nav corners. Schema for Pin captured via user-guided live manifest diff.",
+      "labels": ["enhancement"],
+      "status": "Done",
+      "priority": "P2-Normal",
+      "area": "Engine",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Marketplace submission — claudemarketplaces.com",
+      "body": "GitHub issue #52 submitted 2026-04-23 requesting indexing of thisis-romar/opendeck-factory. Auto-index from `.claude-plugin/marketplace.json`.",
+      "labels": ["distribution"],
+      "status": "Done",
+      "priority": "P2-Normal",
+      "area": "Marketplace",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Marketplace submission — skills.sh / npx skills (vercel-labs)",
+      "body": "GitHub issue #990 submitted to vercel-labs/skills 2026-04-23. Auto-discovered from `.claude/skills/*/SKILL.md` with valid frontmatter.",
+      "labels": ["distribution"],
+      "status": "Done",
+      "priority": "P2-Normal",
+      "area": "Marketplace",
+      "target": "v2.2.x",
+      "closed": true
+    },
+    {
+      "title": "Marketplace submission — claudeskills.info (manual)",
+      "body": "Manual browser visit required to https://claudeskills.info — find Submit in nav, enter repo URL https://github.com/thisis-romar/opendeck-factory. Returns 403 to automation.",
+      "labels": ["distribution"],
+      "status": "Ready",
+      "priority": "P1-High",
+      "area": "Marketplace",
+      "target": "v2.2.x",
+      "closed": false
+    },
+    {
+      "title": "Marketplace submission — skillsmp.com (star gate ≥2)",
+      "body": "Pure auto-scrape of GitHub. No action needed until repo reaches 2 stars. Check https://skillsmp.com after star gate is met.",
+      "labels": ["distribution"],
+      "status": "Blocked",
+      "priority": "P2-Normal",
+      "area": "Marketplace",
+      "target": "v2.2.x",
+      "closed": false
+    },
+    {
+      "title": "Marketplace submission — awesome-claude-skills PR (star gate ≥10)",
+      "body": "PR entry ready: `- **[OpenDeck Factory](https://github.com/thisis-romar/opendeck-factory)** — Generate Elgato Stream Deck profiles from code. 9-tool MCP server + Claude Code plugin with 3 skills.`\n\nOpen PR to travisvn/awesome-claude-skills README under 'Tools & Utilities' only after ≥10 stars.",
+      "labels": ["distribution"],
+      "status": "Blocked",
+      "priority": "P2-Normal",
+      "area": "Marketplace",
+      "target": "v2.2.x",
+      "closed": false
+    },
+    {
+      "title": "GitHub Projects v2 board — OpenDeck Roadmap",
+      "body": "Create Projects v2 board with 4 custom fields (Status, Priority, Area, Target). Sync all 31 work items as GitHub issues. Scripts: `scripts/gh-project-setup.js` + `scripts/gh-project-sync.js`.",
+      "labels": ["devops"],
+      "status": "In Progress",
+      "priority": "P2-Normal",
+      "area": "DevOps",
+      "target": "v2.2.x",
+      "closed": false
+    },
+    {
+      "title": "Git hooks migration — .githooks/ + commitlint",
+      "body": "Move hooks from .git/hooks/ to .githooks/ for version control. Add commitlint for consistent commit message format.",
+      "labels": ["devops"],
+      "status": "Backlog",
+      "priority": "P3-Low",
+      "area": "DevOps",
+      "target": "v2.3.0",
+      "closed": false
+    },
+    {
+      "title": "CHANGELOG.md automation — git-cliff",
+      "body": "Adopt Keep-a-Changelog format + git-cliff for automated changelog generation on release.",
+      "labels": ["devops"],
+      "status": "Backlog",
+      "priority": "P3-Low",
+      "area": "DevOps",
+      "target": "v2.3.0",
+      "closed": false
+    },
+    {
+      "title": "Catalog v1 — VS Code profile pack",
+      "body": "First commercial product: full VS Code shortcuts profile with category-colored icons, multi-page layout, chord shortcuts. Target: stream-deck-catalog repo. First revenue milestone.",
+      "labels": ["enhancement"],
+      "status": "Backlog",
+      "priority": "P1-High",
+      "area": "Catalog",
+      "target": "v2.3.0",
+      "closed": false
+    },
+    {
+      "title": "Agentic pipeline v1 — Agents 1 + 2 (Asset Spec + Build)",
+      "body": "Agent 1: generate asset spec from app keyboard shortcut docs. Agent 2: build full profile pack from spec. Closes the loop from app docs → importable .streamDeckProfile.",
+      "labels": ["enhancement"],
+      "status": "Backlog",
+      "priority": "P2-Normal",
+      "area": "Engine",
+      "target": "v2.3.0",
+      "closed": false
+    },
+    {
+      "title": "Discover elgato-mcp-server tool list",
+      "body": "Audit the elgato-mcp-server project to understand what tools are available and whether any overlap with or can replace opendeck-factory MCP tools.",
+      "labels": ["research"],
+      "status": "Backlog",
+      "priority": "P3-Low",
+      "area": "MCP",
+      "target": "v2.3.0",
+      "closed": false
+    },
+    {
+      "title": "Pro tier — hosted icon generation",
+      "body": "SaaS feature: upload shortcut JSON, receive generated SVG icon pack. Enables non-technical users to generate profiles without running the CLI.",
+      "labels": ["enhancement"],
+      "status": "Backlog",
+      "priority": "P2-Normal",
+      "area": "Catalog",
+      "target": "v3.0.0",
+      "closed": false
+    },
+    {
+      "title": "Enterprise tier — org catalog + SSO",
+      "body": "Enterprise licensing: per-org profile catalog, SSO integration, team management. Q4 2026 milestone.",
+      "labels": ["enhancement"],
+      "status": "Backlog",
+      "priority": "P3-Low",
+      "area": "Catalog",
+      "target": "Future",
+      "closed": false
+    }
+  ]
+}
