@@ -1,6 +1,7 @@
 node_modules/
 _extracted/
 *.log
+qc-report.json
 
 # Commercial catalog assets must never land here
 builds/
