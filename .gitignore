@@ -4,8 +4,11 @@ _extracted/
 qc-report.json
 
 # Commercial catalog assets must never land here
-builds/
+# builds/* (not builds/) so individual files can be un-ignored below
+builds/*
 *.streamDeckProfile
+# Reference profile is tracked — engine test artifact, not a catalog asset
+!builds/Reference - All Actions.streamDeckProfile
 data/icons/generated/
 data/shortcuts/*.paid.json
 profiles/*/private/
