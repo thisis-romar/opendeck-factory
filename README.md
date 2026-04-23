@@ -4,13 +4,15 @@ Open-source engine for programmatically creating, editing, and repacking Elgato 
 
 ## Features
 
+- **MCP server** — 7 tools for Claude Desktop and Claude Code (extract, pack, validate, list, add shortcut, generate icons, list shortcuts)
+- **Claude Code plugin** — install once, get all tools + the `generate-profile` skill
 - **Extract → Modify → Pack** pipeline for `.streamDeckProfile` ZIP archives
 - **Hotkey buttons** with full modifier support (Ctrl, Shift, Alt, Win)
 - **Multi-action buttons** for chord shortcuts (e.g., `Ctrl+K` then `Ctrl+M`)
 - **Template system** — clone a blank profile and populate it programmatically
 - **Icon generation** — 144×144 SVG icons, color-coded by shortcut category
 - **Validation** — verify profile structure, image refs, and grid bounds before packing
-- **Multi-device support** — MK.2, XL, Mini, and Stream Deck +
+- **Multi-device support** — MK.2, XL, Mini, Stream Deck +, and Neo
 - **Pre-commit hook** — auto-validates staged profiles on `git commit`
 
 ## Quick Start
@@ -42,6 +44,43 @@ node src/index.js pack my-profile "My Profile.streamDeckProfile"
 | `list <dir>` | Print ASCII grid layout showing all pages and button labels |
 
 All commands are run via `node src/index.js <command> <args>`.
+
+## MCP Server (Claude Desktop / Claude Code)
+
+`src/mcp-server.js` exposes 7 tools via stdio transport. Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "opendeck": {
+      "command": "node",
+      "args": ["C:/path/to/opendeck-factory/src/mcp-server.js"]
+    }
+  }
+}
+```
+
+| Tool | Description |
+|------|-------------|
+| `extract_profile` | Unzip a `.streamDeckProfile` to an editable directory |
+| `pack_profile` | Pack an extracted directory back to `.streamDeckProfile` |
+| `validate_profile` | Validate structure, manifests, image refs, and grid bounds |
+| `list_profile` | Print ASCII grid of all pages and button labels |
+| `add_shortcut` | Add a hotkey button at a specific grid position (bounds-validated) |
+| `generate_icons` | Generate SVG icons from a `data/shortcuts/<app>.json` file |
+| `list_shortcuts` | Read shortcut definitions for an app |
+
+## Claude Code Plugin
+
+Install the plugin to get the MCP server + `generate-profile` skill in one step:
+
+```json
+{
+  "plugins": [
+    { "path": "C:/path/to/opendeck-factory/.claude-plugin/plugin.json" }
+  ]
+}
+```
 
 ## Generating Profiles from Shortcut Data
 
