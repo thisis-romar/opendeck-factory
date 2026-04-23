@@ -73,14 +73,15 @@ if (!appName) {
   process.exit(1);
 }
 
-const shortcutsPath = resolve(`data/shortcuts/${appName}.json`);
+const shortcutsBase = process.env.SHORTCUTS_DIR ? resolve(process.env.SHORTCUTS_DIR) : resolve('data/shortcuts');
+const shortcutsPath = join(shortcutsBase, `${appName}.json`);
 if (!existsSync(shortcutsPath)) {
   console.error(`Shortcut file not found: ${shortcutsPath}`);
   process.exit(1);
 }
 
 const data = JSON.parse(readFileSync(shortcutsPath, 'utf8'));
-const outDir = resolve(`data/icons/${appName}`);
+const outDir = process.env.ICONS_DIR ? resolve(process.env.ICONS_DIR) : resolve(`data/icons/${appName}`);
 mkdirSync(outDir, { recursive: true });
 
 let count = 0;
