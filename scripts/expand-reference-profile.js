@@ -67,7 +67,8 @@ const ICON = {
   brightnessMin:    { p: 'com.elgato.streamdeck.system.keybrightness', f: 'btn_keybrightness_min.svg' },
   sleep:            { p: 'com.elgato.streamdeck.system.sleep',         f: 'btn_sleep.svg' },
   vsdToggle:        { p: 'com.elgato.streamdeck.vsdtoggle',            f: 'btn_vsdtoggle.svg' },
-  // createFolder: GUI-placement-only — requires sub-profile structure (silently dropped via JSON)
+  createFolder:     { p: 'com.elgato.streamdeck.profile.openchild',    f: 'btn_folder.svg' },
+  parentFolder:     { p: 'com.elgato.streamdeck.profile.backtoparent', f: 'btn_backtoParent.svg' },
   switchProfile:    { p: 'com.elgato.streamdeck.profile.rotate',       f: 'btn_switchProfile.svg' },
   navPrev:          { p: 'com.elgato.streamdeck.page',                 f: 'btn_previousPage.svg' },
   navNext:          { p: 'com.elgato.streamdeck.page',                 f: 'btn_nextPage.svg' },
@@ -288,6 +289,38 @@ function addNavCorners(actions, imagesDir, pageNum) {
   actions['4,2'] = btn('com.elgato.streamdeck.page.next',     'com.elgato.streamdeck.page', 'Pages', {}, `${nextN} →`, nextImage, nextLight);
 }
 
+// Creates a child page (sub-folder) and returns the openchild action for the parent.
+// Schema source: live profile capture — Settings.ProfileUUID links parent to child.
+// Child pages do NOT appear in the root manifest Pages array.
+function makeCreateFolder(imagesDir, pageNum) {
+  const color = PAGE_COLORS[pageNum];
+  const childUUID = randomUUID().toUpperCase();
+  const childImagesDir = join(PROFILE_ROOT, 'Profiles', childUUID, 'Images');
+  mkdirSync(childImagesDir, { recursive: true });
+  writeFileSync(join(childImagesDir, '..', 'manifest.json'), JSON.stringify({
+    Controllers: [{
+      Actions: { '0,0': btn('com.elgato.streamdeck.profile.backtoparent', 'com.elgato.streamdeck.profile.backtoparent', 'Back to Parent Profile', {}, 'Back', writeIconOnly(childImagesDir, 'parentFolder', color), color) },
+      Background: 'Images/page-bg.png',
+      Type: 'Keypad',
+    }],
+    Icon: '',
+    Name: 'Folder',
+  }));
+  writeFileSync(join(childImagesDir, 'page-bg.png'), solidColorPng(480, 272, color));
+  const folderImage = writeIconOnly(imagesDir, 'createFolder', color);
+  return {
+    ActionID: randomUUID(),
+    LinkedTitle: true,
+    Name: 'Create Folder',
+    Plugin: { Name: 'Create Folder', UUID: 'com.elgato.streamdeck.profile.openchild', Version: '1.0' },
+    Resources: null,
+    Settings: { ProfileUUID: childUUID },
+    State: 0,
+    States: [{ Image: folderImage, ShowTitle: true, Title: 'Folder\n', TitleAlignment: 'bottom', TitleColor: '#ffffff', FontSize: 9 }],
+    UUID: 'com.elgato.streamdeck.profile.openchild',
+  };
+}
+
 // ── Page 1 — System (electric blue) ──────────────────────────────────────────
 // Row 0: Website | Hotkey Switch | Hotkey Ctrl+A | Open | [Page Indicator]
 // Row 1: Close | Text | Open App | Prev Track | Play/Pause
@@ -330,14 +363,13 @@ const { actions: page2, imagesDir: imgDir2 } = buildPage(2, [
 addNavCorners(page2, imgDir2, 2);
 
 // ── Page 3 — Navigation (vivid emerald) ──────────────────────────────────────
-// Row 0: Switch Profile | Go to Page | · | · | [Page Indicator]
+// Row 0: Switch Profile | Go to Page | Create Folder | · | [Page Indicator]
 // Row 2: [← 2:orange] | · | · | · | [4→:violet]
-// Create Folder: GUI-only (sub-profile structure required)
-// Parent Folder: removed — only valid inside a sub-folder, confusing at root level
 const { actions: page3, imagesDir: imgDir3 } = buildPage(3, [
   [0, 0, 'switchProfile', 'com.elgato.streamdeck.profile.rotate', 'com.elgato.streamdeck.profile.rotate', 'Switch Profile', {}, 'Switch\nProfile'],
   [1, 0, 'gotoPage',      'com.elgato.streamdeck.page.goto',      'com.elgato.streamdeck.page',           'Pages',          { page: 0 }, 'Go to\nPage'],
 ]);
+page3['2,0'] = makeCreateFolder(imgDir3, 3);
 addNavCorners(page3, imgDir3, 3);
 
 // ── Page 4 — Soundboard + Multi Action + Keys (vivid violet) ─────────────────
