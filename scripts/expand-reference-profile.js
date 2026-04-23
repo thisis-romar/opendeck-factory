@@ -183,6 +183,21 @@ function buttonDefs(color) {
   return `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${top}"/><stop offset="100%" stop-color="${bot}"/></linearGradient></defs>`;
 }
 
+// Neutral light→dark overlay; low opacity so page bg shows through.
+function transparentShadeDefs() {
+  return `<defs><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">`
+    + `<stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>`
+    + `<stop offset="100%" stop-color="#000000" stop-opacity="0.32"/>`
+    + `</linearGradient></defs>`;
+}
+
+function shadeOverlay() {
+  const bw = BORDER_W, r = RX;
+  const size = 144 - bw * 2;
+  const ir = Math.max(0, r - bw);
+  return `<rect x="${bw}" y="${bw}" width="${size}" height="${size}" rx="${ir}" ry="${ir}" fill="url(#shade)"/>`;
+}
+
 // Square outer corners, rounded inner corners.
 // Outer path fills full 144×144; inner path (with rx arcs) punches out the center via evenodd.
 function borderRing() {
@@ -194,7 +209,12 @@ function borderRing() {
 
 function writeIconOnly(imagesDir, key) {
   const layer = buildIconLayer(key);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n${borderRing()}\n${layer}\n</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n`
+    + `${transparentShadeDefs()}\n`
+    + `${shadeOverlay()}\n`
+    + `${borderRing()}\n`
+    + `${layer}\n`
+    + `</svg>`;
   writeFileSync(join(imagesDir, `${key}.svg`), svg);
   return `Images/${key}.svg`;
 }
