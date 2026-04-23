@@ -1,5 +1,6 @@
 {
   "name": "opendeck-factory",
+  "version": "2.2.0",
   "tagline": "Generate Stream Deck profiles from code — no manual button setup",
   "categories": ["developer-tools", "productivity", "stream-deck"],
   "tags": ["stream-deck", "elgato", "profile-generator", "automation"],
@@ -13,6 +14,7 @@
     "claudemarketplaces.com",
     "claudeskills.info",
     "skillsmp.com",
-    "awesome-claude-skills"
+    "awesome-claude-skills",
+    "vercel-labs-skills"
   ]
 }

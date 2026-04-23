@@ -1,9 +1,10 @@
 ---
 title: Capture Stream Deck Reference Profile
+name: capture-streamdeck-reference
 description: Build and validate a reference .streamDeckProfile containing all known built-in Stream Deck action types for reverse engineering
 version: 1.0.0
 created: 2026-04-21T00:00:00Z
-last_updated: 2026-04-21T00:00:00Z
+lastmod: 2026-04-23T03:05:07Z
 ---
 
 ## Charter

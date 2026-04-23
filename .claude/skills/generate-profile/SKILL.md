@@ -1,9 +1,10 @@
 ---
 title: Generate Stream Deck Profile from App Shortcuts
+name: generate-profile
 description: End-to-end workflow for generating a .streamDeckProfile from an application's keyboard shortcuts
 version: 1.1.0
 created: 2026-04-17T00:00:00Z
-last_updated: 2026-04-17T12:44:00Z
+lastmod: 2026-04-23T03:05:07Z
 ---
 
 ## Charter

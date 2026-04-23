@@ -53,7 +53,7 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 
 ## MCP Server
 
-`src/mcp-server.js` — 7 tools: `extract_profile`, `pack_profile`, `validate_profile`, `list_profile`, `add_shortcut`, `generate_icons`, `list_shortcuts`.
+`src/mcp-server.js` — 9 tools: `extract_profile`, `pack_profile`, `validate_profile`, `list_profile`, `add_shortcut`, `generate_icons`, `list_shortcuts`, `quality_check`, `live_test_profile`.
 
 **Claude Desktop config** (`claude_desktop_config.json`):
 ```json

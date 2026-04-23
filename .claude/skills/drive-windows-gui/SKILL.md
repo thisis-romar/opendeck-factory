@@ -1,9 +1,10 @@
 ---
 title: Drive Windows GUI (Stream Deck App)
+name: drive-windows-gui
 description: Orchestrate the streamdeck-driver subagent to perform GUI operations in the Elgato Stream Deck app that cannot be done via JSON injection
 version: 1.0.0
 created: 2026-04-21T00:00:00Z
-last_updated: 2026-04-21T00:00:00Z
+lastmod: 2026-04-23T03:05:07Z
 ---
 
 ## Charter

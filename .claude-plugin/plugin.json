@@ -1,7 +1,7 @@
 {
   "name": "opendeck-factory",
   "displayName": "OpenDeck — Stream Deck Profile Generator",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Programmatically create, edit, validate, and pack Elgato Stream Deck profiles. Generate color-coded icons from shortcut definitions.",
   "skills": [
     "../.claude/skills/generate-profile/SKILL.md"

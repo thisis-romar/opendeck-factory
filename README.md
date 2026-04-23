@@ -6,7 +6,7 @@ Open-source engine for programmatically creating, editing, and repacking Elgato 
 
 ## Features
 
-- **MCP server** — 7 tools for Claude Desktop and Claude Code (extract, pack, validate, list, add shortcut, generate icons, list shortcuts)
+- **MCP server** — 9 tools for Claude Desktop and Claude Code (extract, pack, validate, list, add shortcut, generate icons, list shortcuts, quality check, live test)
 - **Claude Code plugin** — install once, get all tools + the `generate-profile` skill
 - **Extract → Modify → Pack** pipeline for `.streamDeckProfile` ZIP archives
 - **Hotkey buttons** with full modifier support (Ctrl, Shift, Alt, Win)
@@ -49,7 +49,7 @@ All commands are run via `node src/index.js <command> <args>`.
 
 ## MCP Server (Claude Desktop / Claude Code)
 
-`src/mcp-server.js` exposes 7 tools via stdio transport. Add to `claude_desktop_config.json`:
+`src/mcp-server.js` exposes 9 tools via stdio transport. Add to `claude_desktop_config.json`:
 
 ```json
 {
@@ -71,6 +71,8 @@ All commands are run via `node src/index.js <command> <args>`.
 | `add_shortcut` | Add a hotkey button at a specific grid position (bounds-validated) |
 | `generate_icons` | Generate SVG icons from a `data/shortcuts/<app>.json` file |
 | `list_shortcuts` | Read shortcut definitions for an app |
+| `quality_check` | Run QC gate on a built profile (file size, button count, icon resolution) |
+| `live_test_profile` | Install profile into ProfilesV3, restart Stream Deck app, verify button structure |
 
 ## Claude Code Plugin
 
@@ -83,6 +85,16 @@ Install the plugin to get the MCP server + `generate-profile` skill in one step:
   ]
 }
 ```
+
+## Install Skills via `npx skills`
+
+```bash
+npx skills add thisis-romar/opendeck-factory --skill generate-profile
+npx skills add thisis-romar/opendeck-factory --skill capture-streamdeck-reference
+npx skills add thisis-romar/opendeck-factory --skill drive-windows-gui
+```
+
+Skills install to `~/.claude/skills/` (global) or `.claude/skills/` (project). Works with [vercel-labs/skills](https://github.com/vercel-labs/skills) and any compatible agent runner.
 
 ## Generating Profiles from Shortcut Data
 
