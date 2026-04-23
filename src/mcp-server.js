@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// MCP server for opendeck-factory — exposes 7 tools via stdio transport.
+// MCP server for opendeck-factory — exposes 9 tools via stdio transport.
 // Usage: node src/mcp-server.js
 // Claude Desktop config: { "command": "node", "args": ["<abs-path>/src/mcp-server.js"] }
 
@@ -255,6 +255,75 @@ server.tool(
       return {
         content: [{ type: 'text', text: output.trim() }],
         isError: exitCode !== 0,
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+    }
+  }
+);
+
+// ── Tool 9: live_test_profile ─────────────────────────────────────────────────
+server.tool(
+  'live_test_profile',
+  'Install a profile into the Stream Deck app, restart the app, and verify the installation. ' +
+  'Returns a test report with verdict (PASS/FAIL), button count, and any mismatches. ' +
+  'After calling this tool, take a screenshot via mcp__windows-mcp__Screenshot for visual confirmation.',
+  {
+    source: z.string().describe(
+      'Absolute path to the profile — either a packed .streamDeckProfile file or an extracted profile directory'
+    ),
+  },
+  async ({ source }) => {
+    try {
+      const { execFileSync } = await import('node:child_process');
+      const installScript = join(ROOT, 'scripts/install-profile.js');
+      const verifyScript = join(ROOT, 'scripts/verify-profile.js');
+      const sourcePath = resolve(source);
+
+      // Step 1: install
+      let installOutput;
+      try {
+        installOutput = execFileSync(process.execPath, [installScript, sourcePath], {
+          cwd: ROOT, encoding: 'utf8',
+        });
+      } catch (e) {
+        return {
+          content: [{ type: 'text', text: `Install failed:\n${e.stdout ?? e.message}` }],
+          isError: true,
+        };
+      }
+
+      // Parse UUID from install-report.json
+      const { readFileSync: rfs } = await import('node:fs');
+      const installReport = JSON.parse(rfs(join(ROOT, 'install-report.json'), 'utf8'));
+      const uuid = installReport.profile_uuid;
+
+      // Step 2: verify
+      let verifyOutput = '';
+      let verifyExitCode = 0;
+      try {
+        verifyOutput = execFileSync(process.execPath, [verifyScript, uuid], {
+          cwd: ROOT, encoding: 'utf8',
+        });
+      } catch (e) {
+        verifyOutput = e.stdout ?? e.message;
+        verifyExitCode = e.status ?? 1;
+      }
+
+      const testReport = JSON.parse(rfs(join(ROOT, 'test-report.json'), 'utf8'));
+      const summary = [
+        `Install: ${installReport.profile_name} → ${uuid}`,
+        installReport.backup_path ? `Backup: ${installReport.backup_path}` : null,
+        `Verify: ${testReport.verdict} — ${testReport.buttons_total} button(s) across ${testReport.pages_checked} page(s)`,
+        testReport.mismatches.length > 0
+          ? `Mismatches:\n${testReport.mismatches.map(m => `  ✗ ${m}`).join('\n')}`
+          : null,
+        `\nCall mcp__windows-mcp__Screenshot for visual confirmation.`,
+      ].filter(Boolean).join('\n');
+
+      return {
+        content: [{ type: 'text', text: summary }],
+        isError: verifyExitCode !== 0,
       };
     } catch (err) {
       return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
