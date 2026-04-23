@@ -1,6 +1,6 @@
 {
   "name": "opendeck-factory",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "Open-source Stream Deck profile editor engine",
   "main": "src/index.js",

@@ -1,9 +1,9 @@
 ---
 title: Changelog
 description: All notable changes to opendeck-factory
-version: 2.1.0
+version: 2.2.0
 created: 2026-04-22T00:00:00Z
-lastmod: 2026-04-22T00:00:00Z
+lastmod: 2026-04-23T00:00:00Z
 ---
 
 # Changelog
@@ -14,6 +14,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: 
 ---
 
 ## [Unreleased]
+
+## [2.2.0] — 2026-04-23
+
+### Features
+- Agent 3 — `scripts/install-profile.js`: installs a packed or extracted profile into `ProfilesV3`, matches by Name, backs up on UUID collision
+- Agent 3 — `scripts/verify-profile.js`: kills and relaunches Stream Deck app via PowerShell, verifies installed file structure and button count, emits `test-report.json`
+- `live_test_profile` MCP tool (tool 9): wraps install + verify; returns structured verdict, button count, and mismatches; delegates screenshot to caller via `mcp__windows-mcp__Screenshot`
+
+### Bug Fixes
+- Fix `.husky/pre-commit` missing shebang (`exec format error` on every commit)
+- Fix `Makefile` `install-hooks` chmod omitting `commit-msg`
+
+### Documentation
+- Rename `last_updated` → `lastmod` in CHANGELOG.md frontmatter (Hugo standard; matches vault)
+- Add `Version-2.2.0` and `FSL-1.1-ALv2` shields.io badges to README
+- Add `lastmod` timestamp convention to CLAUDE.md
+
+### Refactoring
+- Extend `.githooks/pre-push` with 3-way version sync: `package.json` ↔ README badge (blocking) ↔ CHANGELOG frontmatter (warning)
 
 ## [2.1.0] — 2026-04-22
 
