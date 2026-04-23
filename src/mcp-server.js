@@ -13,6 +13,17 @@ import { fileURLToPath } from 'node:url';
 import { extract } from './extract.js';
 import { pack } from './pack.js';
 import { validate } from './validate.js';
+
+// Grid dimensions keyed by Device.Model from root manifest.json.
+// Fallback covers any unknown model conservatively with the largest known grid (XL: 8×4).
+const DEVICE_GRID = {
+  '20GBA9901': { cols: 5, rows: 3 }, // MK.2
+  '20GAT9901': { cols: 8, rows: 4 }, // XL
+  '20GAI9901': { cols: 3, rows: 2 }, // Mini
+  '20GBD9901': { cols: 4, rows: 2 }, // Stream Deck +
+  '20GBJ9901': { cols: 4, rows: 2 }, // Neo
+};
+const FALLBACK_GRID = { cols: 8, rows: 4 };
 import { ProfileEditor } from './profile.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -145,7 +156,17 @@ server.tool(
   },
   async ({ source_dir, page_uuid, col, row, label, key, ctrl, shift, alt, win, image_path }) => {
     try {
-      const editor = new ProfileEditor(resolve(source_dir));
+      const absDir = resolve(source_dir);
+      const rootManifest = JSON.parse(readFileSync(join(absDir, 'manifest.json'), 'utf8'));
+      const model = rootManifest?.Device?.Model;
+      const grid = DEVICE_GRID[model] ?? FALLBACK_GRID;
+      if (col >= grid.cols || row >= grid.rows) {
+        return {
+          content: [{ type: 'text', text: `Position ${col},${row} is out of bounds for device ${model ?? 'unknown'} (grid: ${grid.cols}×${grid.rows}, max col ${grid.cols - 1}, max row ${grid.rows - 1})` }],
+          isError: true,
+        };
+      }
+      const editor = new ProfileEditor(absDir);
       editor.addHotkeyButton(page_uuid, col, row, {
         label, key, ctrl, shift, alt, win,
         imagePath: image_path ? resolve(image_path) : undefined,
