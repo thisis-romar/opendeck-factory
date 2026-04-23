@@ -1,2 +1,3 @@
+#!/bin/sh
 # Hooks are managed via .githooks/ — run `make install-hooks` to activate.
 # See: Makefile, .githooks/pre-commit
