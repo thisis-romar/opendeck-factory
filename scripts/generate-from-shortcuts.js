@@ -32,10 +32,11 @@ if (!appName) {
 }
 
 // Load shortcut data
-const shortcutsPath = resolve(`data/shortcuts/${appName}.json`);
+const shortcutsBase = process.env.SHORTCUTS_DIR ? resolve(process.env.SHORTCUTS_DIR) : resolve('data/shortcuts');
+const shortcutsPath = join(shortcutsBase, `${appName}.json`);
 if (!existsSync(shortcutsPath)) {
   console.error(`Shortcut file not found: ${shortcutsPath}`);
-  console.error(`Create data/shortcuts/${appName}.json first.`);
+  console.error(`Create ${shortcutsPath} first.`);
   process.exit(1);
 }
 
@@ -75,7 +76,7 @@ console.log(`Shortcuts to place: ${shortcuts.length}`);
 const CATEGORY_ROW_ORDER = ['general', 'navigation', 'view', 'editing', 'debug', 'terminal', 'search', 'file', 'editor', 'chord'];
 
 // Load icons if available
-const iconsDir = resolve(`data/icons/${appName}`);
+const iconsDir = process.env.ICONS_DIR ? resolve(process.env.ICONS_DIR) : resolve(`data/icons/${appName}`);
 const hasIcons = existsSync(iconsDir);
 let iconFiles = [];
 if (hasIcons) {
