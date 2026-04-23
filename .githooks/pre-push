@@ -36,9 +36,31 @@ fi
 
 echo "[pre-push] IP protection checks passed."
 
-# ── Version Consistency ──────────────────────────────────────────────────
+# ── Version Consistency (3-way: package.json ↔ README badge ↔ CHANGELOG frontmatter) ──
 
 PKG_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "")
+
+if [ -n "$PKG_VERSION" ] && [ -f "README.md" ]; then
+    BADGE_VERSION=$(grep -oP 'Version-\K[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1)
+    if [ -n "$BADGE_VERSION" ] && [ "$PKG_VERSION" != "$BADGE_VERSION" ]; then
+        echo "ERROR: README badge version $BADGE_VERSION does not match package.json $PKG_VERSION"
+        FAIL=1
+    fi
+fi
+
+if [ -n "$PKG_VERSION" ] && [ -f "CHANGELOG.md" ]; then
+    CL_FM_VERSION=$(grep -oP '^version:\s*\K[\d.]+' CHANGELOG.md | head -1)
+    if [ -n "$CL_FM_VERSION" ] && [ "$PKG_VERSION" != "$CL_FM_VERSION" ]; then
+        echo "[pre-push] WARNING: CHANGELOG.md frontmatter version ($CL_FM_VERSION) ≠ package.json ($PKG_VERSION)"
+    fi
+fi
+
+if [ "$FAIL" -ne 0 ]; then
+    echo "[pre-push] Version consistency checks FAILED. Push blocked."
+    exit 1
+fi
+
+# ── CHANGELOG Entry Check ────────────────────────────────────────────────
 
 if [ -n "$PKG_VERSION" ] && [ -f "CHANGELOG.md" ]; then
     if ! grep -q "\[$PKG_VERSION\]" CHANGELOG.md; then
