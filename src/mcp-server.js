@@ -230,6 +230,38 @@ server.tool(
   }
 );
 
+// ── Tool 8: quality_check ─────────────────────────────────────────────────────
+server.tool(
+  'quality_check',
+  'Run the quality gate on an extracted profile — validates structure, counts buttons, checks icon dimensions, and optionally checks packed file size. Returns approve/reject verdict with a full check report.',
+  {
+    source_dir: z.string().describe('Absolute path to the extracted profile directory'),
+    packed_file: z.string().optional().describe('Absolute path to the packed .streamDeckProfile (for size check)'),
+  },
+  async ({ source_dir, packed_file }) => {
+    try {
+      const { execFileSync } = await import('node:child_process');
+      const scriptPath = join(ROOT, 'scripts/quality-gate.js');
+      const scriptArgs = [scriptPath, resolve(source_dir)];
+      if (packed_file) scriptArgs.push(resolve(packed_file));
+      let output;
+      let exitCode = 0;
+      try {
+        output = execFileSync(process.execPath, scriptArgs, { cwd: ROOT, encoding: 'utf8' });
+      } catch (e) {
+        output = e.stdout || e.message;
+        exitCode = e.status ?? 1;
+      }
+      return {
+        content: [{ type: 'text', text: output.trim() }],
+        isError: exitCode !== 0,
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
+    }
+  }
+);
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 const transport = new StdioServerTransport();
 await server.connect(transport);
