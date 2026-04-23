@@ -70,3 +70,9 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 ## Claude Code Plugin
 
 `.claude-plugin/plugin.json` — bundles MCP server + skills for Claude Code plugin marketplace distribution.
+
+## Frontmatter Timestamps
+
+When writing or editing any `.md` file with YAML frontmatter, call `get_current_time` first and use the returned `datetime` value for the `lastmod` field. Set `created` only on first creation; never modify it afterward. Fallback: `date -u +%Y-%m-%dT%H:%M:%SZ`.
+
+Files that carry frontmatter in this repo: `CHANGELOG.md`, `README.md`, `CLAUDE.md`, `.claude/skills/<name>/SKILL.md`.
