@@ -104,18 +104,23 @@ for (const item of config.items) {
     created++;
   }
 
-  // Add to board if not already present
+  // Add to board if not already present; always update field values
+  let itemId;
   if (!boardUrls.has(issueUrl)) {
     const addRaw = ghRaw(`project item-add ${projectNumber} --owner ${owner} --url ${issueUrl} --format json`);
-    const { id: itemId } = JSON.parse(addRaw);
+    itemId = JSON.parse(addRaw).id;
+    boardUrls.add(issueUrl);
+    added++;
+  } else {
+    // Find existing item ID so we can update its fields
+    itemId = boardItems.find(i => i.content?.url === issueUrl)?.id;
+  }
 
+  if (itemId) {
     setField(itemId, fieldIds['status'],   optMaps['status']?.[item.status]);
     setField(itemId, fieldIds['priority'], optMaps['priority']?.[item.priority]);
     setField(itemId, fieldIds['area'],     optMaps['area']?.[item.area]);
     setField(itemId, fieldIds['target'],   optMaps['target']?.[item.target]);
-
-    boardUrls.add(issueUrl);
-    added++;
   }
 }
 
