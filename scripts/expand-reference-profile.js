@@ -192,9 +192,9 @@ function borderRing() {
   return `<path fill="white" fill-rule="evenodd" d="M0 0 H144 V144 H0 Z ${inner}"/>`;
 }
 
-function writeIconOnly(imagesDir, key, bgColor) {
+function writeIconOnly(imagesDir, key) {
   const layer = buildIconLayer(key);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n${buttonDefs(bgColor)}\n<rect width="144" height="144" fill="url(#g)"/>\n${borderRing()}\n${layer}\n</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">\n${borderRing()}\n${layer}\n</svg>`;
   writeFileSync(join(imagesDir, `${key}.svg`), svg);
   return `Images/${key}.svg`;
 }
@@ -268,7 +268,7 @@ function buildPage(pageNum, defs) {
 
   const actions = {};
   for (const [col, row, iconKey, aUUID, pUUID, pName, settings, label] of defs) {
-    const image = writeIconOnly(imagesDir, iconKey, color);
+    const image = writeIconOnly(imagesDir, iconKey);
     actions[`${col},${row}`] = btn(aUUID, pUUID, pName, settings, label, image, color);
   }
 
@@ -299,7 +299,7 @@ function makeCreateFolder(imagesDir, pageNum) {
   mkdirSync(childImagesDir, { recursive: true });
   writeFileSync(join(childImagesDir, '..', 'manifest.json'), JSON.stringify({
     Controllers: [{
-      Actions: { '0,0': btn('com.elgato.streamdeck.profile.backtoparent', 'com.elgato.streamdeck.profile.backtoparent', 'Back to Parent Profile', {}, 'Back', writeIconOnly(childImagesDir, 'parentFolder', color), color) },
+      Actions: { '0,0': btn('com.elgato.streamdeck.profile.backtoparent', 'com.elgato.streamdeck.profile.backtoparent', 'Back to Parent Profile', {}, 'Back', writeIconOnly(childImagesDir, 'parentFolder'), color) },
       Background: 'Images/page-bg.png',
       Type: 'Keypad',
     }],
@@ -307,7 +307,7 @@ function makeCreateFolder(imagesDir, pageNum) {
     Name: 'Folder',
   }));
   writeFileSync(join(childImagesDir, 'page-bg.png'), solidColorPng(480, 272, color));
-  const folderImage = writeIconOnly(imagesDir, 'createFolder', color);
+  const folderImage = writeIconOnly(imagesDir, 'createFolder');
   return {
     ActionID: randomUUID(),
     LinkedTitle: true,
