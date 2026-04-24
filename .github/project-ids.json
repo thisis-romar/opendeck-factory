@@ -1,10 +1,80 @@
 {
   "projectNumber": 4,
   "projectId": "PVT_kwHODNwyZM4BVh2a",
+  "repositories": {
+    "factory": "R_kgDOSF-8Xw",
+    "planning": "R_kgDOSKHk7A",
+    "catalog": "R_kgDOSHDbCg"
+  },
+  "milestones": {
+    "v2.0.0": 3,
+    "v2.1.0": 4,
+    "v2.2.0": 5,
+    "v2.3.0": 1,
+    "v3.0.0": 2,
+    "v2.4.0": 6,
+    "v2.5.0": 7,
+    "Catalog-v1": 8,
+    "Catalog-v2": 9,
+    "v3.1.0": 10
+  },
   "fieldIds": {
     "status": "PVTSSF_lAHODNwyZM4BVh2azhQ9Dtc",
     "priority": "PVTSSF_lAHODNwyZM4BVh2azhQ9Du8",
     "area": "PVTSSF_lAHODNwyZM4BVh2azhQ9DvA",
-    "target": "PVTSSF_lAHODNwyZM4BVh2azhQ9Dv4"
+    "target": "PVTSSF_lAHODNwyZM4BVh2azhQ9Dv4",
+    "size": "PVTSSF_lAHODNwyZM4BVh2azhRChH8",
+    "revenue_impact": "PVTSSF_lAHODNwyZM4BVh2azhRChIA",
+    "start_date": "PVTF_lAHODNwyZM4BVh2azhRChJQ",
+    "target_date": "PVTF_lAHODNwyZM4BVh2azhRChJU",
+    "sprint": "PVTIF_lAHODNwyZM4BVh2azhRChJY"
+  },
+  "fieldOptions": {
+    "status": {
+      "Todo": "f75ad846",
+      "In Progress": "47fc9ee4",
+      "Done": "98236657",
+      "Backlog": "a9b4da7c",
+      "In Review": "d550a360",
+      "Blocked": "81b534ec"
+    },
+    "area": {
+      "Engine": "edfd7714",
+      "MCP": "af9547e7",
+      "Skills": "e83a1002",
+      "Marketplace": "1d59c6da",
+      "Catalog": "acc0349e",
+      "Docs": "6f2cabf6",
+      "DevOps": "c7875317",
+      "Plugin": "d5d0cdf9",
+      "Distribution": "0e5e1d63",
+      "Licensing": "65ef9548"
+    },
+    "target": {
+      "v2.2.x": "330a1e30",
+      "v2.3.0": "b288508c",
+      "v3.0.0": "7a56148a",
+      "Future": "9b08c8c8",
+      "v2.0.0": "cc258467",
+      "v2.1.0": "9fc5b34c",
+      "v2.2.0": "2fb2a68f",
+      "v2.4.0": "09176c83",
+      "v2.5.0": "0bfc3644",
+      "v3.1.0": "aa9b7019",
+      "Catalog-v1": "bed37432",
+      "Catalog-v2": "c749f808"
+    },
+    "size": {
+      "XS": "cd6e339b",
+      "S": "6e934628",
+      "M": "9d590ead",
+      "L": "f699cc0b",
+      "XL": "4e310e4c"
+    },
+    "revenue_impact": {
+      "Direct": "7b7ee7fa",
+      "Indirect": "7259e310",
+      "None": "3dbad488"
+    }
   }
 }
