@@ -155,12 +155,13 @@ async function getOrOpenProjectPage(browser) {
 }
 
 async function getExistingViewNames(page) {
-  // View tabs live in a scrollable tab strip — collect all visible tab labels
-  // Filter out the "+ New view" creation tab
-  const tabs = await page.locator('[role="tab"]').allTextContents();
-  return tabs
-    .map(t => t.replace(/^\+\s*/, '').trim())
-    .filter(t => t && t.toLowerCase() !== 'new view');
+  // Use evaluate to walk the DOM directly — allTextContents() only queries visible tabs
+  // when GitHub uses CSS overflow to hide scrolled-off ones.
+  const tabs = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('[role="tab"]'))
+      .map(el => el.textContent.replace(/^\+\s*/, '').trim())
+  );
+  return tabs.filter(t => t && t.toLowerCase() !== 'new view');
 }
 
 async function dismissWelcomeDialogs(page) {
@@ -219,66 +220,68 @@ async function saveUnsavedChanges(page) {
 }
 
 async function deleteViewByName(page, viewName) {
-  // Navigate to the view, open its "..." caret menu, click "Delete view"
-  try {
-    const escapedName = viewName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const tab = page.getByRole('tab', { name: new RegExp(escapedName, 'i') });
-    if (!await tab.isVisible({ timeout: 2000 })) return false;
-    await tab.click();
-    await page.waitForTimeout(600);
-    await dismissWelcomeDialogs(page);
+  // Find the view URL from the tab href
+  const viewUrl = await page.evaluate((name) => {
+    const tab = Array.from(document.querySelectorAll('[role="tab"]'))
+      .find(t => {
+        const text = t.querySelector('[class*="viewNameText"]')?.textContent?.trim();
+        return text === name;
+      });
+    return tab?.href ?? null;
+  }, viewName);
 
-    // The active tab's dropdown button — GitHub renders it as a sibling button
-    // or a button inside the selected tab with aria-haspopup
-    const caretSelectors = [
-      '[role="tab"][aria-selected="true"] ~ button',
-      '[role="tab"][aria-selected="true"] button[aria-haspopup]',
-      '[role="tab"][aria-selected="true"] + button',
-      // GitHub may wrap controls in a span/div beside the tab text
-      'li:has([role="tab"][aria-selected="true"]) button[aria-haspopup]',
-    ];
-    let opened = false;
-    for (const sel of caretSelectors) {
-      try {
-        const btn = page.locator(sel).first();
-        if (await btn.isVisible({ timeout: 1500 })) {
-          await btn.click();
-          await page.waitForTimeout(400);
-          opened = true;
-          break;
-        }
-      } catch { /* try next */ }
-    }
-    if (!opened) {
-      await screenshot(page, `delete-caret-not-found-${viewName.replace(/\s+/g, '-')}`);
-      return false;
-    }
+  if (!viewUrl) {
+    console.log(`    tab href not found for "${viewName}"`);
+    return false;
+  }
 
-    // Click "Delete view" in the dropdown
-    const deleteItem = page.getByRole('menuitem', { name: /delete view/i })
-      .or(page.locator('[role="menuitem"]:has-text("Delete view")'));
-    if (await deleteItem.isVisible({ timeout: 2000 })) {
-      await deleteItem.click();
-      await page.waitForTimeout(1000);
-      return true;
-    }
-    // Dismiss menu if delete not found
+  await page.goto(viewUrl, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+  await page.waitForSelector('[role="tab"].selected', { timeout: 15_000 });
+  await page.waitForTimeout(500);
+  await dismissWelcomeDialogs(page);
+
+  // The caret dropdown trigger is a hidden DIV (viewOptionsPlaceholder) that responds to
+  // mouse clicks at its coordinates even when visibility:hidden. Force-click via mouse.move + click.
+  const placeholder = page.locator('[class*="viewOptionsPlaceholder"]').first();
+  const box = await placeholder.boundingBox().catch(() => null);
+  if (!box) {
+    await screenshot(page, `delete-placeholder-not-found-${viewName.replace(/\s+/g, '-')}`);
+    return false;
+  }
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.waitForTimeout(600);
+
+  // "Delete view" is in the resulting dropdown menu
+  const deleteItem = page.locator('[role="menuitem"]:has-text("Delete view")');
+  if (!await deleteItem.isVisible({ timeout: 3000 })) {
     await page.keyboard.press('Escape');
-  } catch { /* ignore */ }
-  return false;
+    await screenshot(page, `delete-option-not-found-${viewName.replace(/\s+/g, '-')}`);
+    return false;
+  }
+  await deleteItem.click();
+  await page.waitForTimeout(800);
+
+  // GitHub shows a second confirmation dialog: "Delete view? Are you sure?" — click Delete
+  const confirmBtn = page.getByRole('button', { name: /^delete$/i })
+    .or(page.locator('dialog button:has-text("Delete"), [role="dialog"] button:has-text("Delete")'));
+  if (await confirmBtn.isVisible({ timeout: 3000 })) {
+    await confirmBtn.click();
+    await page.waitForTimeout(1200);
+    return true;
+  }
+
+  // If no confirmation dialog appeared, the delete may have gone through directly
+  return true;
 }
 
 async function clickNewViewButton(page) {
-  // GitHub Projects v2: "+ New view" is rendered as role="tab" at the end of the tab strip,
-  // NOT as a button. Screenshot confirmed: it has text "+ New view" with a leading + icon.
+  // GitHub Projects v2: "+ New view" is a <button> with text "New view" in the tab strip
+  // (confirmed via DOM inspection — class view-navigation-module__newViewButton__*)
   const strategies = [
-    // Direct tab with "New view" text (the + icon is a separate span)
-    () => page.getByRole('tab', { name: /new view/i }),
-    // Link inside a tab that acts as the create button
-    () => page.getByRole('link', { name: /new view/i }),
-    // Any element containing the text
+    () => page.getByRole('button', { name: /new view/i }),
+    () => page.locator('button:has-text("New view")').first(),
     () => page.locator(':text("New view")').first(),
-    () => page.locator('a:has-text("New view"), button:has-text("New view")').first(),
+    () => page.getByRole('tab', { name: /new view/i }),
   ];
 
   for (const strategy of strategies) {
@@ -335,19 +338,23 @@ async function setViewLayout(page, layout) {
 
   // Third: use the "..." or settings button on the active tab to switch layout
   try {
-    // Open the view's configuration panel via the "..." button on the active tab
     const moreBtn = page.locator('[role="tab"][aria-selected="true"] ~ button, [role="tab"][aria-selected="true"] button[aria-label*="more" i]');
     if (await moreBtn.isVisible({ timeout: 2000 })) {
       await moreBtn.click();
       await page.waitForTimeout(400);
+      let found = false;
       for (const pattern of patterns) {
         const item = page.getByRole('menuitem', { name: pattern });
         if (await item.isVisible({ timeout: 2000 })) {
           await item.click();
           await page.waitForTimeout(400);
-          return;
+          found = true;
+          break;
         }
       }
+      // Always close the menu if we opened it and didn't find the option
+      if (!found) await page.keyboard.press('Escape');
+      if (found) return;
     }
   } catch { /* continue */ }
 
@@ -443,6 +450,12 @@ async function setGroupBy(page, fieldName) {
 
 async function setFilter(page, filterText) {
   if (!filterText) return;
+
+  // Dismiss any lingering confirmation dialogs before touching the filter bar
+  try {
+    const cancelBtn = page.locator('dialog button:has-text("Cancel"), [role="dialog"] button:has-text("Cancel")').first();
+    if (await cancelBtn.isVisible({ timeout: 800 })) await cancelBtn.click();
+  } catch { /* none */ }
 
   // GitHub Projects filter bar — usually an input with placeholder "Filter by keyword or by field"
   const filterSelectors = [
@@ -549,9 +562,8 @@ async function main() {
           await page.waitForTimeout(500);
           await dismissWelcomeDialogs(page);
         } catch { /* continue */ }
-        if (view.layout && view.layout !== 'table') {
-          await setViewLayout(page, view.layout);
-        }
+        // Layouts are persistent — don't try to re-set them (avoids accidentally opening
+        // the "..." menu and leaving it open or triggering unintended actions)
         if (view.filter) {
           await setFilter(page, view.filter);
           await saveUnsavedChanges(page);
