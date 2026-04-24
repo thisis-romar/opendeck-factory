@@ -31,7 +31,7 @@ mutation {
     targetDate: "2026-05-15"
     body: "Status update body (Markdown supported)"
   }) {
-    projectV2StatusUpdate {
+    statusUpdate {
       id
       status
       body
@@ -42,6 +42,8 @@ mutation {
   }
 }
 ```
+
+> **Note (verified 2026-04-24):** The return payload field is `statusUpdate`, NOT `projectV2StatusUpdate`. The original plan had the wrong field name — using `projectV2StatusUpdate` returns an `undefinedField` error.
 
 ### Status enum values
 
@@ -57,7 +59,7 @@ gh api graphql -f query='mutation {
     startDate: "2026-04-24"
     targetDate: "2026-05-15"
     body: "## Status: ON_TRACK\n\nUpdate body here."
-  }) { projectV2StatusUpdate { id status createdAt } }
+  }) { statusUpdate { id status createdAt } }
 }'
 ```
 

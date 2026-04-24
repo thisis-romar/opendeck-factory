@@ -1,0 +1,46 @@
+name: Support / Question
+description: Ask a question about using OpenDeck
+title: "[Support]: "
+labels: ["research"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before asking, check the [README](https://github.com/thisis-romar/opendeck-factory#readme) and [docs](https://github.com/thisis-romar/opendeck-factory/tree/master/docs).
+
+  - type: textarea
+    id: question
+    attributes:
+      label: What do you want to know?
+      placeholder: "How do I add a multi-action button to an existing profile?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried?
+      description: Show what you attempted and what happened.
+      placeholder: |
+        I tried calling `addShortcut()` with `{ type: 'multi-action' }` but got an error:
+        ```
+        TypeError: invalid action type
+        ```
+    validations:
+      required: true
+
+  - type: input
+    id: node_version
+    attributes:
+      label: Node.js version
+      placeholder: "v22.0.0"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 10
+        - Windows 11
+        - macOS
+        - Linux

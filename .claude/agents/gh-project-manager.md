@@ -104,7 +104,7 @@ Specifically:
 - **`gh issue edit --milestone` on closed issues** — silently no-ops. Use `gh api repos/{owner}/{repo}/issues/{N} -X PATCH -F milestone={number}` instead. Requires PowerShell on Windows (Git Bash rewrites `/repos/...` as filesystem path).
 - **`gh issue create --milestone` takes title, not number** — pass `--milestone "v2.3.0"` not `--milestone 1`.
 - **GraphQL inline IDs with dashes** — Repo node IDs like `R_kgDOSF-8Xw` fail GraphQL inline parsing. Pass via `-F varname=value` flags.
-- **`createProjectV2StatusUpdate`** — correct mutation name for status updates. NOT `addProjectV2StatusUpdate` (doesn't exist). Requires `project` write scope on PAT.
+- **`createProjectV2StatusUpdate`** — correct mutation name for status updates. NOT `addProjectV2StatusUpdate` (doesn't exist). Return payload field is `statusUpdate` (NOT `projectV2StatusUpdate`). Requires `project` write scope on PAT.
 - **`updateProjectV2Field` with `singleSelectOptions` overwrites** — must pass ALL existing option IDs back alongside new ones. Run a pre-flight fetch before any field option mutation.
 - **`createProjectV2View` mutation does not exist** — view creation is web UI only. No GraphQL API for creating views.
 

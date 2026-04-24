@@ -1,0 +1,43 @@
+name: Project Sync
+
+on:
+  issues:
+    types: [opened, reopened, labeled, unlabeled, closed]
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled, closed]
+  schedule:
+    # Sweep every 6 hours to catch items that slipped through event triggers
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Sync issues/PRs to project #4
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PROJECT_SYNC_APP_ID }}
+          private-key: ${{ secrets.PROJECT_SYNC_APP_KEY }}
+          owner: thisis-romar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run project sync
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PROJECT_ID: PVT_kwHODNwyZM4BVh2a
+          PROJECT_NUMBER: "4"
+          PROJECT_OWNER: thisis-romar
+        run: node scripts/gh-project-sync.js
