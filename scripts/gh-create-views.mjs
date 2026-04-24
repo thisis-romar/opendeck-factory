@@ -111,7 +111,9 @@ async function launchEdgeWithCDP() {
 async function screenshot(page, name) {
   mkdirSync(SCREENSHOTS_DIR, { recursive: true });
   const p = path.join(SCREENSHOTS_DIR, `${name}.png`);
-  await page.screenshot({ path: p, fullPage: false });
+  // timeout prevents hanging on slow font/resource loads; animations:disabled speeds it up
+  await page.screenshot({ path: p, fullPage: false, timeout: 10_000, animations: 'disabled' })
+    .catch(err => console.warn(`  [screenshot failed] ${name}: ${err.message}`));
   console.log(`  [screenshot] ${p}`);
 }
 
@@ -237,23 +239,19 @@ async function saveUnsavedChanges(page) {
     await page.waitForTimeout(800);
   } catch { /* unexpected */ }
 
-  // Step 3: handle the "Save filters for X?" confirmation modal
-  // Wait for the dialog to appear, then click its Save button.
+  // Step 3: handle the "Save filters for X?" confirmation modal.
+  // GitHub Primer renders dialogs in a portal (#__primerPortalRoot__) with a backdrop
+  // that intercepts pointer events for anything outside the portal. Must scope the
+  // Save button selector to the portal root — generic .last() hits the toolbar button
+  // behind the backdrop and times out.
   try {
-    await page.waitForSelector(
-      '[role="dialog"], dialog, [class*="Dialog"], [class*="Modal"]',
-      { timeout: 3000 }
-    );
-    // Click "Save" inside the dialog — try multiple selectors
-    const confirmBtn =
-      page.locator('[role="dialog"] button:has-text("Save")').last()
-        .or(page.locator('dialog button:has-text("Save")').last())
-        .or(page.getByRole('button', { name: /^save$/i }).last());
+    await page.waitForSelector('#__primerPortalRoot__ button', { timeout: 3000 });
+    const confirmBtn = page.locator('#__primerPortalRoot__ button:has-text("Save")').first();
     if (await confirmBtn.isVisible({ timeout: 2000 })) {
       await confirmBtn.click();
       await page.waitForTimeout(600);
     }
-  } catch { /* no confirmation dialog appeared — filter saved without confirmation */ }
+  } catch { /* no confirmation dialog — filter saved without secondary confirm */ }
 }
 
 async function deleteViewByName(page, viewName) {
