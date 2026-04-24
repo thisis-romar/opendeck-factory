@@ -20,7 +20,7 @@
     "validate": "node src/index.js validate",
     "list": "node src/index.js list",
     "prepare": "make install-hooks",
-    "brain:build": "python -m graphify knowledge/github",
+    "brain:build": "echo 'Run /graphify knowledge/github in Claude Code to rebuild the graph'",
     "brain:query": "python -m graphify query"
   },
   "dependencies": {

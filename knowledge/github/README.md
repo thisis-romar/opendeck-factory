@@ -8,7 +8,7 @@ Consumed by the `gh-project-manager` subagent and indexed by graphify.
 ```
 knowledge/github/
 ├── README.md             ← this file
-├── reference/            ← fetched GitHub docs (~52 files, fetched 2026-04-24)
+├── reference/            ← fetched GitHub docs (~75 files, fetched 2026-04-24)
 │   ├── projects-v2/      ← Projects v2: creating, views, fields, automations, insights, access
 │   ├── issues/           ← Issues: templates, labels, milestones, sub-issues, linking
 │   ├── pull-requests/    ← PRs: auto-merge, merge queue, reviews, drafts

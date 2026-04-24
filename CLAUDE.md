@@ -92,6 +92,6 @@ Rules:
 
 See `.claude/agents/gh-project-manager.md` for all project anchors, field IDs, canonical views, playbook index, and the 6-point health-audit checklist.
 
-**Knowledge brain:** `knowledge/github/` — 52 fetched docs + 6 playbooks, indexed by graphify.
+**Knowledge brain:** `knowledge/github/` — 75 fetched docs + 6 playbooks, indexed by graphify.
 - Query: `npm run brain:query "<question>"` or `/graphify query "<question>"`
-- Rebuild: `npm run brain:build`
+- Rebuild: `/graphify knowledge/github` (the `brain:build` npm script is a stub — run the skill instead)
