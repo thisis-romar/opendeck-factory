@@ -9,7 +9,7 @@
  */
 
 import { chromium } from 'playwright';
-import { execSync, spawn } from 'node:child_process';
+import { execSync, spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
 import http from 'node:http';
@@ -164,6 +164,26 @@ async function getExistingViewNames(page) {
   return tabs.filter(t => t && t.toLowerCase() !== 'new view');
 }
 
+async function dismissAllDialogs(page) {
+  // Dismiss any modal confirmation dialogs (Save/Discard filter prompts, etc.)
+  // Try Cancel first, then Escape as a fallback
+  try {
+    const cancelBtn = page.locator(
+      'dialog button:has-text("Cancel"), [role="dialog"] button:has-text("Cancel"), .Overlay button:has-text("Cancel")'
+    ).first();
+    if (await cancelBtn.isVisible({ timeout: 1000 })) {
+      await cancelBtn.click();
+      await page.waitForTimeout(400);
+      return;
+    }
+  } catch { /* none */ }
+  // Fallback: press Escape to close any open overlay
+  try {
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+  } catch { /* ignore */ }
+}
+
 async function dismissWelcomeDialogs(page) {
   // "Welcome to Roadmap!" and similar first-run dialogs block subsequent interactions
   const dismissButtons = [
@@ -196,27 +216,44 @@ async function navigateToView1(page) {
 }
 
 async function saveUnsavedChanges(page) {
-  // After setting a filter or group-by, GitHub shows Save/Discard buttons — click Save
+  // GitHub shows Save/Discard buttons in the filter bar when changes are pending.
+  // Clicking Save triggers a "Save filters for X?" confirmation modal — must click Save there too.
+
+  // Step 1: is there an unsaved-filter state? (Discard button is the reliable signal)
+  let hasPendingSave = false;
   try {
-    const saveBtn = page.getByRole('button', { name: /^save$/i }).first();
-    if (await saveBtn.isVisible({ timeout: 2000 })) {
-      await saveBtn.click();
-      await page.waitForTimeout(600);
-    }
+    const discardBtn = page.locator('button:has-text("Discard")').first();
+    hasPendingSave = await discardBtn.isVisible({ timeout: 2000 });
   } catch { /* no pending save */ }
 
-  // GitHub may then show a confirmation dialog: "Save filters for X? Saving these filters
-  // will make it the default for everyone in this view." — click the dialog's Save button.
-  // Give it up to 3 s to appear (it's triggered by the first Save click above).
+  if (!hasPendingSave) return;
+
+  // Step 2: click the toolbar Save (not a dialog button — find it by proximity to Discard)
   try {
-    const confirmBtn = page.locator(
-      '[role="dialog"] button:has-text("Save"), .Overlay button:has-text("Save")'
-    ).last();
-    if (await confirmBtn.isVisible({ timeout: 3000 })) {
+    // The toolbar Save button is adjacent to Discard. Use a broader locator and pick the one
+    // nearest the filter bar (which has both Discard and Save side by side).
+    const saveBtn = page.locator('button:has-text("Save")').first();
+    await saveBtn.click();
+    await page.waitForTimeout(800);
+  } catch { /* unexpected */ }
+
+  // Step 3: handle the "Save filters for X?" confirmation modal
+  // Wait for the dialog to appear, then click its Save button.
+  try {
+    await page.waitForSelector(
+      '[role="dialog"], dialog, [class*="Dialog"], [class*="Modal"]',
+      { timeout: 3000 }
+    );
+    // Click "Save" inside the dialog — try multiple selectors
+    const confirmBtn =
+      page.locator('[role="dialog"] button:has-text("Save")').last()
+        .or(page.locator('dialog button:has-text("Save")').last())
+        .or(page.getByRole('button', { name: /^save$/i }).last());
+    if (await confirmBtn.isVisible({ timeout: 2000 })) {
       await confirmBtn.click();
-      await page.waitForTimeout(800);
+      await page.waitForTimeout(600);
     }
-  } catch { /* no confirmation dialog */ }
+  } catch { /* no confirmation dialog appeared — filter saved without confirmation */ }
 }
 
 async function deleteViewByName(page, viewName) {
@@ -300,12 +337,15 @@ async function clickNewViewButton(page) {
 }
 
 async function setViewLayout(page, layout) {
-  if (layout === 'table') return; // Table is the default; nothing to do
+  // IMPORTANT: After clicking "+ New view", GitHub shows a layout picker dropdown.
+  // We MUST click an option (even Table) to dismiss it and complete view creation.
+  // Returning early for 'table' leaves the dropdown open and breaks subsequent steps.
 
   // After a new view is created, GitHub shows layout options in a panel/popover
   // OR we need to switch layout via the toolbar
   // Try the immediate layout selector first (appears right after creating a view)
   const layoutSelectors = {
+    table:   [/^table$/i],
     board:   [/board/i, /kanban/i],
     roadmap: [/roadmap/i, /timeline/i],
   };
@@ -540,6 +580,50 @@ async function main() {
       await page.waitForTimeout(800);
     }
 
+    // ── 3.6. Detect and fix layout mismatches via GraphQL ─────────────────────
+    // GitHub's API exposes the current layout of each view. Compare against spec
+    // and delete any views whose layout doesn't match — the create path will recreate them.
+    try {
+      const layoutQuery = `query { user(login: "${owner}") { projectV2(number: ${projectNumber}) { views(first: 20) { nodes { name layout } } } } }`;
+      // Use spawnSync with args array to avoid shell quoting issues on Windows
+      const layoutResult = spawnSync('gh', ['api', 'graphql', '-f', `query=${layoutQuery}`], { encoding: 'utf8' });
+      if (layoutResult.status !== 0) throw new Error(layoutResult.stderr || 'gh api graphql failed');
+      const layoutRaw = layoutResult.stdout;
+      const layoutData = JSON.parse(layoutRaw);
+      const ghViews = layoutData.data.user.projectV2.views.nodes;
+      const ghLayoutMap = Object.fromEntries(ghViews.map(v => [v.name, v.layout]));
+      const specToGhLayout = { table: 'TABLE_LAYOUT', board: 'BOARD_LAYOUT', roadmap: 'ROADMAP_LAYOUT' };
+
+      const layoutMismatches = VIEWS.filter(v => {
+        const ghLayout = ghLayoutMap[v.name];
+        if (!ghLayout) return false; // view doesn't exist yet — create path will handle it
+        const expected = specToGhLayout[v.layout ?? 'table'];
+        return ghLayout !== expected;
+      });
+
+      if (layoutMismatches.length > 0) {
+        console.log(`\n3.6. Fixing ${layoutMismatches.length} layout mismatch(es): [${layoutMismatches.map(v => v.name).join(', ')}]`);
+        for (const v of layoutMismatches) {
+          const actual = ghLayoutMap[v.name];
+          const expected = specToGhLayout[v.layout ?? 'table'];
+          console.log(`  Layout mismatch: "${v.name}" — actual: ${actual}, expected: ${expected} — deleting to recreate`);
+          const deleted = await deleteViewByName(page, v.name);
+          if (deleted) {
+            // Remove from existingNames so the create path handles it
+            const idx = existingNames.findIndex(n => n.toLowerCase() === v.name.toLowerCase());
+            if (idx !== -1) existingNames.splice(idx, 1);
+            console.log(`  ✓  Deleted: "${v.name}" (will be recreated with correct layout)`);
+          } else {
+            console.log(`  !  Could not delete: "${v.name}" — manual fix needed`);
+          }
+          await page.waitForTimeout(500);
+        }
+        await page.waitForTimeout(800);
+      }
+    } catch (e) {
+      console.warn(`  WARNING: Layout mismatch check skipped (${e.message}) — run views:fix to re-apply`);
+    }
+
     // ── 4. Create each view ─────────────────────────────────────────────────
     let created = 0;
     let skipped = 0;
@@ -556,12 +640,19 @@ async function main() {
 
       if (alreadyExists && REAPPLY) {
         console.log(`\n  ~ Reapplying settings to existing view: "${view.name}"...`);
+
+        // Dismiss any dialogs left open by the previous iteration BEFORE navigating
+        await dismissAllDialogs(page);
+
         // Click the existing tab to make it active
         try {
           await page.getByRole('tab', { name: new RegExp(view.name, 'i') }).click();
-          await page.waitForTimeout(500);
+          await page.waitForTimeout(700);
+          // Dismiss again in case a dialog appeared during tab navigation
+          await dismissAllDialogs(page);
           await dismissWelcomeDialogs(page);
         } catch { /* continue */ }
+
         // Layouts are persistent — don't try to re-set them (avoids accidentally opening
         // the "..." menu and leaving it open or triggering unintended actions)
         if (view.filter) {
@@ -583,11 +674,9 @@ async function main() {
       await clickNewViewButton(page);
       await screenshot(page, `${String(created + 1).padStart(2, '0')}-after-new-view-click`);
 
-      // b) Set layout (table is default, skip)
-      if (view.layout && view.layout !== 'table') {
-        await setViewLayout(page, view.layout);
-        await screenshot(page, `${String(created + 1).padStart(2, '0')}-after-layout-set`);
-      }
+      // b) Select layout from picker — always required to dismiss the dropdown and create the view
+      await setViewLayout(page, view.layout ?? 'table');
+      await screenshot(page, `${String(created + 1).padStart(2, '0')}-after-layout-set`);
 
       // c) Rename the view
       await setViewName(page, view.name);
