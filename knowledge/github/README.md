@@ -20,8 +20,21 @@ knowledge/github/
     ├── linking-a-pr.md
     ├── triaging-an-issue.md
     ├── sub-issue-hierarchies.md
-    ├── project-health-audit.md
-    └── milestone-vs-target-field.md
+    ├── project-health-audit.md  ← 7-point checklist (PR linkage check added 2026-04-24)
+    ├── milestone-vs-target-field.md
+    ├── retroactive-milestoning.md  ← how to bucket past issues into closed milestones
+    ├── sprint-planning.md          ← 2-week Sprint field usage + iteration filter syntax
+    └── revenue-tagging.md          ← Direct/Indirect/None taxonomy + how to read the Revenue view
+```
+
+Also see `knowledge/audit/` for structured audit outputs:
+
+```
+knowledge/audit/
+├── 2026-04-24-linkage-audit.md  ← linkage gaps found + fixes applied
+├── historical-timeline.md       ← release dates derived from git tags + GH releases
+├── field-taxonomy.md            ← all 9 project fields with option IDs
+└── repo-linkage.md              ← which repos are linked, visibility behavior
 ```
 
 ## Rebuild the graph

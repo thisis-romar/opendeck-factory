@@ -71,6 +71,12 @@
       "L": "f699cc0b",
       "XL": "4e310e4c"
     },
+    "priority": {
+      "P0-Critical": "ac1c6265",
+      "P1-High": "2b3f7957",
+      "P2-Normal": "d671e2b3",
+      "P3-Low": "365e940f"
+    },
     "revenue_impact": {
       "Direct": "7b7ee7fa",
       "Indirect": "7259e310",

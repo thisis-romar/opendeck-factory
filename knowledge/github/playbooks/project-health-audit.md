@@ -67,6 +67,25 @@ See check 1 — the GraphQL query returns layout per view. Compare against the e
 ### 6. Billing status OK?
 Check for the billing banner at https://github.com/users/thisis-romar/projects/4 — if "We are having a problem billing your account" appears, automations and paid-tier features may silently fail.
 
+### 7. Every closed issue has a PR linkage?
+
+Every closed issue should either:
+- Have a merged PR with `Closes #N` in its body, OR
+- Have an explicit comment explaining why it was closed without a PR (e.g. "resolved by configuration change")
+
+```bash
+gh issue list --state closed --json number,title,closingIssuesReferences,stateReason | \
+  node -e "
+    const issues = JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));
+    issues.forEach(i => {
+      if (!i.closingIssuesReferences?.length && i.stateReason !== 'NOT_PLANNED')
+        console.log('#' + i.number, i.title, '-- no linked PR');
+    });
+  "
+```
+
+If a PR closed an issue before `Closes #N` was in the body, add it retroactively via `gh pr edit` body append. See `knowledge/github/playbooks/retroactive-milestoning.md`.
+
 ## Frequency
 
 Run before any release cut or when you notice project state drifting. Also run after bulk-importing issues.
