@@ -19,7 +19,9 @@
     "pack": "node src/index.js pack",
     "validate": "node src/index.js validate",
     "list": "node src/index.js list",
-    "prepare": "make install-hooks"
+    "prepare": "make install-hooks",
+    "brain:build": "python -m graphify knowledge/github",
+    "brain:query": "python -m graphify query"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

@@ -76,3 +76,32 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 When writing or editing any `.md` file with YAML frontmatter, call `get_current_time` first and use the returned `datetime` value for the `lastmod` field. Set `created` only on first creation; never modify it afterward. Fallback: `date -u +%Y-%m-%dT%H:%M:%SZ`.
 
 Files that carry frontmatter in this repo: `CHANGELOG.md`, `README.md`, `CLAUDE.md`, `.claude/skills/<name>/SKILL.md`.
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
+- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+
+## GitHub Project Management
+
+The OpenDeck Roadmap is GitHub project #4 (`PVT_kwHODNwyZM4BVh2a`, repo: `thisis-romar/opendeck-factory`).
+
+**Subagent:** `.claude/agents/gh-project-manager.md` — invoke for any project-management task (audit, triage, linking PRs, view management).
+
+**Knowledge brain:** `knowledge/github/` — 52 fetched GitHub docs + 6 playbooks, indexed by graphify.
+- Query: `npm run brain:query "<question>"` or `/graphify query "<question>"`
+- Rebuild graph: `npm run brain:build`
+- Refresh a stale doc: `python -m graphify add <URL> --dir knowledge/github/reference/<subdir>`
+
+**Field IDs** (also in `.github/project-ids.json`):
+- status: `PVTSSF_lAHODNwyZM4BVh2azhQ9Dtc`
+- priority: `PVTSSF_lAHODNwyZM4BVh2azhQ9Du8`
+- area: `PVTSSF_lAHODNwyZM4BVh2azhQ9DvA`
+- target: `PVTSSF_lAHODNwyZM4BVh2azhQ9Dv4`
+
+**5 canonical views:** Marketplace (Table), Board — By Status (Board), Board — By Area (Board), Roadmap — By Target (Roadmap), Active Work (Table). Fix with `npm run views:fix`.
