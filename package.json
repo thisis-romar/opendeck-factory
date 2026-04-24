@@ -19,6 +19,11 @@
     "pack": "node src/index.js pack",
     "validate": "node src/index.js validate",
     "list": "node src/index.js list",
+    "views": "node scripts/gh-create-views.mjs",
+    "views:headed": "node scripts/gh-create-views.mjs --headed",
+    "views:dry": "node scripts/gh-create-views.mjs --dry-run",
+    "views:fix": "node scripts/gh-create-views.mjs --reapply --headed",
+    "workflows:toggle": "node scripts/gh-toggle-workflows.mjs --headed",
     "prepare": "make install-hooks",
     "brain:build": "echo 'Run /graphify knowledge/github in Claude Code to rebuild the graph'",
     "brain:query": "python -m graphify query"
@@ -30,6 +35,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "playwright": "^1.59.1"
   }
 }
