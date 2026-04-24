@@ -50,6 +50,7 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 - Profile generation workflow: `.claude/skills/generate-profile/SKILL.md`
 - Capture reference profile (all action types): `.claude/skills/capture-streamdeck-reference/SKILL.md`
 - Drive Windows GUI (Stream Deck app): `.claude/skills/drive-windows-gui/SKILL.md`
+- GitHub project management (`/gh-project-manage`): `.claude/skills/gh-project-manage/SKILL.md`
 
 ## MCP Server
 
@@ -89,19 +90,8 @@ Rules:
 
 ## GitHub Project Management
 
-The OpenDeck Roadmap is GitHub project #4 (`PVT_kwHODNwyZM4BVh2a`, repo: `thisis-romar/opendeck-factory`).
+See `.claude/agents/gh-project-manager.md` for all project anchors, field IDs, canonical views, playbook index, and the 6-point health-audit checklist.
 
-**Subagent:** `.claude/agents/gh-project-manager.md` — invoke for any project-management task (audit, triage, linking PRs, view management).
-
-**Knowledge brain:** `knowledge/github/` — 52 fetched GitHub docs + 6 playbooks, indexed by graphify.
+**Knowledge brain:** `knowledge/github/` — 52 fetched docs + 6 playbooks, indexed by graphify.
 - Query: `npm run brain:query "<question>"` or `/graphify query "<question>"`
-- Rebuild graph: `npm run brain:build`
-- Refresh a stale doc: `python -m graphify add <URL> --dir knowledge/github/reference/<subdir>`
-
-**Field IDs** (also in `.github/project-ids.json`):
-- status: `PVTSSF_lAHODNwyZM4BVh2azhQ9Dtc`
-- priority: `PVTSSF_lAHODNwyZM4BVh2azhQ9Du8`
-- area: `PVTSSF_lAHODNwyZM4BVh2azhQ9DvA`
-- target: `PVTSSF_lAHODNwyZM4BVh2azhQ9Dv4`
-
-**5 canonical views:** Marketplace (Table), Board — By Status (Board), Board — By Area (Board), Roadmap — By Target (Roadmap), Active Work (Table). Fix with `npm run views:fix`.
+- Rebuild: `npm run brain:build`
