@@ -19,6 +19,9 @@
     "pack": "node src/index.js pack",
     "validate": "node src/index.js validate",
     "list": "node src/index.js list",
+    "views": "node scripts/gh-create-views.mjs",
+    "views:headed": "node scripts/gh-create-views.mjs --headed",
+    "views:dry": "node scripts/gh-create-views.mjs --dry-run",
     "prepare": "make install-hooks"
   },
   "dependencies": {
@@ -28,6 +31,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "playwright": "^1.59.1"
   }
 }

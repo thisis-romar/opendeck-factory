@@ -26,6 +26,13 @@
       "options": ["v2.2.x", "v2.3.0", "v3.0.0", "Future"]
     }
   ],
+  "views": [
+    { "name": "Board — By Status",   "layout": "board",   "groupBy": "Status" },
+    { "name": "Board — By Area",     "layout": "board",   "groupBy": "Area"   },
+    { "name": "Roadmap — By Target", "layout": "roadmap", "groupBy": "Target" },
+    { "name": "Active Work",              "layout": "table",   "filter": "-status:Done" },
+    { "name": "Marketplace",              "layout": "table",   "filter": "area:Marketplace" }
+  ],
   "items": [
     {
       "title": "MCP server — 9 tools shipped",
