@@ -22,6 +22,7 @@
     "views": "node scripts/gh-create-views.mjs",
     "views:headed": "node scripts/gh-create-views.mjs --headed",
     "views:dry": "node scripts/gh-create-views.mjs --dry-run",
+    "views:fix": "node scripts/gh-create-views.mjs --reapply --headed",
     "prepare": "make install-hooks"
   },
   "dependencies": {

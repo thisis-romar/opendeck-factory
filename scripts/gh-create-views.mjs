@@ -33,6 +33,7 @@ const SCREENSHOTS_DIR = path.join(ROOT, '.gh-views-debug');
 
 const HEADED = process.argv.includes('--headed');
 const DRY_RUN = process.argv.includes('--dry-run');
+const REAPPLY = process.argv.includes('--reapply'); // re-apply layout/filter to existing views
 
 // ── View definitions ──────────────────────────────────────────────────────────
 const VIEWS = config.views ?? [
@@ -101,7 +102,7 @@ async function launchEdgeWithCDP() {
   ], { detached: true, stdio: 'ignore' });
   proc.unref();
 
-  await waitForCDP(30_000);
+  await waitForCDP(60_000);
   console.log('  Edge CDP ready.');
 }
 
@@ -117,55 +118,182 @@ async function screenshot(page, name) {
 // ── GitHub Projects UI helpers ────────────────────────────────────────────────
 
 async function getOrOpenProjectPage(browser) {
+  let page;
+
   // Find an existing context that might have github.com open
-  for (const ctx of browser.contexts()) {
+  outer: for (const ctx of browser.contexts()) {
     for (const pg of ctx.pages()) {
       if (pg.url().includes('github.com')) {
-        await pg.goto(PROJECT_URL, { waitUntil: 'domcontentloaded' });
-        await pg.waitForLoadState('networkidle');
-        return pg;
+        page = pg;
+        break outer;
       }
     }
   }
-  // No github page found — open new one in first available context
-  const ctx = browser.contexts()[0] ?? await browser.newContext();
-  const page = await ctx.newPage();
-  await page.goto(PROJECT_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
+
+  if (!page) {
+    const ctx = browser.contexts()[0] ?? await browser.newContext();
+    page = await ctx.newPage();
+  }
+
+  await page.goto(PROJECT_URL, { waitUntil: 'load', timeout: 60_000 });
+
+  // Dismiss any open modal/overlay that may have been left open from a previous session
+  try {
+    await page.keyboard.press('Escape');
+    await delay(300);
+  } catch { /* ignore */ }
+
+  // Wait for the Projects v2 view tab strip to mount.
+  // GitHub Projects keeps persistent connections so networkidle never fires — wait for tabs.
+  // The tab strip lives inside the prc-navigation component.
+  await page.waitForSelector(
+    '[role="tab"]:not([aria-label*="Overlay" i]):not([class*="Overlay" i])',
+    { timeout: 30_000 }
+  );
+
   return page;
 }
 
 async function getExistingViewNames(page) {
   // View tabs live in a scrollable tab strip — collect all visible tab labels
+  // Filter out the "+ New view" creation tab
   const tabs = await page.locator('[role="tab"]').allTextContents();
-  return tabs.map(t => t.trim()).filter(Boolean);
+  return tabs
+    .map(t => t.replace(/^\+\s*/, '').trim())
+    .filter(t => t && t.toLowerCase() !== 'new view');
+}
+
+async function dismissWelcomeDialogs(page) {
+  // "Welcome to Roadmap!" and similar first-run dialogs block subsequent interactions
+  const dismissButtons = [
+    () => page.getByRole('button', { name: /got it/i }),
+    () => page.getByRole('button', { name: /dismiss/i }),
+    () => page.locator('button:has-text("Got it")'),
+  ];
+  for (const sel of dismissButtons) {
+    try {
+      const btn = sel();
+      if (await btn.isVisible({ timeout: 1000 })) {
+        await btn.click();
+        await page.waitForTimeout(300);
+      }
+    } catch { /* no dialog present */ }
+  }
+}
+
+async function navigateToView1(page) {
+  // Always start from View 1 (Table layout) before creating a new view to prevent
+  // GitHub from inheriting the current view's layout for the newly created view
+  try {
+    const view1Tab = page.getByRole('tab', { name: /^view 1$/i });
+    if (await view1Tab.isVisible({ timeout: 2000 })) {
+      await view1Tab.click();
+      await page.waitForTimeout(400);
+      await dismissWelcomeDialogs(page);
+    }
+  } catch { /* View 1 not found — proceed anyway */ }
+}
+
+async function saveUnsavedChanges(page) {
+  // After setting a filter or group-by, GitHub shows Save/Discard buttons — click Save
+  try {
+    const saveBtn = page.getByRole('button', { name: /^save$/i }).first();
+    if (await saveBtn.isVisible({ timeout: 2000 })) {
+      await saveBtn.click();
+      await page.waitForTimeout(600);
+    }
+  } catch { /* no pending save */ }
+
+  // GitHub may then show a confirmation dialog: "Save filters for X? Saving these filters
+  // will make it the default for everyone in this view." — click the dialog's Save button.
+  // Give it up to 3 s to appear (it's triggered by the first Save click above).
+  try {
+    const confirmBtn = page.locator(
+      '[role="dialog"] button:has-text("Save"), .Overlay button:has-text("Save")'
+    ).last();
+    if (await confirmBtn.isVisible({ timeout: 3000 })) {
+      await confirmBtn.click();
+      await page.waitForTimeout(800);
+    }
+  } catch { /* no confirmation dialog */ }
+}
+
+async function deleteViewByName(page, viewName) {
+  // Navigate to the view, open its "..." caret menu, click "Delete view"
+  try {
+    const escapedName = viewName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const tab = page.getByRole('tab', { name: new RegExp(escapedName, 'i') });
+    if (!await tab.isVisible({ timeout: 2000 })) return false;
+    await tab.click();
+    await page.waitForTimeout(600);
+    await dismissWelcomeDialogs(page);
+
+    // The active tab's dropdown button — GitHub renders it as a sibling button
+    // or a button inside the selected tab with aria-haspopup
+    const caretSelectors = [
+      '[role="tab"][aria-selected="true"] ~ button',
+      '[role="tab"][aria-selected="true"] button[aria-haspopup]',
+      '[role="tab"][aria-selected="true"] + button',
+      // GitHub may wrap controls in a span/div beside the tab text
+      'li:has([role="tab"][aria-selected="true"]) button[aria-haspopup]',
+    ];
+    let opened = false;
+    for (const sel of caretSelectors) {
+      try {
+        const btn = page.locator(sel).first();
+        if (await btn.isVisible({ timeout: 1500 })) {
+          await btn.click();
+          await page.waitForTimeout(400);
+          opened = true;
+          break;
+        }
+      } catch { /* try next */ }
+    }
+    if (!opened) {
+      await screenshot(page, `delete-caret-not-found-${viewName.replace(/\s+/g, '-')}`);
+      return false;
+    }
+
+    // Click "Delete view" in the dropdown
+    const deleteItem = page.getByRole('menuitem', { name: /delete view/i })
+      .or(page.locator('[role="menuitem"]:has-text("Delete view")'));
+    if (await deleteItem.isVisible({ timeout: 2000 })) {
+      await deleteItem.click();
+      await page.waitForTimeout(1000);
+      return true;
+    }
+    // Dismiss menu if delete not found
+    await page.keyboard.press('Escape');
+  } catch { /* ignore */ }
+  return false;
 }
 
 async function clickNewViewButton(page) {
-  // GitHub Projects v2: "New view" button at the end of the tab bar
-  // Try multiple selector strategies in order of reliability
+  // GitHub Projects v2: "+ New view" is rendered as role="tab" at the end of the tab strip,
+  // NOT as a button. Screenshot confirmed: it has text "+ New view" with a leading + icon.
   const strategies = [
-    () => page.getByRole('button', { name: /new view/i }),
-    () => page.locator('button[aria-label*="new view" i]'),
-    () => page.locator('button[aria-label*="New view" i]'),
-    // The "+" icon button at the end of the tab strip
-    () => page.locator('[data-component="TabNav"] button').last(),
-    () => page.locator('nav[aria-label*="project" i] button').last(),
+    // Direct tab with "New view" text (the + icon is a separate span)
+    () => page.getByRole('tab', { name: /new view/i }),
+    // Link inside a tab that acts as the create button
+    () => page.getByRole('link', { name: /new view/i }),
+    // Any element containing the text
+    () => page.locator(':text("New view")').first(),
+    () => page.locator('a:has-text("New view"), button:has-text("New view")').first(),
   ];
 
   for (const strategy of strategies) {
     try {
-      const btn = strategy();
-      if (await btn.isVisible({ timeout: 2000 })) {
-        await btn.click();
-        await page.waitForTimeout(600);
+      const el = strategy();
+      if (await el.isVisible({ timeout: 2000 })) {
+        await el.click();
+        await page.waitForTimeout(800);
         return;
       }
     } catch { /* try next */ }
   }
 
   await screenshot(page, 'new-view-button-not-found');
-  throw new Error('Could not find "New view" button. See debug screenshot.');
+  throw new Error('Could not find "New view" tab. See debug screenshot.');
 }
 
 async function setViewLayout(page, layout) {
@@ -382,6 +510,23 @@ async function main() {
     const existingNames = await getExistingViewNames(page);
     console.log(`  Existing views: [${existingNames.join(', ')}]`);
 
+    // ── 3.5. Delete ghost views (tabs whose names don't match any VIEWS spec) ──
+    const expectedNameSet = new Set([
+      'view 1', // built-in default — never delete
+      ...VIEWS.map(v => v.name.toLowerCase()),
+    ]);
+    const ghostViews = existingNames.filter(n => !expectedNameSet.has(n.toLowerCase()));
+    if (ghostViews.length > 0) {
+      console.log(`\n3.5. Cleaning up ${ghostViews.length} ghost view(s): [${ghostViews.join(', ')}]`);
+      for (const ghost of ghostViews) {
+        const deleted = await deleteViewByName(page, ghost);
+        console.log(deleted ? `  ✓  Deleted: "${ghost}"` : `  !  Could not delete: "${ghost}" — remove manually`);
+        await page.waitForTimeout(500);
+      }
+      // Refresh tab list after deletions
+      await page.waitForTimeout(800);
+    }
+
     // ── 4. Create each view ─────────────────────────────────────────────────
     let created = 0;
     let skipped = 0;
@@ -390,13 +535,37 @@ async function main() {
     for (const view of VIEWS) {
       const alreadyExists = existingNames.some(n => n.toLowerCase() === view.name.toLowerCase());
 
-      if (alreadyExists) {
-        console.log(`\n  ↩  Skipping (exists): "${view.name}"`);
+      if (alreadyExists && !REAPPLY) {
+        console.log(`\n  ↩  Skipping (exists): "${view.name}" — use --reapply to re-apply settings`);
+        skipped++;
+        continue;
+      }
+
+      if (alreadyExists && REAPPLY) {
+        console.log(`\n  ~ Reapplying settings to existing view: "${view.name}"...`);
+        // Click the existing tab to make it active
+        try {
+          await page.getByRole('tab', { name: new RegExp(view.name, 'i') }).click();
+          await page.waitForTimeout(500);
+          await dismissWelcomeDialogs(page);
+        } catch { /* continue */ }
+        if (view.layout && view.layout !== 'table') {
+          await setViewLayout(page, view.layout);
+        }
+        if (view.filter) {
+          await setFilter(page, view.filter);
+          await saveUnsavedChanges(page);
+        }
+        await screenshot(page, `reapply-${view.name.replace(/[^a-z0-9]/gi, '-')}`);
         skipped++;
         continue;
       }
 
       console.log(`\n  + Creating: "${view.name}" (layout: ${view.layout ?? 'table'})...`);
+
+      // Navigate to View 1 first so GitHub creates new view in Table layout by default,
+      // not inheriting Roadmap or Board layout from the currently active view
+      await navigateToView1(page);
 
       // a) Click "New view"
       await clickNewViewButton(page);
@@ -421,9 +590,12 @@ async function main() {
       // e) Filter
       if (view.filter) {
         await setFilter(page, view.filter);
+        await saveUnsavedChanges(page);
         await screenshot(page, `${String(created + 1).padStart(2, '0')}-after-filter`);
       }
 
+      // Dismiss any welcome/onboarding dialogs before moving on
+      await dismissWelcomeDialogs(page);
       // Wait for autosave
       await page.waitForTimeout(1000);
       console.log(`  ✓  Created: "${view.name}"`);
