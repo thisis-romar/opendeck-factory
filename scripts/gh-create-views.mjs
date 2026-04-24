@@ -9,13 +9,15 @@
  */
 
 import { chromium } from 'playwright';
-import { execSync, spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
-import http from 'node:http';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  CDP_PORT, EDGE_USER_DATA,
+  launchEdgeWithCDP, waitForCDP, screenshot as cdpScreenshot, delay,
+} from './lib/cdp.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -27,8 +29,6 @@ const { owner } = config.project;
 const { projectNumber } = ids;
 const PROJECT_URL = `https://github.com/users/${owner}/projects/${projectNumber}`;
 
-const CDP_PORT = 9222;
-const EDGE_USER_DATA = path.join(os.homedir(), 'AppData', 'Local', 'Microsoft', 'Edge', 'User Data');
 const SCREENSHOTS_DIR = path.join(ROOT, '.gh-views-debug');
 
 const HEADED = process.argv.includes('--headed');
@@ -46,75 +46,12 @@ const VIEWS = config.views ?? [
 
 // ── Edge / CDP helpers ────────────────────────────────────────────────────────
 
-function getEdgePath() {
-  const candidates = [
-    path.join(process.env['ProgramFiles(x86)'] ?? '', 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-    path.join(process.env.ProgramFiles ?? '', 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-    path.join(os.homedir(), 'AppData', 'Local', 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-  ];
-  for (const p of candidates) { if (existsSync(p)) return p; }
-  return 'msedge.exe';
-}
+// CDP launch + helpers imported from scripts/lib/cdp.mjs
 
-function httpGet(url) {
-  return new Promise((resolve, reject) => {
-    const req = http.get(url, { timeout: 3000 }, (res) => {
-      let data = '';
-      res.on('data', (c) => data += c);
-      res.on('end', () => resolve({ status: res.statusCode, data }));
-    });
-    req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
-  });
-}
+// ── Screenshot helper (wrapper over shared cdpScreenshot) ────────────────────
 
-async function waitForCDP(maxWait = 30_000) {
-  const start = Date.now();
-  while (Date.now() - start < maxWait) {
-    try {
-      const resp = await httpGet(`http://127.0.0.1:${CDP_PORT}/json/version`);
-      if (resp.status === 200) return JSON.parse(resp.data);
-    } catch { /* not ready */ }
-    await delay(1000);
-  }
-  throw new Error(`CDP endpoint not ready after ${maxWait / 1000}s`);
-}
-
-async function launchEdgeWithCDP() {
-  // Check if already running with debugging port
-  try {
-    await waitForCDP(3000);
-    console.log('  CDP already open on port ' + CDP_PORT);
-    return;
-  } catch { /* not running, launch it */ }
-
-  console.log('  Closing Edge...');
-  try { execSync('taskkill.exe /F /IM msedge.exe', { stdio: 'pipe' }); } catch { /* not running */ }
-  await delay(1500);
-
-  console.log('  Launching Edge with remote debugging...');
-  const proc = spawn(getEdgePath(), [
-    `--remote-debugging-port=${CDP_PORT}`,
-    `--user-data-dir=${EDGE_USER_DATA}`,
-    '--no-first-run',
-    '--no-default-browser-check',
-    PROJECT_URL,
-  ], { detached: true, stdio: 'ignore' });
-  proc.unref();
-
-  await waitForCDP(60_000);
-  console.log('  Edge CDP ready.');
-}
-
-// ── Screenshot helper ─────────────────────────────────────────────────────────
-
-async function screenshot(page, name) {
-  mkdirSync(SCREENSHOTS_DIR, { recursive: true });
-  const p = path.join(SCREENSHOTS_DIR, `${name}.png`);
-  // timeout prevents hanging on slow font/resource loads; animations:disabled speeds it up
-  await page.screenshot({ path: p, fullPage: false, timeout: 10_000, animations: 'disabled' })
-    .catch(err => console.warn(`  [screenshot failed] ${name}: ${err.message}`));
-  console.log(`  [screenshot] ${p}`);
+function screenshot(page, name) {
+  return cdpScreenshot(page, name, SCREENSHOTS_DIR);
 }
 
 // ── GitHub Projects UI helpers ────────────────────────────────────────────────
@@ -537,7 +474,7 @@ async function main() {
 
   // ── 1. Start Edge with CDP ────────────────────────────────────────────────
   console.log('\n1. Setting up Edge CDP connection...');
-  await launchEdgeWithCDP();
+  await launchEdgeWithCDP(PROJECT_URL);
 
   const browser = await chromium.connectOverCDP(`http://127.0.0.1:${CDP_PORT}`);
   console.log('  Connected to Edge via CDP.');
@@ -716,10 +653,6 @@ async function main() {
     await browser.close();
     console.log('\nDisconnected from Edge (Edge remains open).');
   }
-}
-
-function delay(ms) {
-  return new Promise(r => setTimeout(r, ms));
 }
 
 main().catch(err => {

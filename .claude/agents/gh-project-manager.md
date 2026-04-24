@@ -46,15 +46,21 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 | `knowledge/github/playbooks/retroactive-milestoning.md` | Assigning closed issues to historical milestones |
 | `knowledge/github/playbooks/sprint-planning.md` | 2-week sprint field + @current iteration filter |
 | `knowledge/github/playbooks/revenue-tagging.md` | Revenue Impact taxonomy (Direct/Indirect/None) |
+| `knowledge/github/playbooks/github-app-setup.md` | One-time setup of opendeck-project-sync GitHub App |
+| `knowledge/github/playbooks/insights-charts.md` | 3 standard Insights chart configs (burn-up, status-by-area, priority) |
 
 ## House conventions
 
-**Views (5 canonical):**
+**Views (9 canonical):**
 - `Marketplace` — Table, filter `area:Marketplace`
 - `Board — By Status` — Board (column = Status)
 - `Board — By Area` — Board (column = Area)
-- `Roadmap — By Target` — Roadmap
+- `Roadmap — By Target` — Roadmap (grouped by Target field)
 - `Active Work` — Table (no filter)
+- `Roadmap — By Target Date` — Roadmap (Start Date / Target Date fields; date config is manual)
+- `Revenue — By Impact` — Table, grouped by Revenue Impact
+- `Current Sprint` — Board, filter `sprint:@current`, grouped by Status
+- `Blocked` — Table, filter `status:Blocked`
 
 **Label taxonomy:** `enhancement`, `bug`, `research`, `devops`, `distribution`
 
