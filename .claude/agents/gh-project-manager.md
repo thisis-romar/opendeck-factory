@@ -31,7 +31,15 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 1. **`/graphify query "<question>"`** — query the knowledge graph for docs/concepts (built from `knowledge/github/`)
 2. **`gh` CLI** (`gh project`, `gh issue`, `gh pr`) — live project state
 3. **`gh api graphql`** — mutations and complex queries; use `spawnSync` not `execSync` on Windows (shell splits multi-word queries)
-4. **Playwright `scripts/gh-create-views.mjs`** — view creation/mutation that the API cannot do; run via `npm run views:fix`
+4. **Playwright scripts** — UI-only operations that the API cannot do:
+   - `scripts/gh-create-views.mjs` — create/reapply views → `npm run views:fix`
+   - `scripts/gh-fix-roadmap-view.mjs` — restore Start/Target Date fields on roadmap view → `node scripts/gh-fix-roadmap-view.mjs`
+   - `scripts/gh-toggle-workflows.mjs` — enable built-in workflows → `npm run workflows:toggle`
+   - `scripts/gh-create-insights.mjs` — create/rename Insights charts → `npm run insights`
+5. **Date scripts** — set Start/Target Date fields:
+   - `scripts/gh-set-dates.mjs` — historical dates on closed items (hardcoded map from git history)
+   - `scripts/gh-set-milestone-dates.mjs` — backfill dates on open items from milestone due_on → `npm run dates:backfill`
+6. **Sub-issue scripts** — `scripts/gh-link-subissues.mjs` → `npm run epics:link`
 
 ## Playbook index
 
@@ -47,8 +55,11 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 | `knowledge/github/playbooks/sprint-planning.md` | 2-week sprint field + @current iteration filter |
 | `knowledge/github/playbooks/revenue-tagging.md` | Revenue Impact taxonomy (Direct/Indirect/None) |
 | `knowledge/github/playbooks/github-app-setup.md` | One-time setup of opendeck-project-sync GitHub App |
-| `knowledge/github/playbooks/insights-charts.md` | 3 standard Insights chart configs (burn-up, status-by-area, priority) |
-| `knowledge/audit/2026-04-26-views-and-subissues-audit.md` | Current view state, date-field gotcha, epic + sub-issue hierarchy (14 epics, 79 children, `npm run epics:link`) |
+| `knowledge/github/playbooks/insights-charts.md` | 3 standard Insights chart configs; Playwright automation via `npm run insights` |
+| `knowledge/github/playbooks/setting-dates.md` | Historical dates (`gh-set-dates.mjs`) + milestone backfill (`npm run dates:backfill`) |
+| `knowledge/github/playbooks/workflow-management.md` | 8 enabled workflows; Auto-add filter; `npm run workflows:toggle` |
+| `knowledge/audit/2026-04-26-views-and-subissues-audit.md` | View state (9/9 correct), date-field gotcha, sub-issue hierarchy (14 epics, 79 children) |
+| `knowledge/audit/2026-04-26-dates-and-insights.md` | Milestone date backfill (99 items, 7 bands), 3 Insights charts, workflow state, views:fix chain |
 
 ## House conventions
 
@@ -121,6 +132,20 @@ Specifically:
 - **Roadmap view date fields** — after creating a Roadmap-layout view, the "Date fields" button (`aria-label="Select date fields"`) opens a `[role="menu"]` with `[role="menuitemradio"]` items. To set Start Date + Target Date: `nth(0).click({force:true})` for start slot, `nth(5).click({force:true})` for target slot. Script: `scripts/gh-fix-roadmap-view.mjs`.
 - **View rename race condition** — `gh-create-views.mjs` may leave a view named "View N" if it navigates away before the rename commits. Fix: post-creation `page.goto(PROJECT_URL)` + 3s settle applied 2026-04-26. Ghost views are auto-deleted on next run (step 3.5).
 - **Sub-issue linking** — `addSubIssue` requires GraphQL node IDs (not issue numbers). Script `scripts/gh-link-subissues.mjs` resolves IDs by fetching all open issues into a title→{number,id} map. Epic manifest: `scripts/component-epics.json`. Children manifest: `scripts/component-inventory.json` (field: `parent_title`). Run: `npm run epics:dry` then `npm run epics:link`.
+- **Project items query pagination** — `items(first: 200)` fails with "exceeds the `first` limit of 100". Always paginate with `first: 100` + `pageInfo { hasNextPage endCursor }`. See `gh-set-milestone-dates.mjs` for the correct pattern.
+- **Milestone dates** — `gh-set-milestone-dates.mjs` maps milestone title → date band (hardcoded). Skips items already with dates unless `--force`. After creating new items or changing milestones, re-run `npm run dates:backfill`.
+
+## npm scripts reference
+
+| Script | What it does |
+|---|---|
+| `npm run views` / `views:headed` | Create missing views (Playwright) |
+| `npm run views:fix` | Re-apply view settings + auto-repair roadmap date fields |
+| `npm run workflows:toggle` | Enable Auto-archive + Auto-add workflows |
+| `npm run epics:dry` / `epics:link` | Create epics + link sub-issues |
+| `npm run dates:dry` / `dates:backfill` | Preview / apply milestone dates on open items |
+| `npm run insights:probe` / `insights` | Probe Insights DOM / create 3 canonical charts |
+| `npm run brain:query` | Query the graphify knowledge graph |
 
 ## Refuses
 
