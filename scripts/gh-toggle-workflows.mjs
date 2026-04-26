@@ -46,18 +46,15 @@ const DRY_RUN = process.argv.includes('--dry-run');
 
 // ── Workflow definitions ──────────────────────────────────────────────────────
 
-const AUTO_ADD_FILTER = [
-  'is:issue,pr',
-  'repo:thisis-romar/opendeck-factory',
-  'repo:thisis-romar/stream-deck-catalog',
-  'repo:thisis-romar/opendeck-planning',
-].join(' ');
+// The Auto-add workflow filter box only accepts issue/PR field qualifiers.
+// repo: is handled by the separate repo-selector pill in the UI, not the text filter.
+// For multi-repo coverage, create separate Auto-add workflows per repo in the UI.
+const AUTO_ADD_FILTER = 'is:issue,pr';
 
-// GitHub's built-in workflow names (match what appears in the UI)
+// Only workflows that are currently OFF (confirmed from screenshots 2026-04-26).
+// Already ON: Auto-add sub-issues, Auto-close issue, Item added to project,
+//             Item closed, Pull request linked to issue, Pull request merged.
 const BUILTIN_WORKFLOWS = [
-  'Item closed',
-  'Pull request merged',
-  'Item added to project',
   'Auto-archive items',
   'Auto-add to project',
 ];
@@ -88,93 +85,134 @@ async function getOrOpenWorkflowsPage(browser) {
 }
 
 /**
- * Click a workflow card to open it, then enable it if currently disabled.
+ * GitHub Workflows UI (2026): workflows open in "viewing mode" by default.
+ * - Already-ON workflows: show a blue "On" indicator + "Edit" button in top-right.
+ * - OFF workflows: show only "Edit" button; toggle is only revealed after clicking Edit.
+ *
+ * Flow: click sidebar card → check for "On" indicator → if absent, click Edit →
+ *       find toggle → turn on → save.
+ *
  * Returns 'enabled', 'already-enabled', or 'not-found'.
  */
 async function enableWorkflow(page, workflowName) {
-  // Find the card by heading text
-  const card = page.locator(`text=${workflowName}`).first();
+  // Click the card in the sidebar
+  const card = page.locator(`text="${workflowName}"`).first()
+    .or(page.locator(`text=${workflowName}`).first());
   if (!await card.isVisible({ timeout: 5000 }).catch(() => false)) {
-    console.warn(`  [warn] Workflow "${workflowName}" not found in UI`);
+    console.warn(`  [warn] Workflow "${workflowName}" not found in sidebar`);
     return 'not-found';
   }
 
   await card.click();
-  await delay(800);
+  await delay(1000);
   await screenshot(page, `workflow-${workflowName.replace(/\s+/g, '-').toLowerCase()}-open`);
 
-  // Look for a toggle or enable button
-  const enableBtn = page.locator('button:has-text("Enable"), button[aria-label*="enable" i]').first();
-  const toggleOn  = page.locator('input[type="checkbox"][aria-label*="enable" i], [role="switch"]').first();
-
-  if (await enableBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    console.log(`    Clicking Enable button for "${workflowName}"...`);
-    await enableBtn.click();
-    await delay(600);
-    return 'enabled';
-  }
-
-  if (await toggleOn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    const checked = await toggleOn.isChecked().catch(() => false);
-    if (!checked) {
-      console.log(`    Toggling ON "${workflowName}"...`);
-      await toggleOn.click();
-      await delay(600);
-      return 'enabled';
-    }
-    console.log(`    Already enabled: "${workflowName}"`);
-    return 'already-enabled';
-  }
-
-  // Check if a "Workflow is on" / "Workflow is off" indicator exists
-  const isOn = await page.locator('text=/workflow is on/i').isVisible({ timeout: 2000 }).catch(() => false);
-  if (isOn) {
+  // Check if already ON (viewing-mode ON shows "On" text near top-right)
+  const onIndicator = page.locator('button:has-text("On"), [data-testid*="toggle"][aria-checked="true"]').first()
+    .or(page.locator('[role="switch"][aria-checked="true"]').first());
+  if (await onIndicator.isVisible({ timeout: 2000 }).catch(() => false)) {
     console.log(`    Already on: "${workflowName}"`);
     return 'already-enabled';
   }
 
-  console.warn(`  [warn] Could not find enable control for "${workflowName}"`);
-  return 'not-found';
+  // Need to enter Edit mode to reveal the toggle
+  const editBtn = page.locator('button:has-text("Edit"), a:has-text("Edit")').first();
+  if (!await editBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    console.warn(`  [warn] Edit button not found for "${workflowName}"`);
+    return 'not-found';
+  }
+
+  console.log(`    Clicking Edit for "${workflowName}"...`);
+  await editBtn.click();
+  await delay(1000);
+
+  // In edit mode, the On/Off toggle should now be visible
+  const toggle = page.locator('[role="switch"], input[type="checkbox"]').first();
+  if (await toggle.isVisible({ timeout: 3000 }).catch(() => false)) {
+    const checked = await toggle.isChecked().catch(() => false);
+    if (!checked) {
+      await toggle.click();
+      await delay(600);
+      console.log(`    Toggled ON.`);
+    } else {
+      console.log(`    Toggle already checked in edit mode.`);
+    }
+  } else {
+    console.warn(`  [warn] Toggle not found in edit mode for "${workflowName}"`);
+  }
+
+  // Save
+  const saveBtn = page.locator('button:has-text("Save and turn on workflow"), button:has-text("Save")').first();
+  if (await saveBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await saveBtn.click();
+    await delay(800);
+    console.log(`    Saved.`);
+  }
+
+  await screenshot(page, `workflow-${workflowName.replace(/\s+/g, '-').toLowerCase()}-saved`);
+  return 'enabled';
 }
 
 /**
- * Find and configure the Auto-add workflow filter, then save.
- * GitHub's Auto-add workflow has a text input for the filter query.
+ * Configure the Auto-add workflow: enable it and set the filter text.
+ * The filter input is disabled in viewing mode — must click Edit first.
+ * Note: the UI also shows a repo-selector pill. We update only the text filter;
+ * the repo can be changed manually if needed.
  */
 async function configureAutoAddFilter(page, filter) {
-  // Navigate to the Auto-add workflow card (may already be there)
+  // Navigate to Auto-add to project in the sidebar
   const autoAddLink = page.locator('text=Auto-add to project').first();
   if (await autoAddLink.isVisible({ timeout: 5000 }).catch(() => false)) {
     await autoAddLink.click();
     await delay(800);
   }
-
   await screenshot(page, 'autoadd-open');
 
-  // Find the filter text input
-  const filterInput = page.locator('input[placeholder*="filter" i], input[aria-label*="filter" i], input[name="filter"]').first();
+  // Must be in Edit mode for the filter input to be enabled
+  const editBtn = page.locator('button:has-text("Edit"), a:has-text("Edit")').first();
+  const filterInput = page.locator('input[aria-label*="filter" i], input[placeholder*="filter" i]').first();
+  const isEditable = await filterInput.isEnabled({ timeout: 1000 }).catch(() => false);
+
+  if (!isEditable) {
+    console.log('  Entering Edit mode to unlock filter input...');
+    if (await editBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await editBtn.click();
+      await delay(1000);
+    }
+  }
+
+  // Enable the toggle while in edit mode (if not already on)
+  const toggle = page.locator('[role="switch"], input[type="checkbox"]').first();
+  if (await toggle.isVisible({ timeout: 2000 }).catch(() => false)) {
+    const checked = await toggle.isChecked().catch(() => false);
+    if (!checked) {
+      await toggle.click();
+      await delay(600);
+      console.log('  Auto-add toggle turned ON.');
+    }
+  }
+
+  // Set the filter text
   if (!await filterInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-    console.warn('  [warn] Auto-add filter input not found — may need manual configuration');
+    console.warn('  [warn] Filter input not found — update manually at the Workflows page.');
     return false;
   }
 
-  // Clear and set
   await filterInput.fill('');
   await filterInput.fill(filter);
   await delay(400);
+  await screenshot(page, 'autoadd-filter-set');
 
   // Save
-  const saveBtn = page.locator(
-    '#__primerPortalRoot__ button:has-text("Save"), button:has-text("Save workflow"), button:has-text("Save")'
-  ).first();
+  const saveBtn = page.locator('button:has-text("Save and turn on workflow"), button:has-text("Save")').first();
   if (await saveBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
     await saveBtn.click();
-    await delay(600);
-    console.log(`    Auto-add filter saved: ${filter}`);
+    await delay(800);
+    console.log(`  Auto-add filter saved: ${filter}`);
     return true;
   }
 
-  console.warn('  [warn] Save button not found for Auto-add filter');
+  console.warn('  [warn] Save button not found — filter may not have been saved.');
   return false;
 }
 

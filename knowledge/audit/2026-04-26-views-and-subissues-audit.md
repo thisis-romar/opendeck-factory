@@ -6,19 +6,27 @@ captured_at: 2026-04-26
 
 # Views + Sub-Issue Hierarchy Audit
 
-## View State (as of 2026-04-26)
+## View State (as of 2026-04-26, post-creation audit)
 
-| # | View Name | Layout | Notes |
-|---|---|---|---|
-| 1 | Roadmap — By Target | Roadmap | Existing — groups by Target field |
-| 2 | Board — By Status | Board | Existing |
-| 3 | Board — By Area | Board | Existing |
-| 4 | Marketplace | Table | Filter: area:Marketplace |
-| 5 | Active Work | Table | Filter: -status:Done |
-| 13 | Roadmap — By Target Date | Roadmap | **Newly created** — Start Date + Target Date configured |
+All 9 canonical views are live. Health: **7/9 fully correct** (see filter gaps below).
 
-**Still missing (3 views to create):** Revenue — By Impact, Current Sprint, Blocked.
-Run `npm run views:headed` to create them. The post-creation navigation fix has been applied to `scripts/gh-create-views.mjs`.
+| # | View Name | Layout | Filter (live) | GroupBy | Status |
+|---|---|---|---|---|---|
+| 1 | Marketplace | Table | `area:Marketplace` | — | ✅ Correct |
+| 2 | Board — By Status | Board | — | Status | ✅ Correct |
+| 3 | Board — By Area | Board | — | Area | ✅ Correct |
+| 7 | Roadmap — By Target | Roadmap | — | Target | ✅ Correct |
+| 10 | Active Work | Table | `-status:Done` | — | ✅ Correct |
+| 13 | Roadmap — By Target Date | Roadmap | — | — | ✅ Start Date + Target Date configured |
+| 14 | Revenue — By Impact | Table | — | Revenue Impact | ✅ Correct |
+| 15 | Current Sprint | Board | `sprint:@current` | Status | ✅ Fixed 2026-04-26 |
+| 16 | Blocked | Table | `status:Blocked` | — | ✅ Fixed 2026-04-26 |
+
+**No duplicate or unnecessary views.** Each view serves a distinct audience question.
+**Health: 9/9 ✅ All views fully correct as of 2026-04-26.**
+
+### Filter persistence root cause (resolved)
+`views:fix` and earlier Playwright runs typed the filter but used `page.locator('button:has-text("Save")')` which missed the split-button Save in the sticky toolbar. Fix: use `page.getByRole('button', { name: 'Save' })` which finds the ARIA-accessible Save button. Then confirm the Primer portal `#__primerPortalRoot__ button:has-text("Save")` if it appears.
 
 ## Roadmap View Date Fields Gotcha
 
