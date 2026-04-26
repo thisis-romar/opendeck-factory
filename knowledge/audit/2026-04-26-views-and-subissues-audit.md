@@ -25,6 +25,9 @@ All 9 canonical views are live. Health: **7/9 fully correct** (see filter gaps b
 **No duplicate or unnecessary views.** Each view serves a distinct audience question.
 **Health: 9/9 ✅ All views fully correct as of 2026-04-26.**
 
+### Roadmap date fields reset issue
+The `Roadmap — By Target Date` date field config (Start Date + Target Date) resets whenever another Playwright session interacts with that view page (e.g. `views:fix --reapply` or Insights script navigation). Symptom: "Welcome to Roadmap!" dialog reappears. Fix: run `node scripts/gh-fix-roadmap-view.mjs` — takes ~10 seconds and is idempotent.
+
 ### Filter persistence root cause (resolved)
 `views:fix` and earlier Playwright runs typed the filter but used `page.locator('button:has-text("Save")')` which missed the split-button Save in the sticky toolbar. Fix: use `page.getByRole('button', { name: 'Save' })` which finds the ARIA-accessible Save button. Then confirm the Primer portal `#__primerPortalRoot__ button:has-text("Save")` if it appears.
 

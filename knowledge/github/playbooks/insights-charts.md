@@ -7,11 +7,16 @@ created: 2026-04-24T00:00:00Z
 
 # Playbook: Insights Charts
 
-GitHub Projects v2 Insights has no API — charts must be created manually via the web UI.
+GitHub Projects v2 Insights has no public API, but chart creation can be automated via Playwright CDP.
 
-Navigate to: **`github.com/users/thisis-romar/projects/4` → Insights tab**
+**Automated:** `npm run insights` (`scripts/gh-create-insights.mjs`) — creates all 3 charts and renames them.
+**Manual:** Navigate to `github.com/users/thisis-romar/projects/4` → Insights tab. Each chart takes ~3 min to configure.
 
-Expect a blank chart canvas. Each chart takes ~3 min to configure.
+**DOM gotchas (2026):**
+- Configure panel is a right sidebar (not dialog): Layout + X-axis + Y-axis dropdowns + "Save to new chart"
+- Rename: pencil button opens `[role="dialog"]`; fill input; click dialog's Save button
+- Delete: hover the sidebar link to show "Chart options" button; click → "Delete chart"
+- Chart ordering is creation order (no drag-to-reorder). Delete and recreate to change order.
 
 ---
 
