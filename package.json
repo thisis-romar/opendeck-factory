@@ -26,6 +26,8 @@
     "workflows:toggle": "node scripts/gh-toggle-workflows.mjs --headed",
     "epics:dry": "node scripts/gh-link-subissues.mjs --dry-run",
     "epics:link": "node scripts/gh-link-subissues.mjs",
+    "insights:probe": "node scripts/gh-create-insights.mjs --probe",
+    "insights": "node scripts/gh-create-insights.mjs",
     "prepare": "make install-hooks",
     "brain:build": "echo 'Run /graphify knowledge/github in Claude Code to rebuild the graph'",
     "brain:query": "python -m graphify query"
