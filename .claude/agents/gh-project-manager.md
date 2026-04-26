@@ -68,7 +68,7 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 |---|---|---|---|
 | 1 | Marketplace | Table | filter `area:Marketplace` |
 | 2 | Board — By Status | Board | column = Status; Sub-issues progress enabled on cards |
-| 3 | Board — By Area | Board | column = Area |
+| 3 | Board — By Area | Board | column = Area (**was misconfigured to Status — fixed 2026-04-26 via Playwright**) |
 | 10 | Active Work | Table | no filter; Sub-issues progress column visible |
 | 13 | Roadmap — By Target Date | Roadmap | Start/Target Date fields; **date config resets** — run `node scripts/gh-fix-roadmap-view.mjs` to repair |
 | 14 | Revenue — By Impact | Table | grouped by Revenue Impact |
