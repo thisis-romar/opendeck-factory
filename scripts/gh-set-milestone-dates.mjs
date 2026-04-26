@@ -20,10 +20,10 @@
  * Run: node scripts/gh-set-milestone-dates.mjs [--dry-run] [--force]
  */
 
-import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gql, gqlAll } from './lib/gql.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -63,31 +63,17 @@ const MILESTONE_START = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function graphql(query, ...extra) {
-  const r = spawnSync('gh', ['api', 'graphql', '-f', `query=${query}`, ...extra], { encoding: 'utf8' });
-  if (r.error) throw r.error;
-  if (r.status !== 0) throw new Error(`GraphQL: ${r.stderr}`);
-  const d = JSON.parse(r.stdout);
-  if (d.errors) throw new Error(`GraphQL errors: ${JSON.stringify(d.errors)}`);
-  return d.data;
-}
-
 function setDate(itemId, fieldId, dateStr) {
   const m = `mutation { updateProjectV2ItemFieldValue(input: { projectId: "${PROJECT_ID}", itemId: "${itemId}", fieldId: "${fieldId}", value: { date: "${dateStr}" } }) { projectV2Item { id } } }`;
-  graphql(m);
+  gql(m);
 }
 
 // ── Fetch all open project items with their current field values ───────────────
 
 console.log(`Fetching open items from project #${PROJECT_NUM}${DRY_RUN ? ' [DRY RUN]' : ''}...`);
 
-let allItems = [];
-let cursor = null;
-let hasNext = true;
-
-while (hasNext) {
-  const after = cursor ? `, after: "${cursor}"` : '';
-  const q = `{
+const allItems = gqlAll(
+  after => `{
     user(login: "${OWNER}") {
       projectV2(number: ${PROJECT_NUM}) {
         items(first: 100${after}) {
@@ -110,14 +96,9 @@ while (hasNext) {
         }
       }
     }
-  }`;
-
-  const data = graphql(q);
-  const page = data.user.projectV2.items;
-  allItems = allItems.concat(page.nodes);
-  hasNext = page.pageInfo.hasNextPage;
-  cursor = page.pageInfo.endCursor;
-}
+  }`,
+  data => data.user.projectV2.items,
+);
 
 console.log(`  Fetched ${allItems.length} total project items.\n`);
 

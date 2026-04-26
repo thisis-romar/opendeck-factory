@@ -55,10 +55,10 @@ body:
     attributes:
       label: Suggested priority
       options:
-        - P0-Critical (blocking release)
-        - P1-High (next sprint)
-        - P2-Normal (backlog)
-        - P3-Low (nice to have)
+        - P0-Critical
+        - P1-High
+        - P2-Normal
+        - P3-Low
     validations:
       required: true
 

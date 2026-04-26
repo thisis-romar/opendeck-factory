@@ -84,11 +84,24 @@ body:
       label: Area
       description: Which part of the codebase is affected?
       options:
-        - Engine (extract/pack/validate)
-        - MCP server
-        - Skills / Claude Code plugin
-        - CLI
-        - Profiles / templates
-        - Other
+        - Engine
+        - MCP
+        - Skills
+        - Plugin
+        - Distribution
+        - Docs
+        - DevOps
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Severity
+      options:
+        - P0-Critical
+        - P1-High
+        - P2-Normal
+        - P3-Low
     validations:
       required: true

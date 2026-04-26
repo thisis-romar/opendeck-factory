@@ -11,6 +11,37 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ── Triage new issues immediately (reads form body → sets Area/Priority/Status)
+  triage:
+    name: Triage new issue to project #4
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PROJECT_SYNC_APP_ID }}
+          private-key: ${{ secrets.PROJECT_SYNC_APP_KEY }}
+          owner: thisis-romar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Triage issue
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/gh-triage-new-issue.mjs
+
+  # ── Full sweep: backfill all items from manifest and fix stale field values
   sync:
     name: Sync issues/PRs to project #4
     runs-on: ubuntu-latest

@@ -8,10 +8,10 @@
  *   --force    Assign sprint even to items that already have one
  */
 
-import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gql, gqlAll } from './lib/gql.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -28,20 +28,6 @@ const OWNER           = 'thisis-romar';
 const IN_PROGRESS_ID  = ids.fieldOptions.status['In Progress'];
 const TODO_ID         = ids.fieldOptions.status['Todo'];
 
-function gql(query) {
-  const r = spawnSync('gh', ['api', 'graphql', '-f', `query=${query}`], { encoding: 'utf8' });
-  if (r.status !== 0) {
-    console.error('GQL error:', r.stderr?.trim());
-    return null;
-  }
-  const parsed = JSON.parse(r.stdout);
-  if (parsed.errors) {
-    console.error('GraphQL errors:', JSON.stringify(parsed.errors, null, 2));
-    return null;
-  }
-  return parsed;
-}
-
 function getCurrentIteration() {
   const q = `{
     node(id: "${SPRINT_FIELD_ID}") {
@@ -53,7 +39,7 @@ function getCurrentIteration() {
     }
   }`;
   const result = gql(q);
-  const iters = result?.data?.node?.configuration?.iterations ?? [];
+  const iters = result.data?.node?.configuration?.iterations ?? [];
   if (!iters.length) {
     console.error('No sprint iterations found. Run this first to create one:');
     console.error('  node scripts/gh-set-sprint.mjs --create-sprint "Sprint 1" 2026-04-27');
@@ -69,16 +55,11 @@ function getCurrentIteration() {
 }
 
 function fetchAllProjectItems() {
-  const items = [];
-  let cursor = null;
-  let hasNext = true;
-
-  while (hasNext) {
-    const afterClause = cursor ? `, after: "${cursor}"` : '';
-    const q = `{
+  const raw = gqlAll(
+    after => `{
       user(login: "${OWNER}") {
         projectV2(number: ${PROJECT_NUMBER}) {
-          items(first: 100${afterClause}) {
+          items(first: 100${after}) {
             nodes {
               id
               fieldValues(first: 20) {
@@ -104,34 +85,25 @@ function fetchAllProjectItems() {
           }
         }
       }
-    }`;
-
-    const result = gql(q);
-    if (!result) break;
-
-    const page = result.data.user.projectV2.items;
-    for (const item of page.nodes) {
-      let statusOptionId = null, sprintId = null;
-      for (const fv of item.fieldValues?.nodes ?? []) {
-        const fname = fv.field?.name;
-        if (fname === 'Status') statusOptionId = fv.optionId;
-        if (fname === 'Sprint') sprintId = fv.iterationId;
-      }
-      items.push({
-        id: item.id,
-        num: item.content?.number ?? '?',
-        title: item.content?.title ?? 'Draft',
-        state: item.content?.state ?? null,
-        statusOptionId,
-        sprintId,
-      });
+    }`,
+    data => data.user.projectV2.items,
+  );
+  return raw.map(item => {
+    let statusOptionId = null, sprintId = null;
+    for (const fv of item.fieldValues?.nodes ?? []) {
+      const fname = fv.field?.name;
+      if (fname === 'Status') statusOptionId = fv.optionId;
+      if (fname === 'Sprint') sprintId = fv.iterationId;
     }
-
-    hasNext = page.pageInfo.hasNextPage;
-    cursor = page.pageInfo.endCursor;
-  }
-
-  return items;
+    return {
+      id: item.id,
+      num: item.content?.number ?? '?',
+      title: item.content?.title ?? 'Draft',
+      state: item.content?.state ?? null,
+      statusOptionId,
+      sprintId,
+    };
+  });
 }
 
 function assignSprint(itemId, iterationId) {
@@ -143,7 +115,8 @@ function assignSprint(itemId, iterationId) {
       value: { iterationId: "${iterationId}" }
     }) { projectV2Item { id } }
   }`;
-  return gql(mut);
+  gql(mut);
+  return true;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -177,9 +150,13 @@ for (const item of targets) {
   console.log(`  ${DRY_RUN ? '[DRY]' : '     '} #${item.num} ${item.title.slice(0, 60)}${stateMsg}${alreadyMsg}`);
 
   if (!DRY_RUN) {
-    const ok = assignSprint(item.id, sprint.id);
-    if (ok) { assigned++; }
-    else { failed++; }
+    try {
+      assignSprint(item.id, sprint.id);
+      assigned++;
+    } catch (err) {
+      console.error(`    ERROR: ${err.message}`);
+      failed++;
+    }
   }
 }
 

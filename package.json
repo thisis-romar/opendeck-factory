@@ -30,10 +30,9 @@
     "epics:link": "node scripts/gh-link-subissues.mjs",
     "insights:probe": "node scripts/gh-create-insights.mjs --probe",
     "insights": "node scripts/gh-create-insights.mjs",
-    "columns:probe": "node scripts/gh-add-subissues-column.mjs --probe",
-    "columns:add": "node scripts/gh-add-subissues-column.mjs",
     "sprint:dry": "node scripts/gh-set-sprint.mjs --dry-run",
     "sprint:assign": "node scripts/gh-set-sprint.mjs",
+    "triage": "node scripts/gh-triage-new-issue.mjs",
     "prepare": "make install-hooks",
     "brain:build": "echo 'Run /graphify knowledge/github in Claude Code to rebuild the graph'",
     "brain:query": "python -m graphify query"
