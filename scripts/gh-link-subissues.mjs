@@ -21,10 +21,10 @@
  * Run: node scripts/gh-link-subissues.mjs [--dry-run]
  */
 
-import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gql, gqlAll, gh } from './lib/gql.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -42,21 +42,10 @@ const PROJECT_ID = ids.projectId ?? 'PVT_kwHODNwyZM4BVh2a';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function gh(...args) {
-  const result = spawnSync('gh', args, { encoding: 'utf8' });
-  if (result.error) throw result.error;
-  return { stdout: result.stdout.trim(), stderr: result.stderr.trim(), status: result.status };
-}
+// gh() and gql() imported from ./lib/gql.mjs
 
-function graphql(query, ...fields) {
-  const args = ['api', 'graphql', '-f', `query=${query}`, ...fields];
-  const result = spawnSync('gh', args, { encoding: 'utf8' });
-  if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(`GraphQL error: ${result.stderr}`);
-  const data = JSON.parse(result.stdout);
-  if (data.errors) throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
-  return data.data;
-}
+// Convenience wrapper: run gql and return only data (not the full response)
+const graphql = (query, ...fields) => gql(query, ...fields).data;
 
 function action(label, fn) {
   if (DRY_RUN) { console.log(`  [dry-run] ${label}`); return null; }
@@ -122,32 +111,21 @@ console.log('\n4. Fetching all open issues for title→ID lookup...');
 /** @type {Map<string, {number: number, id: string}>} */
 const issueMap = new Map(); // title_lowercase -> {number, id}
 
-let hasNextPage = true;
-let cursor = null;
-let totalFetched = 0;
-
-while (hasNextPage) {
-  const afterClause = cursor ? `, after: "${cursor}"` : '';
-  const q = `
-    query {
-      repository(owner: "${OWNER}", name: "${REPO}") {
-        issues(first: 100, states: [OPEN]${afterClause}) {
-          pageInfo { hasNextPage endCursor }
-          nodes { number title id }
-        }
+const allIssues = gqlAll(
+  after => `{
+    repository(owner: "${OWNER}", name: "${REPO}") {
+      issues(first: 100, states: [OPEN]${after}) {
+        pageInfo { hasNextPage endCursor }
+        nodes { number title id }
       }
     }
-  `;
-  const data = graphql(q);
-  const page = data.repository.issues;
-  for (const issue of page.nodes) {
-    issueMap.set(issue.title.toLowerCase(), { number: issue.number, id: issue.id });
-    totalFetched++;
-  }
-  hasNextPage = page.pageInfo.hasNextPage;
-  cursor = page.pageInfo.endCursor;
+  }`,
+  data => data.repository.issues,
+);
+for (const issue of allIssues) {
+  issueMap.set(issue.title.toLowerCase(), { number: issue.number, id: issue.id });
 }
-console.log(`  Fetched ${totalFetched} open issues.`);
+console.log(`  Fetched ${allIssues.length} open issues.`);
 
 // ── Build option lookup maps from project-ids.json ───────────────────────────
 // Structure: ids.fieldOptions.status = { "Todo": "f75ad846", ... }
@@ -284,20 +262,10 @@ for (const epic of epics) {
 
   if (!DRY_RUN) {
     try {
-      // Paginate through all project items to find this epic's item ID
-      let allProjectItems = [];
-      let itemCursor = null;
-      let itemHasNext = true;
-      while (itemHasNext) {
-        const cursorArg = itemCursor ? `-f after=${itemCursor}` : '';
-        const r = spawnSync('gh', ['api', 'graphql', '-f', `query=${itemQuery}`, ...(itemCursor ? ['-f', `after=${itemCursor}`] : [])], { encoding: 'utf8' });
-        if (r.status !== 0) throw new Error(r.stderr);
-        const d = JSON.parse(r.stdout);
-        const pg = d.data.user.projectV2.items;
-        allProjectItems = allProjectItems.concat(pg.nodes);
-        itemHasNext = pg.pageInfo.hasNextPage;
-        itemCursor = pg.pageInfo.endCursor;
-      }
+      const allProjectItems = gqlAll(
+        after => itemQuery.replace('items(first: 100)', `items(first: 100${after})`),
+        data => data.user.projectV2.items,
+      );
       const item = allProjectItems.find(i => i.content?.number === epicInfo.number);
       if (item) {
         const fieldSets = [
