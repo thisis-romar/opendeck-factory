@@ -263,12 +263,13 @@ for (const epic of epics) {
     revenue_impact: ids.fieldIds?.revenue_impact,
   };
 
-  // Get project item ID for this issue
+  // Get project item ID for this issue (paginated, max 100 per page)
   const itemQuery = `
-    query {
+    query($after: String) {
       user(login: "${OWNER}") {
         projectV2(number: ${PROJECT_NUMBER}) {
-          items(first: 200) {
+          items(first: 100, after: $after) {
+            pageInfo { hasNextPage endCursor }
             nodes {
               id
               content {
@@ -283,9 +284,21 @@ for (const epic of epics) {
 
   if (!DRY_RUN) {
     try {
-      const itemData = graphql(itemQuery);
-      const items = itemData.user.projectV2.items.nodes;
-      const item = items.find(i => i.content?.number === epicInfo.number);
+      // Paginate through all project items to find this epic's item ID
+      let allProjectItems = [];
+      let itemCursor = null;
+      let itemHasNext = true;
+      while (itemHasNext) {
+        const cursorArg = itemCursor ? `-f after=${itemCursor}` : '';
+        const r = spawnSync('gh', ['api', 'graphql', '-f', `query=${itemQuery}`, ...(itemCursor ? ['-f', `after=${itemCursor}`] : [])], { encoding: 'utf8' });
+        if (r.status !== 0) throw new Error(r.stderr);
+        const d = JSON.parse(r.stdout);
+        const pg = d.data.user.projectV2.items;
+        allProjectItems = allProjectItems.concat(pg.nodes);
+        itemHasNext = pg.pageInfo.hasNextPage;
+        itemCursor = pg.pageInfo.endCursor;
+      }
+      const item = allProjectItems.find(i => i.content?.number === epicInfo.number);
       if (item) {
         const fieldSets = [
           { fieldId: FIELD_IDS.status,         optionId: getOptionId(STATUS_OPTIONS, 'Todo') },
