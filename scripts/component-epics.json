@@ -1,0 +1,142 @@
+[
+  {
+    "title": "Catalog v1 — VS Code profile pack",
+    "reuse_existing_issue": 19,
+    "target": "Catalog-v1",
+    "milestone_name": "Catalog-v1",
+    "retarget_milestone": true
+  },
+  {
+    "title": "Agentic pipeline v1 — Agents 1 + 2 (Asset Spec + Build)",
+    "reuse_existing_issue": 20,
+    "target": "v2.3.0",
+    "milestone_name": "v2.3.0"
+  },
+  {
+    "title": "Pro tier — hosted icon generation",
+    "reuse_existing_issue": 22,
+    "target": "v3.0.0",
+    "milestone_name": "v3.0.0"
+  },
+  {
+    "title": "MCP server v2.3.0 — 9 tools shipped",
+    "body": "Epic tracking the complete 9-tool MCP server shipped in v2.3.0. Children are the individual tool implementations: extract_profile, pack_profile, validate_profile, list_profile, add_shortcut, generate_icons, list_shortcuts, quality_check, live_test_profile.",
+    "area": "MCP",
+    "priority": "P0-Critical",
+    "target": "v2.3.0",
+    "size": "L",
+    "revenue_impact": "Direct",
+    "milestone_name": "v2.3.0",
+    "labels": ["epic", "area:mcp"]
+  },
+  {
+    "title": "MCP distribution",
+    "body": "Epic tracking MCP server distribution work: npm publish pipeline and marketplace listing submissions.",
+    "area": "MCP",
+    "priority": "P1-High",
+    "target": "v2.4.0",
+    "size": "M",
+    "revenue_impact": "Indirect",
+    "milestone_name": "v2.4.0",
+    "labels": ["epic", "area:mcp"]
+  },
+  {
+    "title": "Engine core API surface",
+    "body": "Epic tracking the core engine API surface: ProfileEditor, hotkey-builder, extract/pack, validate, list, constants, template, image generator, and format converter.",
+    "area": "Engine",
+    "priority": "P1-High",
+    "target": "v2.3.0",
+    "size": "XL",
+    "revenue_impact": "Direct",
+    "milestone_name": "v2.3.0",
+    "labels": ["epic", "area:engine"]
+  },
+  {
+    "title": "DevOps foundation — workflows + scripts",
+    "body": "Epic tracking all DevOps automation: Playwright view/sync scripts, GitHub Actions workflows, GitHub App, CI pipeline, Dependabot, release-please, npm publish credentials, and project bootstrap.",
+    "area": "DevOps",
+    "priority": "P1-High",
+    "target": "v2.3.0",
+    "size": "XL",
+    "revenue_impact": "Indirect",
+    "milestone_name": "v2.3.0",
+    "labels": ["epic", "area:devops"]
+  },
+  {
+    "title": "Repo hygiene — branch protection + templates",
+    "body": "Epic tracking repo-quality items: commitlint, CHANGELOG automation, branch protection, PR template, CODEOWNERS, graphify rebuild automation, and prepare hook.",
+    "area": "DevOps",
+    "priority": "P2-Normal",
+    "target": "v2.3.0",
+    "size": "M",
+    "revenue_impact": "None",
+    "milestone_name": "v2.3.0",
+    "labels": ["epic", "area:devops"]
+  },
+  {
+    "title": "Skills + subagents v2.3.0",
+    "body": "Epic tracking the Claude Code skill and subagent suite: generate-profile, capture-streamdeck-reference, drive-windows-gui, gh-project-manage, and gh-project-manager subagent.",
+    "area": "Skills",
+    "priority": "P1-High",
+    "target": "v2.3.0",
+    "size": "M",
+    "revenue_impact": "Indirect",
+    "milestone_name": "v2.3.0",
+    "labels": ["epic", "area:skills"]
+  },
+  {
+    "title": "Claude Code plugin packaging",
+    "body": "Epic tracking the Claude Code plugin distribution: plugin.json manifest, marketplace.json, hooks, .mcp.json bundling, install-size budget, and cross-platform smoke tests.",
+    "area": "Plugin",
+    "priority": "P1-High",
+    "target": "v2.4.0",
+    "size": "M",
+    "revenue_impact": "Direct",
+    "milestone_name": "v2.4.0",
+    "labels": ["epic", "area:plugin"]
+  },
+  {
+    "title": "Distribution channels",
+    "body": "Epic tracking distribution channel work: Claude Desktop MCP server, plugin marketplace submission, VS Code extension pack, Obsidian plugin, and CLI standalone binary.",
+    "area": "Distribution",
+    "priority": "P2-Normal",
+    "target": "v2.4.0",
+    "size": "L",
+    "revenue_impact": "Direct",
+    "milestone_name": "v2.4.0",
+    "labels": ["epic", "area:distribution"]
+  },
+  {
+    "title": "Marketplace listings",
+    "body": "Epic tracking marketplace listing submissions: Anthropic plugin store, VS Code Marketplace, and Obsidian plugin community listing.",
+    "area": "Marketplace",
+    "priority": "P2-Normal",
+    "target": "v2.4.0",
+    "size": "S",
+    "revenue_impact": "Direct",
+    "milestone_name": "v2.4.0",
+    "labels": ["epic", "area:marketplace"]
+  },
+  {
+    "title": "Docs v2.3.0",
+    "body": "Epic tracking documentation for v2.3.0: Obsidian vault, knowledge/github brain refresh cadence, public-facing README overhaul, CHANGELOG curation, and API reference auto-generation.",
+    "area": "Docs",
+    "priority": "P2-Normal",
+    "target": "v2.3.0",
+    "size": "M",
+    "revenue_impact": "Indirect",
+    "milestone_name": "v2.3.0",
+    "labels": ["epic", "area:docs"]
+  },
+  {
+    "title": "Licensing — FSL + trademark",
+    "body": "Epic tracking licensing obligations: FSL-1.1-ALv2 annual review, NOTICE file upkeep, and 2-year OSS conversion automation to Apache 2.0.",
+    "area": "Licensing",
+    "priority": "P3-Low",
+    "target": "Future",
+    "size": "S",
+    "revenue_impact": "None",
+    "milestone_name": null,
+    "labels": ["epic", "area:licensing"]
+  }
+]

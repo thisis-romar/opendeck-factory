@@ -48,6 +48,7 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 | `knowledge/github/playbooks/revenue-tagging.md` | Revenue Impact taxonomy (Direct/Indirect/None) |
 | `knowledge/github/playbooks/github-app-setup.md` | One-time setup of opendeck-project-sync GitHub App |
 | `knowledge/github/playbooks/insights-charts.md` | 3 standard Insights chart configs (burn-up, status-by-area, priority) |
+| `knowledge/audit/2026-04-26-views-and-subissues-audit.md` | Current view state, date-field gotcha, epic + sub-issue hierarchy (14 epics, 79 children, `npm run epics:link`) |
 
 ## House conventions
 
@@ -113,6 +114,9 @@ Specifically:
 - **`createProjectV2StatusUpdate`** — correct mutation name for status updates. NOT `addProjectV2StatusUpdate` (doesn't exist). Return payload field is `statusUpdate` (NOT `projectV2StatusUpdate`). Requires `project` write scope on PAT.
 - **`updateProjectV2Field` with `singleSelectOptions` overwrites** — must pass ALL existing option IDs back alongside new ones. Run a pre-flight fetch before any field option mutation.
 - **`createProjectV2View` mutation does not exist** — view creation is web UI only. No GraphQL API for creating views.
+- **Roadmap view date fields** — after creating a Roadmap-layout view, the "Date fields" button (`aria-label="Select date fields"`) opens a `[role="menu"]` with `[role="menuitemradio"]` items. To set Start Date + Target Date: `nth(0).click({force:true})` for start slot, `nth(5).click({force:true})` for target slot. Script: `scripts/gh-fix-roadmap-view.mjs`.
+- **View rename race condition** — `gh-create-views.mjs` may leave a view named "View N" if it navigates away before the rename commits. Fix: post-creation `page.goto(PROJECT_URL)` + 3s settle applied 2026-04-26. Ghost views are auto-deleted on next run (step 3.5).
+- **Sub-issue linking** — `addSubIssue` requires GraphQL node IDs (not issue numbers). Script `scripts/gh-link-subissues.mjs` resolves IDs by fetching all open issues into a title→{number,id} map. Epic manifest: `scripts/component-epics.json`. Children manifest: `scripts/component-inventory.json` (field: `parent_title`). Run: `npm run epics:dry` then `npm run epics:link`.
 
 ## Refuses
 

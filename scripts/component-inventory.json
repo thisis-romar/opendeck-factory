@@ -1,7 +1,7 @@
 [
   {
-    "title": "ProfileEditor class \u2014 core API surface",
-    "body": "Tracks the ProfileEditor class in src/profile.js \u2014 the primary public API for reading, mutating, and saving extracted profile directories. Covers method completeness, error handling, and TypeScript type stubs.",
+    "title": "ProfileEditor class — core API surface",
+    "body": "Tracks the ProfileEditor class in src/profile.js — the primary public API for reading, mutating, and saving extracted profile directories. Covers method completeness, error handling, and TypeScript type stubs.",
     "area": "Engine",
     "priority": "P1-High",
     "target": "v2.3.0",
@@ -11,10 +11,11 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "hotkey-builder \u2014 multi-action chord support",
+    "title": "hotkey-builder — multi-action chord support",
     "body": "Tracks the hotkey builder module responsible for constructing multi-action chord shortcuts (e.g. Ctrl+K Ctrl+C). Covers the chord sequencing logic, modifier mapping, and integration with ProfileEditor.addHotkeyButton.",
     "area": "Engine",
     "priority": "P2-Normal",
@@ -25,11 +26,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "extract/pack pipeline \u2014 adm-zip wrapper",
-    "body": "Tracks src/extract.js and src/pack.js \u2014 the adm-zip\u00e2\u20ac\u201cbased ZIP read/write pipeline that converts .streamDeckProfile files to editable directories and back. Covers edge cases, large profiles, and error propagation.",
+    "title": "extract/pack pipeline — adm-zip wrapper",
+    "body": "Tracks src/extract.js and src/pack.js — the adm-zipâ€“based ZIP read/write pipeline that converts .streamDeckProfile files to editable directories and back. Covers edge cases, large profiles, and error propagation.",
     "area": "Engine",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -39,11 +41,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "validate \u2014 schema + invariant checks",
-    "body": "Tracks src/validate.js \u2014 the structural validator that checks manifests, image references, grid bounds, and profile version invariants. Drives the quality gate and CI pipeline.",
+    "title": "validate — schema + invariant checks",
+    "body": "Tracks src/validate.js — the structural validator that checks manifests, image references, grid bounds, and profile version invariants. Drives the quality gate and CI pipeline.",
     "area": "Engine",
     "priority": "P1-High",
     "target": "v2.3.0",
@@ -53,11 +56,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "list \u2014 grid-layout printer",
-    "body": "Tracks the list command in src/index.js and the list_profile MCP tool \u2014 the human-readable grid printer that renders page/row/button layouts to the console. Covers formatting edge cases and wide device support.",
+    "title": "list — grid-layout printer",
+    "body": "Tracks the list command in src/index.js and the list_profile MCP tool — the human-readable grid printer that renders page/row/button layouts to the console. Covers formatting edge cases and wide device support.",
     "area": "Engine",
     "priority": "P3-Low",
     "target": "v2.4.0",
@@ -67,10 +71,11 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "constants.js \u2014 KEY_CODES completeness audit",
+    "title": "constants.js — KEY_CODES completeness audit",
     "body": "Audit and expand the KEY_CODES map in src/constants.js to cover all keys recognized by the Stream Deck firmware, including media keys, numpad variants, and international layouts.",
     "area": "Engine",
     "priority": "P2-Normal",
@@ -81,10 +86,11 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "profiles/_template/ \u2014 bootstrap for new apps",
+    "title": "profiles/_template/ — bootstrap for new apps",
     "body": "Tracks the _template profile directory used by ProfileEditor.initFromTemplate() to seed new app profiles. Covers the template manifest, default page structure, and placeholder icons.",
     "area": "Engine",
     "priority": "P2-Normal",
@@ -95,11 +101,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "image generator \u2014 144x144 retina icon pipeline",
-    "body": "Tracks scripts/generate-icons.js \u2014 the SVG-to-144x144-PNG icon generation pipeline that produces color-coded retina icons from shortcut category definitions.",
+    "title": "image generator — 144x144 retina icon pipeline",
+    "body": "Tracks scripts/generate-icons.js — the SVG-to-144x144-PNG icon generation pipeline that produces color-coded retina icons from shortcut category definitions.",
     "area": "Engine",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -109,7 +116,8 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
     "title": "Live-format to normalized-format converter",
@@ -123,11 +131,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Engine core API surface"
   },
   {
-    "title": "Plugin-format extension hooks \u2014 Pro tier API",
-    "body": "Design and implement the plugin-format extension hook API that will underpin the Pro tier \u2014 allowing third-party skill authors and enterprise users to inject custom action types, validators, and icon renderers.",
+    "title": "Plugin-format extension hooks — Pro tier API",
+    "body": "Design and implement the plugin-format extension hook API that will underpin the Pro tier — allowing third-party skill authors and enterprise users to inject custom action types, validators, and icon renderers.",
     "area": "Engine",
     "priority": "P1-High",
     "target": "v3.0.0",
@@ -137,11 +146,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Pro tier — hosted icon generation"
   },
   {
     "title": "MCP tool: extract_profile",
-    "body": "Tracks the extract_profile MCP tool in src/mcp-server.js \u2014 exposes ZIP extraction to AI agents and Claude Desktop via the MCP stdio transport.",
+    "body": "Tracks the extract_profile MCP tool in src/mcp-server.js — exposes ZIP extraction to AI agents and Claude Desktop via the MCP stdio transport.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -151,11 +161,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: pack_profile",
-    "body": "Tracks the pack_profile MCP tool in src/mcp-server.js \u2014 exposes profile repacking to AI agents via the MCP protocol.",
+    "body": "Tracks the pack_profile MCP tool in src/mcp-server.js — exposes profile repacking to AI agents via the MCP protocol.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -165,11 +176,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: validate_profile",
-    "body": "Tracks the validate_profile MCP tool in src/mcp-server.js \u2014 exposes structural validation to AI agents so they can check profiles before packing.",
+    "body": "Tracks the validate_profile MCP tool in src/mcp-server.js — exposes structural validation to AI agents so they can check profiles before packing.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -179,11 +191,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: list_profile",
-    "body": "Tracks the list_profile MCP tool in src/mcp-server.js \u2014 surfaces the button grid layout as structured text to AI agents for spatial reasoning about profile layouts.",
+    "body": "Tracks the list_profile MCP tool in src/mcp-server.js — surfaces the button grid layout as structured text to AI agents for spatial reasoning about profile layouts.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -193,11 +206,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: add_shortcut",
-    "body": "Tracks the add_shortcut MCP tool in src/mcp-server.js \u2014 allows AI agents to programmatically add hotkey buttons to a profile page at a specific grid position with label, key, and modifier configuration.",
+    "body": "Tracks the add_shortcut MCP tool in src/mcp-server.js — allows AI agents to programmatically add hotkey buttons to a profile page at a specific grid position with label, key, and modifier configuration.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -207,11 +221,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: generate_icons",
-    "body": "Tracks the generate_icons MCP tool in src/mcp-server.js \u2014 delegates to scripts/generate-icons.js to produce color-coded SVG/PNG icons for a shortcuts JSON file.",
+    "body": "Tracks the generate_icons MCP tool in src/mcp-server.js — delegates to scripts/generate-icons.js to produce color-coded SVG/PNG icons for a shortcuts JSON file.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -221,11 +236,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: list_shortcuts",
-    "body": "Tracks the list_shortcuts MCP tool in src/mcp-server.js \u2014 reads and returns shortcut definitions from data/shortcuts/<app>.json for AI agent consumption.",
+    "body": "Tracks the list_shortcuts MCP tool in src/mcp-server.js — reads and returns shortcut definitions from data/shortcuts/<app>.json for AI agent consumption.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -235,11 +251,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: quality_check",
-    "body": "Tracks the quality_check MCP tool in src/mcp-server.js \u2014 runs the quality gate script and returns an approve/reject verdict with a full check report including icon dimensions and button counts.",
+    "body": "Tracks the quality_check MCP tool in src/mcp-server.js — runs the quality gate script and returns an approve/reject verdict with a full check report including icon dimensions and button counts.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -249,11 +266,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP tool: live_test_profile",
-    "body": "Tracks the live_test_profile MCP tool in src/mcp-server.js \u2014 installs a profile into the Stream Deck app, restarts it, verifies the installation, and returns a PASS/FAIL report for CI integration.",
+    "body": "Tracks the live_test_profile MCP tool in src/mcp-server.js — installs a profile into the Stream Deck app, restarts it, verifies the installation, and returns a PASS/FAIL report for CI integration.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -263,11 +281,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP server v2.3.0 — 9 tools shipped"
   },
   {
     "title": "MCP server npm publish pipeline",
-    "body": "Set up the automated npm publish pipeline for the opendeck MCP server package \u2014 including version tagging, package.json exports configuration, and GitHub Actions release workflow.",
+    "body": "Set up the automated npm publish pipeline for the opendeck MCP server package — including version tagging, package.json exports configuration, and GitHub Actions release workflow.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -277,11 +296,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP distribution"
   },
   {
-    "title": "MCP Pro tier \u2014 signed licenses + telemetry",
-    "body": "Design and implement the MCP Pro tier gate \u2014 signed license validation, usage telemetry hooks, and feature flags that unlock advanced tools for paying subscribers.",
+    "title": "MCP Pro tier — signed licenses + telemetry",
+    "body": "Design and implement the MCP Pro tier gate — signed license validation, usage telemetry hooks, and feature flags that unlock advanced tools for paying subscribers.",
     "area": "MCP",
     "priority": "P2-Normal",
     "target": "v3.0.0",
@@ -291,7 +311,8 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Pro tier — hosted icon generation"
   },
   {
     "title": "MCP marketplace listing submissions",
@@ -305,11 +326,12 @@
     "labels": [
       "area:mcp"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "MCP distribution"
   },
   {
     "title": "Skill: generate-profile",
-    "body": "Tracks the generate-profile Claude Code skill in .claude/skills/generate-profile/SKILL.md \u2014 the end-to-end workflow skill for generating a .streamDeckProfile from an application's keyboard shortcuts.",
+    "body": "Tracks the generate-profile Claude Code skill in .claude/skills/generate-profile/SKILL.md — the end-to-end workflow skill for generating a .streamDeckProfile from an application's keyboard shortcuts.",
     "area": "Skills",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -319,11 +341,12 @@
     "labels": [
       "area:skills"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Skills + subagents v2.3.0"
   },
   {
     "title": "Skill: capture-streamdeck-reference",
-    "body": "Tracks the capture-streamdeck-reference skill \u2014 builds and validates a reference .streamDeckProfile containing all known built-in Stream Deck action types for reverse engineering new action formats.",
+    "body": "Tracks the capture-streamdeck-reference skill — builds and validates a reference .streamDeckProfile containing all known built-in Stream Deck action types for reverse engineering new action formats.",
     "area": "Skills",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -333,11 +356,12 @@
     "labels": [
       "area:skills"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Skills + subagents v2.3.0"
   },
   {
     "title": "Skill: drive-windows-gui",
-    "body": "Tracks the drive-windows-gui skill \u2014 orchestrates the streamdeck-driver subagent to perform GUI operations in the Elgato Stream Deck app that cannot be done via JSON injection.",
+    "body": "Tracks the drive-windows-gui skill — orchestrates the streamdeck-driver subagent to perform GUI operations in the Elgato Stream Deck app that cannot be done via JSON injection.",
     "area": "Skills",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -347,11 +371,12 @@
     "labels": [
       "area:skills"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Skills + subagents v2.3.0"
   },
   {
     "title": "Skill: gh-project-manage",
-    "body": "Tracks the gh-project-manage Claude Code skill \u2014 a GitHub project management skill for creating issues, updating project fields, and managing the opendeck-factory GitHub Project board.",
+    "body": "Tracks the gh-project-manage Claude Code skill — a GitHub project management skill for creating issues, updating project fields, and managing the opendeck-factory GitHub Project board.",
     "area": "Skills",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -361,11 +386,12 @@
     "labels": [
       "area:skills"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Skills + subagents v2.3.0"
   },
   {
     "title": "Subagent: gh-project-manager",
-    "body": "Tracks the gh-project-manager subagent definition (.claude/agents/gh-project-manager.md) \u2014 the autonomous agent responsible for project board health audits, field backfills, and bulk issue operations.",
+    "body": "Tracks the gh-project-manager subagent definition (.claude/agents/gh-project-manager.md) — the autonomous agent responsible for project board health audits, field backfills, and bulk issue operations.",
     "area": "Skills",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -375,11 +401,12 @@
     "labels": [
       "area:skills"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Skills + subagents v2.3.0"
   },
   {
     "title": "plugin.json manifest + schema validation",
-    "body": "Tracks the .claude-plugin/plugin.json manifest \u2014 the Claude Code plugin descriptor that bundles the MCP server and skills. Includes JSON schema validation and spec compliance testing.",
+    "body": "Tracks the .claude-plugin/plugin.json manifest — the Claude Code plugin descriptor that bundles the MCP server and skills. Includes JSON schema validation and spec compliance testing.",
     "area": "Plugin",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -389,11 +416,12 @@
     "labels": [
       "area:plugin"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Claude Code plugin packaging"
   },
   {
     "title": "marketplace.json submission pipeline",
-    "body": "Design and implement the marketplace.json submission artifact and automated pipeline for submitting the Claude Code plugin to the Anthropic marketplace \u2014 including metadata, screenshots, and capability declarations.",
+    "body": "Design and implement the marketplace.json submission artifact and automated pipeline for submitting the Claude Code plugin to the Anthropic marketplace — including metadata, screenshots, and capability declarations.",
     "area": "Plugin",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -403,11 +431,12 @@
     "labels": [
       "area:plugin"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Claude Code plugin packaging"
   },
   {
     "title": "Plugin hooks: pre-pack, post-pack, pre-validate",
-    "body": "Implement the pre-pack-validate, post-pack, and pre-validate lifecycle hooks in .claude-plugin/hooks/ \u2014 shell scripts invoked by the Claude Code harness to enforce quality gates around profile pack operations.",
+    "body": "Implement the pre-pack-validate, post-pack, and pre-validate lifecycle hooks in .claude-plugin/hooks/ — shell scripts invoked by the Claude Code harness to enforce quality gates around profile pack operations.",
     "area": "Plugin",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -417,11 +446,12 @@
     "labels": [
       "area:plugin"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Claude Code plugin packaging"
   },
   {
     "title": ".mcp.json bundling rules",
-    "body": "Define and document the .mcp.json configuration bundling rules for the Claude Code plugin \u2014 specifying how the MCP server entry point, environment, and permissions are declared for plugin distribution.",
+    "body": "Define and document the .mcp.json configuration bundling rules for the Claude Code plugin — specifying how the MCP server entry point, environment, and permissions are declared for plugin distribution.",
     "area": "Plugin",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -431,11 +461,12 @@
     "labels": [
       "area:plugin"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Claude Code plugin packaging"
   },
   {
     "title": "Plugin install-size budget < 5MB",
-    "body": "Establish and enforce a < 5MB install-size budget for the Claude Code plugin bundle \u2014 includes dependency auditing, tree-shaking configuration, and a size-check CI step.",
+    "body": "Establish and enforce a < 5MB install-size budget for the Claude Code plugin bundle — includes dependency auditing, tree-shaking configuration, and a size-check CI step.",
     "area": "Plugin",
     "priority": "P3-Low",
     "target": "v2.4.0",
@@ -445,11 +476,12 @@
     "labels": [
       "area:plugin"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Claude Code plugin packaging"
   },
   {
     "title": "Plugin cross-platform smoke test Win/Mac/Linux",
-    "body": "Add cross-platform smoke tests for the Claude Code plugin on Windows, macOS, and Linux \u2014 verifying the MCP server starts, tools respond, and hooks execute correctly on all three platforms.",
+    "body": "Add cross-platform smoke tests for the Claude Code plugin on Windows, macOS, and Linux — verifying the MCP server starts, tools respond, and hooks execute correctly on all three platforms.",
     "area": "Plugin",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -459,11 +491,12 @@
     "labels": [
       "area:plugin"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Claude Code plugin packaging"
   },
   {
-    "title": "Distribution: MCP server \u2014 Claude Desktop",
-    "body": "Package and document the opendeck MCP server for Claude Desktop distribution \u2014 including the claude_desktop_config.json snippet, installation guide, and auto-update mechanism.",
+    "title": "Distribution: MCP server — Claude Desktop",
+    "body": "Package and document the opendeck MCP server for Claude Desktop distribution — including the claude_desktop_config.json snippet, installation guide, and auto-update mechanism.",
     "area": "Distribution",
     "priority": "P1-High",
     "target": "v2.3.0",
@@ -473,11 +506,12 @@
     "labels": [
       "area:distribution"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Distribution channels"
   },
   {
     "title": "Distribution: Claude Code plugin marketplace submission",
-    "body": "Submit the opendeck-factory plugin to the Claude Code plugin marketplace \u2014 covers marketplace.json preparation, review process, listing copy, and post-submission monitoring.",
+    "body": "Submit the opendeck-factory plugin to the Claude Code plugin marketplace — covers marketplace.json preparation, review process, listing copy, and post-submission monitoring.",
     "area": "Distribution",
     "priority": "P1-High",
     "target": "v2.4.0",
@@ -487,7 +521,8 @@
     "labels": [
       "area:distribution"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Distribution channels"
   },
   {
     "title": "Distribution: VS Code extension pack",
@@ -501,11 +536,12 @@
     "labels": [
       "area:distribution"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Distribution channels"
   },
   {
     "title": "Distribution: Obsidian plugin",
-    "body": "Build an Obsidian plugin that integrates opendeck-factory \u2014 allowing users to manage Stream Deck profiles, browse shortcut catalogs, and trigger profile generation from within their Obsidian vault.",
+    "body": "Build an Obsidian plugin that integrates opendeck-factory — allowing users to manage Stream Deck profiles, browse shortcut catalogs, and trigger profile generation from within their Obsidian vault.",
     "area": "Distribution",
     "priority": "P1-High",
     "target": "v3.0.0",
@@ -515,11 +551,12 @@
     "labels": [
       "area:distribution"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Distribution channels"
   },
   {
     "title": "Distribution: CLI standalone binary",
-    "body": "Package the opendeck-factory CLI as a standalone binary (via pkg or node-sea) for distribution without a Node.js requirement \u2014 covering Windows, macOS, and Linux x64/arm64 targets.",
+    "body": "Package the opendeck-factory CLI as a standalone binary (via pkg or node-sea) for distribution without a Node.js requirement — covering Windows, macOS, and Linux x64/arm64 targets.",
     "area": "Distribution",
     "priority": "P1-High",
     "target": "v2.5.0",
@@ -529,10 +566,11 @@
     "labels": [
       "area:distribution"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Distribution channels"
   },
   {
-    "title": "Catalog v1 release \u2014 VS Code pack 12 profiles",
+    "title": "Catalog v1 release — VS Code pack 12 profiles",
     "body": "Ship the Catalog v1 milestone: 12 production-ready VS Code shortcut profiles (MK.2, XL, Mini variants) in the private catalog repo, bundled as a VS Code extension pack for the marketplace.",
     "area": "Catalog",
     "priority": "P0-Critical",
@@ -543,11 +581,12 @@
     "labels": [
       "area:catalog"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": null
   },
   {
-    "title": "Catalog submission intake \u2014 Issue Form",
-    "body": "Create a GitHub Issue Form template for community profile submissions to the catalog \u2014 capturing app name, platform, shortcut source, and license attestation.",
+    "title": "Catalog submission intake — Issue Form",
+    "body": "Create a GitHub Issue Form template for community profile submissions to the catalog — capturing app name, platform, shortcut source, and license attestation.",
     "area": "Catalog",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -557,7 +596,8 @@
     "labels": [
       "area:catalog"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Catalog v1 — VS Code profile pack"
   },
   {
     "title": "Catalog-to-factory ingestion script",
@@ -571,11 +611,12 @@
     "labels": [
       "area:catalog"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Catalog v1 — VS Code profile pack"
   },
   {
     "title": "Catalog billing/subscription harness",
-    "body": "Implement the billing and subscription management harness for Catalog v2 \u2014 covering Stripe integration, license key issuance, and download gating for premium catalog profiles.",
+    "body": "Implement the billing and subscription management harness for Catalog v2 — covering Stripe integration, license key issuance, and download gating for premium catalog profiles.",
     "area": "Catalog",
     "priority": "P1-High",
     "target": "Catalog-v2",
@@ -585,11 +626,12 @@
     "labels": [
       "area:catalog"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Catalog v1 — VS Code profile pack"
   },
   {
-    "title": "Script: gh-create-views.mjs \u2014 view automation",
-    "body": "Tracks scripts/gh-create-views.mjs \u2014 the GitHub CLI automation script that creates and configures project board views (by area, priority, target, sprint) on the opendeck-factory GitHub Project.",
+    "title": "Script: gh-create-views.mjs — view automation",
+    "body": "Tracks scripts/gh-create-views.mjs — the GitHub CLI automation script that creates and configures project board views (by area, priority, target, sprint) on the opendeck-factory GitHub Project.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -599,11 +641,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
-    "title": "Script: gh-project-sync.js \u2014 project field sync",
-    "body": "Tracks scripts/gh-project-sync.js \u2014 the script that synchronizes GitHub issue metadata (labels, milestones) with GitHub Project custom field values to keep the board consistent.",
+    "title": "Script: gh-project-sync.js — project field sync",
+    "body": "Tracks scripts/gh-project-sync.js — the script that synchronizes GitHub issue metadata (labels, milestones) with GitHub Project custom field values to keep the board consistent.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -613,7 +656,8 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "Scripts: profile generation pipeline",
@@ -627,11 +671,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Agentic pipeline v1 — Agents 1 + 2 (Asset Spec + Build)"
   },
   {
-    "title": "Script: gh-backfill-issues.mjs \u2014 bulk issue creator",
-    "body": "Tracks scripts/gh-backfill-issues.mjs \u2014 the bulk issue creation script that reads component-inventory.json and creates all tracking issues with project field values on the GitHub Project board.",
+    "title": "Script: gh-backfill-issues.mjs — bulk issue creator",
+    "body": "Tracks scripts/gh-backfill-issues.mjs — the bulk issue creation script that reads component-inventory.json and creates all tracking issues with project field values on the GitHub Project board.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -641,11 +686,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
-    "title": "Script: gh-project-schema-migrate.mjs \u2014 field mutation runner",
-    "body": "Tracks scripts/gh-project-schema-migrate.mjs \u2014 the script that applies GitHub Project field schema migrations (adding/renaming options, changing field types) via the GraphQL API.",
+    "title": "Script: gh-project-schema-migrate.mjs — field mutation runner",
+    "body": "Tracks scripts/gh-project-schema-migrate.mjs — the script that applies GitHub Project field schema migrations (adding/renaming options, changing field types) via the GraphQL API.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -655,11 +701,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
-    "title": "Script: gh-linkage-backfill.mjs \u2014 retroactive milestone linkage",
-    "body": "Tracks scripts/gh-linkage-backfill.mjs \u2014 the retroactive script that adds milestone and project field assignments to existing issues that were created before the project schema was finalized.",
+    "title": "Script: gh-linkage-backfill.mjs — retroactive milestone linkage",
+    "body": "Tracks scripts/gh-linkage-backfill.mjs — the retroactive script that adds milestone and project field assignments to existing issues that were created before the project schema was finalized.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -669,7 +716,8 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "Commitlint + husky pre-commit hooks",
@@ -683,11 +731,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Repo hygiene — branch protection + templates"
   },
   {
-    "title": "CHANGELOG automation \u2014 git-cliff",
-    "body": "Configure git-cliff to auto-generate CHANGELOG.md from conventional commits on every release \u2014 covering scopes, breaking changes, and the FSL license frontmatter timestamp requirement.",
+    "title": "CHANGELOG automation — git-cliff",
+    "body": "Configure git-cliff to auto-generate CHANGELOG.md from conventional commits on every release — covering scopes, breaking changes, and the FSL license frontmatter timestamp requirement.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -697,10 +746,11 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Repo hygiene — branch protection + templates"
   },
   {
-    "title": "prepare npm hook \u2014 install-hooks",
+    "title": "prepare npm hook — install-hooks",
     "body": "Add a prepare npm lifecycle hook that installs git hooks via scripts/hooks/install-hooks so that any contributor who runs npm install automatically gets the commitlint and pre-commit hooks.",
     "area": "DevOps",
     "priority": "P3-Low",
@@ -711,11 +761,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Repo hygiene — branch protection + templates"
   },
   {
-    "title": "Docs: Obsidian vault \u2014 docs/obsidian-vault/",
-    "body": "Maintain and expand the technical documentation Obsidian vault at docs/obsidian-vault/ \u2014 covering file format internals, API reference, patterns, and the graphify knowledge graph integration.",
+    "title": "Docs: Obsidian vault — docs/obsidian-vault/",
+    "body": "Maintain and expand the technical documentation Obsidian vault at docs/obsidian-vault/ — covering file format internals, API reference, patterns, and the graphify knowledge graph integration.",
     "area": "Docs",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -725,11 +776,12 @@
     "labels": [
       "area:docs"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Docs v2.3.0"
   },
   {
     "title": "Docs: knowledge/github/ brain refresh cadence",
-    "body": "Establish a periodic refresh cadence for the knowledge/github/ brain (75 fetched docs + 6 playbooks) \u2014 automating stale-doc detection and triggering graphify rebuilds when GitHub CLI docs change.",
+    "body": "Establish a periodic refresh cadence for the knowledge/github/ brain (75 fetched docs + 6 playbooks) — automating stale-doc detection and triggering graphify rebuilds when GitHub CLI docs change.",
     "area": "Docs",
     "priority": "P3-Low",
     "target": "v2.5.0",
@@ -739,11 +791,12 @@
     "labels": [
       "area:docs"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Docs v2.3.0"
   },
   {
     "title": "Docs: README public-facing overhaul",
-    "body": "Overhaul the public README.md \u2014 add a hero section, quickstart, feature matrix, MCP server setup instructions, plugin installation guide, and license summary for open-source visitors.",
+    "body": "Overhaul the public README.md — add a hero section, quickstart, feature matrix, MCP server setup instructions, plugin installation guide, and license summary for open-source visitors.",
     "area": "Docs",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -753,11 +806,12 @@
     "labels": [
       "area:docs"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Docs v2.3.0"
   },
   {
     "title": "Docs: CHANGELOG content curation",
-    "body": "Curate and back-fill the CHANGELOG.md with accurate entries for v2.0.0 through v2.2.0 \u2014 ensuring the git-cliff automation has a clean baseline to build from for future releases.",
+    "body": "Curate and back-fill the CHANGELOG.md with accurate entries for v2.0.0 through v2.2.0 — ensuring the git-cliff automation has a clean baseline to build from for future releases.",
     "area": "Docs",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -767,11 +821,12 @@
     "labels": [
       "area:docs"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Docs v2.3.0"
   },
   {
     "title": "Docs: API reference auto-generation",
-    "body": "Set up JSDoc or TypeDoc to auto-generate an HTML/Markdown API reference from the src/ codebase \u2014 covering ProfileEditor, extract, pack, validate, and all exported utilities.",
+    "body": "Set up JSDoc or TypeDoc to auto-generate an HTML/Markdown API reference from the src/ codebase — covering ProfileEditor, extract, pack, validate, and all exported utilities.",
     "area": "Docs",
     "priority": "P3-Low",
     "target": "v2.4.0",
@@ -781,11 +836,12 @@
     "labels": [
       "area:docs"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Docs v2.3.0"
   },
   {
     "title": "Licensing: FSL-1.1-ALv2 annual review",
-    "body": "Conduct the annual FSL-1.1-ALv2 license review \u2014 verify SPDX identifiers in all source files, update NOTICE, and confirm the 2-year Apache 2.0 conversion schedule for each release.",
+    "body": "Conduct the annual FSL-1.1-ALv2 license review — verify SPDX identifiers in all source files, update NOTICE, and confirm the 2-year Apache 2.0 conversion schedule for each release.",
     "area": "Licensing",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -795,11 +851,12 @@
     "labels": [
       "area:licensing"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Licensing — FSL + trademark"
   },
   {
-    "title": "Licensing: Trademark registration \u2014 OPENDECK wordmark USPTO",
-    "body": "File a USPTO trademark application for the OPENDECK wordmark in IC 009 (software) and IC 042 (SaaS) \u2014 covering the brand protection required for the v3.0.0 commercial launch.",
+    "title": "Licensing: Trademark registration — OPENDECK wordmark USPTO",
+    "body": "File a USPTO trademark application for the OPENDECK wordmark in IC 009 (software) and IC 042 (SaaS) — covering the brand protection required for the v3.0.0 commercial launch.",
     "area": "Licensing",
     "priority": "P1-High",
     "target": "v3.0.0",
@@ -809,11 +866,12 @@
     "labels": [
       "area:licensing"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Licensing — FSL + trademark"
   },
   {
     "title": "Licensing: NOTICE file upkeep",
-    "body": "Keep the NOTICE file current with all third-party dependency attributions \u2014 triggered on any dependency addition or update, and validated as part of the CI lint pipeline.",
+    "body": "Keep the NOTICE file current with all third-party dependency attributions — triggered on any dependency addition or update, and validated as part of the CI lint pipeline.",
     "area": "Licensing",
     "priority": "P3-Low",
     "target": "v2.3.0",
@@ -823,11 +881,12 @@
     "labels": [
       "area:licensing"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Licensing — FSL + trademark"
   },
   {
-    "title": "Licensing: 2-year OSS conversion automation \u2014 Apache 2.0",
-    "body": "Implement the automated Apache 2.0 conversion workflow triggered two years after each FSL release \u2014 including the GitHub Action, release notes update, and SPDX header swap.",
+    "title": "Licensing: 2-year OSS conversion automation — Apache 2.0",
+    "body": "Implement the automated Apache 2.0 conversion workflow triggered two years after each FSL release — including the GitHub Action, release notes update, and SPDX header swap.",
     "area": "Licensing",
     "priority": "P2-Normal",
     "target": "v3.0.0",
@@ -837,7 +896,8 @@
     "labels": [
       "area:licensing"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Licensing — FSL + trademark"
   },
   {
     "title": "GitHub Actions: project-sync workflow",
@@ -851,11 +911,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "GitHub Actions: status-update cron",
-    "body": "Create a scheduled GitHub Actions cron workflow that runs nightly to audit project board health \u2014 flagging stale In-Progress items, unassigned P0s, and issues missing required field values.",
+    "body": "Create a scheduled GitHub Actions cron workflow that runs nightly to audit project board health — flagging stale In-Progress items, unassigned P0s, and issues missing required field values.",
     "area": "DevOps",
     "priority": "P1-High",
     "target": "v2.3.0",
@@ -865,11 +926,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "GitHub App: opendeck-project-sync",
-    "body": "Create and configure the opendeck-project-sync GitHub App \u2014 providing the OAuth credentials and project write permissions needed by the project-sync GitHub Actions workflow.",
+    "body": "Create and configure the opendeck-project-sync GitHub App — providing the OAuth credentials and project write permissions needed by the project-sync GitHub Actions workflow.",
     "area": "DevOps",
     "priority": "P1-High",
     "target": "v2.3.0",
@@ -879,11 +941,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
-    "title": "Branch protection rules \u2014 main branch",
-    "body": "Configure branch protection rules on main \u2014 requiring PR reviews, passing CI status checks, and blocking direct pushes to protect the production release branch.",
+    "title": "Branch protection rules — main branch",
+    "body": "Configure branch protection rules on main — requiring PR reviews, passing CI status checks, and blocking direct pushes to protect the production release branch.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -893,10 +956,11 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Repo hygiene — branch protection + templates"
   },
   {
-    "title": "PR template \u2014 .github/pull_request_template.md",
+    "title": "PR template — .github/pull_request_template.md",
     "body": "Create the .github/pull_request_template.md file with a standardized checklist covering test coverage, validation pass, CHANGELOG entry, and license header for all pull requests.",
     "area": "DevOps",
     "priority": "P2-Normal",
@@ -907,7 +971,8 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Repo hygiene — branch protection + templates"
   },
   {
     "title": "CODEOWNERS file",
@@ -921,11 +986,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Repo hygiene — branch protection + templates"
   },
   {
     "title": "CI lint + validate pipeline",
-    "body": "Set up the primary CI pipeline (.github/workflows/ci.yml) \u2014 running ESLint, running validate on all committed profiles, and checking NOTICE file completeness on every push and pull request.",
+    "body": "Set up the primary CI pipeline (.github/workflows/ci.yml) — running ESLint, running validate on all committed profiles, and checking NOTICE file completeness on every push and pull request.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -935,11 +1001,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "graphify rebuild automation",
-    "body": "Automate the graphify knowledge graph rebuild \u2014 triggering graphify update . after significant code changes via a post-commit hook or GitHub Actions workflow to keep graphify-out/ current.",
+    "body": "Automate the graphify knowledge graph rebuild — triggering graphify update . after significant code changes via a post-commit hook or GitHub Actions workflow to keep graphify-out/ current.",
     "area": "DevOps",
     "priority": "P3-Low",
     "target": "v2.4.0",
@@ -949,7 +1016,8 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "Dependabot config",
@@ -963,11 +1031,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "release-please config",
-    "body": "Configure release-please for automated changelog-driven GitHub releases \u2014 generating release PRs from conventional commits, bumping package.json version, and triggering the npm publish workflow.",
+    "body": "Configure release-please for automated changelog-driven GitHub releases — generating release PRs from conventional commits, bumping package.json version, and triggering the npm publish workflow.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -977,11 +1046,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "npm publish credentials rotation",
-    "body": "Document and automate the npm publish token rotation process \u2014 including GitHub secret updates, token expiry monitoring, and the runbook for emergency re-issuance.",
+    "body": "Document and automate the npm publish token rotation process — including GitHub secret updates, token expiry monitoring, and the runbook for emergency re-issuance.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -991,11 +1061,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "Issue Form templates",
-    "body": "Create GitHub Issue Form YAML templates (.github/ISSUE_TEMPLATE/) for bug reports, feature requests, and catalog submissions \u2014 replacing freeform issue creation with structured intake forms.",
+    "body": "Create GitHub Issue Form YAML templates (.github/ISSUE_TEMPLATE/) for bug reports, feature requests, and catalog submissions — replacing freeform issue creation with structured intake forms.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -1005,11 +1076,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
-    "title": "Script: quality-gate.js \u2014 profile quality enforcement",
-    "body": "Tracks scripts/quality-gate.js \u2014 the quality gate script that validates structure, counts buttons, checks 144x144 icon dimensions, and optionally checks packed file size, returning approve/reject with a full report.",
+    "title": "Script: quality-gate.js — profile quality enforcement",
+    "body": "Tracks scripts/quality-gate.js — the quality gate script that validates structure, counts buttons, checks 144x144 icon dimensions, and optionally checks packed file size, returning approve/reject with a full report.",
     "area": "Engine",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -1019,11 +1091,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Agentic pipeline v1 — Agents 1 + 2 (Asset Spec + Build)"
   },
   {
-    "title": "Script: install-profile.js \u2014 live install pipeline",
-    "body": "Tracks scripts/install-profile.js \u2014 the script that copies a .streamDeckProfile into the Stream Deck app's profile directory and writes an install-report.json for the live_test_profile MCP tool.",
+    "title": "Script: install-profile.js — live install pipeline",
+    "body": "Tracks scripts/install-profile.js — the script that copies a .streamDeckProfile into the Stream Deck app's profile directory and writes an install-report.json for the live_test_profile MCP tool.",
     "area": "Engine",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -1033,11 +1106,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Agentic pipeline v1 — Agents 1 + 2 (Asset Spec + Build)"
   },
   {
-    "title": "Script: verify-profile.js \u2014 post-install verification",
-    "body": "Tracks scripts/verify-profile.js \u2014 the post-install verification script that confirms a profile UUID is present and correctly structured in the Stream Deck app's live profile directory.",
+    "title": "Script: verify-profile.js — post-install verification",
+    "body": "Tracks scripts/verify-profile.js — the post-install verification script that confirms a profile UUID is present and correctly structured in the Stream Deck app's live profile directory.",
     "area": "Engine",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -1047,11 +1121,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Agentic pipeline v1 — Agents 1 + 2 (Asset Spec + Build)"
   },
   {
-    "title": "Script: fix-typo.js \u2014 profile patch utility",
-    "body": "Tracks scripts/fix-typo.js \u2014 the one-off profile patch utility for correcting label typos in extracted profile JSON without a full re-generation cycle.",
+    "title": "Script: fix-typo.js — profile patch utility",
+    "body": "Tracks scripts/fix-typo.js — the one-off profile patch utility for correcting label typos in extracted profile JSON without a full re-generation cycle.",
     "area": "Engine",
     "priority": "P3-Low",
     "target": "v2.3.0",
@@ -1061,11 +1136,12 @@
     "labels": [
       "area:engine"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Agentic pipeline v1 — Agents 1 + 2 (Asset Spec + Build)"
   },
   {
-    "title": "Script: gh-project-setup.js \u2014 initial project bootstrap",
-    "body": "Tracks scripts/gh-project-setup.js \u2014 the one-time setup script that bootstraps the GitHub Project board by creating all required custom fields, field options, and initial views.",
+    "title": "Script: gh-project-setup.js — initial project bootstrap",
+    "body": "Tracks scripts/gh-project-setup.js — the one-time setup script that bootstraps the GitHub Project board by creating all required custom fields, field options, and initial views.",
     "area": "DevOps",
     "priority": "P2-Normal",
     "target": "v2.3.0",
@@ -1075,11 +1151,12 @@
     "labels": [
       "area:devops"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "DevOps foundation — workflows + scripts"
   },
   {
     "title": "Marketplace: Anthropic plugin store listing",
-    "body": "Prepare and submit the opendeck-factory listing for the Anthropic Claude Code plugin marketplace \u2014 including plugin description, capability tags, hero image, and review submission.",
+    "body": "Prepare and submit the opendeck-factory listing for the Anthropic Claude Code plugin marketplace — including plugin description, capability tags, hero image, and review submission.",
     "area": "Marketplace",
     "priority": "P2-Normal",
     "target": "v2.4.0",
@@ -1089,11 +1166,12 @@
     "labels": [
       "area:marketplace"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Marketplace listings"
   },
   {
     "title": "Marketplace: VS Code Marketplace listing",
-    "body": "Prepare and publish the opendeck VS Code extension to the Visual Studio Marketplace and Open VSX Registry \u2014 covering publisher account setup, extension manifest, and update automation.",
+    "body": "Prepare and publish the opendeck VS Code extension to the Visual Studio Marketplace and Open VSX Registry — covering publisher account setup, extension manifest, and update automation.",
     "area": "Marketplace",
     "priority": "P1-High",
     "target": "v2.5.0",
@@ -1103,11 +1181,12 @@
     "labels": [
       "area:marketplace"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Marketplace listings"
   },
   {
     "title": "Marketplace: Obsidian plugin community listing",
-    "body": "Submit the opendeck Obsidian plugin to the Obsidian community plugins registry \u2014 covering the plugin manifest, README, and the Obsidian plugin review checklist.",
+    "body": "Submit the opendeck Obsidian plugin to the Obsidian community plugins registry — covering the plugin manifest, README, and the Obsidian plugin review checklist.",
     "area": "Marketplace",
     "priority": "P2-Normal",
     "target": "v3.0.0",
@@ -1117,6 +1196,7 @@
     "labels": [
       "area:marketplace"
     ],
-    "parent_issue": null
+    "parent_issue": null,
+    "parent_title": "Marketplace listings"
   }
 ]

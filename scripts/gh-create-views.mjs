@@ -632,10 +632,19 @@ async function main() {
 
       // Dismiss any welcome/onboarding dialogs before moving on
       await dismissWelcomeDialogs(page);
-      // Wait for autosave
-      await page.waitForTimeout(1000);
+      // Wait for autosave — increased from 1s to 2.5s so rename commits before navigation
+      await page.waitForTimeout(2500);
       console.log(`  ✓  Created: "${view.name}"`);
       created++;
+
+      // Navigate back to the base project URL after each creation so the next
+      // iteration always starts with a fresh tab strip (roadmap views can fill
+      // the viewport and push the "+ New view" button out of sight).
+      await page.goto(PROJECT_URL, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      // Let GitHub fully render (especially roadmap onboarding dialogs) before acting
+      await page.waitForTimeout(3000);
+      await dismissWelcomeDialogs(page);
+      await page.waitForTimeout(500);
     }
 
     // ── 5. Summary ────────────────────────────────────────────────────────────

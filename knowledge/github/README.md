@@ -24,17 +24,20 @@ knowledge/github/
     ├── milestone-vs-target-field.md
     ├── retroactive-milestoning.md  ← how to bucket past issues into closed milestones
     ├── sprint-planning.md          ← 2-week Sprint field usage + iteration filter syntax
-    └── revenue-tagging.md          ← Direct/Indirect/None taxonomy + how to read the Revenue view
+    ├── revenue-tagging.md          ← Direct/Indirect/None taxonomy + how to read the Revenue view
+    ├── github-app-setup.md         ← one-time setup of opendeck-project-sync GitHub App
+    └── insights-charts.md          ← 3 standard Insights chart configs (burn-up, status-by-area, priority)
 ```
 
 Also see `knowledge/audit/` for structured audit outputs:
 
 ```
 knowledge/audit/
-├── 2026-04-24-linkage-audit.md  ← linkage gaps found + fixes applied
-├── historical-timeline.md       ← release dates derived from git tags + GH releases
-├── field-taxonomy.md            ← all 9 project fields with option IDs
-└── repo-linkage.md              ← which repos are linked, visibility behavior
+├── 2026-04-24-linkage-audit.md              ← linkage gaps found + fixes applied
+├── historical-timeline.md                   ← release dates derived from git tags + GH releases
+├── field-taxonomy.md                        ← all 9 project fields with option IDs
+├── repo-linkage.md                          ← which repos are linked, visibility behavior
+└── 2026-04-26-views-and-subissues-audit.md  ← view state, roadmap date-field gotcha, sub-issue epic structure
 ```
 
 ## Rebuild the graph
