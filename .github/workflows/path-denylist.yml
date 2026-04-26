@@ -11,14 +11,15 @@ jobs:
       - name: Check denied paths
         run: |
           DENY='^(builds/|data/icons/generated/|.*\.streamDeckProfile$|profiles/[^/]+/private/|profiles/[^/]+-colored/|profiles/[^/]+-commercial/|originals/|data/shortcuts/.*\.paid\.json$)'
-          # Intentionally tracked reference file — exempt from the denylist
-          ALLOW='^builds/Reference - All Actions\.streamDeckProfile$'
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             CHANGED=$(git diff --name-only origin/${{ github.base_ref }}..HEAD)
           else
             CHANGED=$(git diff --name-only HEAD~1..HEAD 2>/dev/null || git ls-files)
           fi
-          VIOLATIONS=$(echo "$CHANGED" | grep -E "$DENY" | grep -vE "$ALLOW" || true)
+          # Strip git quoting (spaces in filenames cause git to wrap paths in double-quotes)
+          CHANGED_CLEAN=$(echo "$CHANGED" | tr -d '"')
+          # Exempt the intentionally-tracked reference profile from the deny check
+          VIOLATIONS=$(echo "$CHANGED_CLEAN" | grep -E "$DENY" | grep -v "Reference - All Actions" || true)
           if [ -n "$VIOLATIONS" ]; then
             echo "::error::Commercial paths detected"
             echo "$VIOLATIONS"
