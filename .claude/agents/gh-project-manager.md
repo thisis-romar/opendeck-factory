@@ -63,16 +63,21 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 
 ## House conventions
 
-**Views (9 canonical):**
-- `Marketplace` — Table, filter `area:Marketplace`
-- `Board — By Status` — Board (column = Status)
-- `Board — By Area` — Board (column = Area)
-- `Roadmap — By Target` — Roadmap (grouped by Target field)
-- `Active Work` — Table (no filter)
-- `Roadmap — By Target Date` — Roadmap (Start Date / Target Date fields; date config is manual)
-- `Revenue — By Impact` — Table, grouped by Revenue Impact
-- `Current Sprint` — Board, filter `sprint:@current`, grouped by Status
-- `Blocked` — Table, filter `status:Blocked`
+**Views (11 live as of 2026-04-26):**
+| # | Name | Layout | Notes |
+|---|---|---|---|
+| 1 | Marketplace | Table | filter `area:Marketplace` |
+| 2 | Board — By Status | Board | column = Status; Sub-issues progress enabled on cards |
+| 3 | Board — By Area | Board | column = Area |
+| 10 | Active Work | Table | no filter; Sub-issues progress column visible |
+| 13 | Roadmap — By Target Date | Roadmap | Start/Target Date fields; **date config resets** — run `node scripts/gh-fix-roadmap-view.mjs` to repair |
+| 14 | Revenue — By Impact | Table | grouped by Revenue Impact |
+| 15 | Current Sprint | Board | filter `sprint:@current`, grouped by Status |
+| 16 | Blocked | Table | filter `status:Blocked` |
+| 18 | Licensing | Table | created 2026-04-26 |
+| 19 | Distribution | Table | created 2026-04-26 |
+
+Note: `Roadmap — By Target` (old view #7, grouped by Target field) was deleted; replaced by #13 (date-based).
 
 **Label taxonomy:** `enhancement`, `bug`, `research`, `devops`, `distribution`
 
@@ -134,6 +139,8 @@ Specifically:
 - **Sub-issue linking** — `addSubIssue` requires GraphQL node IDs (not issue numbers). Script `scripts/gh-link-subissues.mjs` resolves IDs by fetching all open issues into a title→{number,id} map. Epic manifest: `scripts/component-epics.json`. Children manifest: `scripts/component-inventory.json` (field: `parent_title`). Run: `npm run epics:dry` then `npm run epics:link`.
 - **Project items query pagination** — `items(first: 200)` fails with "exceeds the `first` limit of 100". Always paginate with `first: 100` + `pageInfo { hasNextPage endCursor }`. See `gh-set-milestone-dates.mjs` for the correct pattern.
 - **Milestone dates** — `gh-set-milestone-dates.mjs` maps milestone title → date band (hardcoded). Skips items already with dates unless `--force`. After creating new items or changing milestones, re-run `npm run dates:backfill`.
+- **Sprint iteration field** — `updateProjectV2Field` with `iterationConfiguration` requires `iterations: [...]` (not optional). Pass `[{startDate, duration, title}]` to add an iteration. Sprint 1 created 2026-04-27 (ID: `e501013a`). Script: `scripts/gh-set-sprint.mjs`. Default: assigns only "In Progress" items; pass `--include-todo` for Todo items too.
+- **Field visibility Playwright automation** — For all view types (table/board/roadmap), clicking the toolbar "View" / kebab (⋯) opens the COPY VIEW dialog, not a field settings panel. `selectField()` matching "Sub-issues progress" in that dialog will apply a FILTER instead of toggling visibility. The correct way to add a column in table view is the "+" at the right end of column headers. For board/roadmap, field visibility is set via the copy dialog's "Fields" section but it's not automatable via a simple click.
 
 ## npm scripts reference
 
@@ -145,6 +152,8 @@ Specifically:
 | `npm run epics:dry` / `epics:link` | Create epics + link sub-issues |
 | `npm run dates:dry` / `dates:backfill` | Preview / apply milestone dates on open items |
 | `npm run insights:probe` / `insights` | Probe Insights DOM / create 3 canonical charts |
+| `npm run columns:probe` / `columns:add` | Probe / add Sub-issues progress column to views |
+| `npm run sprint:dry` / `sprint:assign` | Preview / assign Sprint field to In Progress items |
 | `npm run brain:query` | Query the graphify knowledge graph |
 
 ## Refuses
