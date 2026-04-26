@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: OpenDeck Roadmap
+    url: https://github.com/users/thisis-romar/projects/4
+    about: See what's planned and in progress
+  - name: OpenDeck Discussions
+    url: https://github.com/thisis-romar/opendeck-factory/discussions
+    about: General questions and community discussion
+  - name: Stream Deck Profile Catalog
+    url: https://github.com/thisis-romar/stream-deck-catalog
+    about: Browse and submit catalog profiles

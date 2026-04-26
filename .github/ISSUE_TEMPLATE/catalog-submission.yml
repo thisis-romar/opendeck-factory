@@ -1,0 +1,93 @@
+name: Catalog Profile Submission
+description: Submit a Stream Deck profile for inclusion in the OpenDeck Catalog
+title: "[Catalog]: "
+labels: ["distribution"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The OpenDeck Catalog is a curated library of professional Stream Deck profiles. Commercial profiles are reviewed before inclusion.
+
+        See [stream-deck-catalog](https://github.com/thisis-romar/stream-deck-catalog) for submission criteria.
+
+  - type: input
+    id: profile_name
+    attributes:
+      label: Profile name
+      placeholder: "Pro Video Editing — DaVinci Resolve"
+    validations:
+      required: true
+
+  - type: input
+    id: target_app
+    attributes:
+      label: Target application
+      placeholder: "DaVinci Resolve 19"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: profile_type
+    attributes:
+      label: Profile type
+      options:
+        - Application-specific (one app)
+        - Workflow-specific (multi-app workflow)
+        - System utility
+        - Development tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: shortcut_list
+    attributes:
+      label: Key shortcuts included
+      description: List the main shortcuts/actions this profile provides. One per line.
+      placeholder: |
+        Cut (Ctrl+X)
+        Ripple Delete (Backspace)
+        Color Corrector (Alt+6)
+        Full Screen Viewer (P)
+    validations:
+      required: true
+
+  - type: input
+    id: preview_url
+    attributes:
+      label: Preview image URL
+      description: Direct link to a 144x144 or larger PNG/JPG preview of the profile grid.
+      placeholder: "https://..."
+
+  - type: dropdown
+    id: stream_deck_model
+    attributes:
+      label: Stream Deck model tested on
+      options:
+        - Stream Deck MK.2 (15 keys)
+        - Stream Deck XL (32 keys)
+        - Stream Deck + (8 keys + dials)
+        - Stream Deck Mini (6 keys)
+        - Stream Deck Pedal
+        - Multiple models
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Profile description
+      description: What does this profile do? Who is it for? What workflows does it improve?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Submission checklist
+      options:
+        - label: Profile validates with `node src/index.js validate`
+          required: true
+        - label: All shortcuts tested on a real Stream Deck
+          required: true
+        - label: I agree to the OpenDeck Catalog license terms (FSL-1.1-ALv2 for free tier; commercial license for Pro)
+          required: true

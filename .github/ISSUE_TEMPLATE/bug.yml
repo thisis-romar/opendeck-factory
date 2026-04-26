@@ -1,0 +1,94 @@
+name: Bug Report
+description: Something is broken in the engine, MCP server, or CLI
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing, check [existing issues](https://github.com/thisis-romar/opendeck-factory/issues) and confirm this isn't already tracked.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: "When I run `node src/index.js pack ...`, it crashes with..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal reproduction steps.
+      placeholder: |
+        1. Extract profile with `node src/index.js extract ...`
+        2. Edit `manifest.json`
+        3. Run `node src/index.js pack ...`
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: "The profile should pack without errors."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: "Error: Cannot read properties of undefined (reading 'UUID')"
+    validations:
+      required: true
+
+  - type: input
+    id: node_version
+    attributes:
+      label: Node.js version
+      placeholder: "v22.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: streamdeck_version
+    attributes:
+      label: Stream Deck app version
+      placeholder: "7.1.2"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 10
+        - Windows 11
+        - macOS
+        - Linux
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or stack trace
+      render: shell
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the codebase is affected?
+      options:
+        - Engine (extract/pack/validate)
+        - MCP server
+        - Skills / Claude Code plugin
+        - CLI
+        - Profiles / templates
+        - Other
+    validations:
+      required: true

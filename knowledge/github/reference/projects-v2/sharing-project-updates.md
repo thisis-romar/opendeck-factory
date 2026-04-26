@@ -1,0 +1,72 @@
+---
+source_url: "https://docs.github.com/en/issues/planning-and-tracking-with-projects/sharing-project-updates"
+type: webpage
+title: "Sharing project updates - GitHub Docs"
+captured_at: 2026-04-24T17:23:55.276885+00:00
+contributor: "unknown"
+---
+
+# Sharing project updates - GitHub Docs
+
+Source: https://docs.github.com/en/issues/planning-and-tracking-with-projects/sharing-project-updates
+
+---
+
+Sharing project updates - GitHub Docs Skip to main content GitHub Docs Version: Free, Pro, &amp; Team Search or ask Copilot Search or ask Copilot Select language: current language is English Search or ask Copilot Search or ask Copilot Open menu Open Sidebar GitHub Issues / Projects / Sharing project updates Home GitHub Issues Issues Learning about issues About issues Quickstart for GitHub Issues Planning and tracking work for your team or project Using issues Create an issue Adding sub-issues Creating issue dependencies Assign issues &amp; PRs Editing an issue View all issues &amp; PRs Browsing sub-issues Filter and search Create branch for issue Link PR to issue About slash commands Managing issue types Managing issue fields Using issue fields Administering issues Triage an issue Pin an issue Marking issues or pull requests as a duplicate Transfer an issue Close an issue Deleting an issue Duplicate an issue Projects Learning about Projects About Projects Quickstart for Projects Best practices for Projects Creating projects Creating a project Copying a project Managing items in your project Adding items Converting draft issues Editing items Archiving items Understanding fields About text and number fields About date fields About single select fields About iteration fields About issue fields About sub-issue fields About pull request fields About the issue type field Renaming custom fields Deleting custom fields Customizing views Changing the layout Customizing tables Customizing boards Customizing roadmaps Filtering projects Managing your views Automating projects Using built-in automations Automating with the API Automating with Actions Adding items automatically Archiving items automatically Viewing insights About insights for Projects Creating charts Configuring charts Managing your project Managing project visibility Managing project access Managing templates Closing and deleting projects Adding a project to a repo Adding a project to a team Exporting your project data Finding your projects Sharing project updates Labels and milestones Managing labels About milestones Create &amp; edit milestones Add to milestones Filter by milestone View progress to milestone GitHub Issues / Projects / Sharing project updates Sharing project updates You can post updates to your projects that share the current status, start date, and target date of the project itself. Who can use this feature? Anyone with write access for a project can add a status update. Anyone with read access for a project can view status updates and subscribe. Copy as Markdown In this article About status updates Adding new status updates About status updates You can keep your team up to date and share high-level overviews, which people can use to determine the status of your project. You can set a status, such as "On track" or "At risk", to allow people to quickly determine the current state of the project. You can also set start dates and target dates. Your status update can also contain a message that supports formatting with Markdown. Status updates can be found on your project's side panel, below the description and README. You can read the most recent update at the top and the full history of updates beneath. Once you've added a status update, the current status is also shown in the project's header and in lists when you're browsing projects. Adding new status updates You can add status updates to any project you have write access for. You can't add status updates to a project that is set as a template. When you start creating a new status update, the form will default to the previous update's status, start date, and target date. Navigate to your project. In the top-right, click to open the side panel. Next to "Status updates", click Add update . To change the status, click Status , and then select the status that best reflects the state of the project. To change the dates shown in your status update, click either Start date or Target date , and select a new date. Optionally, in the comment field, type a message to include in your status update. You can use Markdown to format your message. Click Save update . Help and support Did you find what you needed? Yes No Privacy policy Help us make these docs great! All GitHub docs are open source. See something that&#x27;s wrong or unclear? Submit a pull request. Make a contribution Learn how to contribute Still need help? Ask the GitHub community Contact support Legal © 2026 GitHub, Inc. Terms Privacy Status Pricing Expert services Blog
+
+---
+
+## API Appendix — `createProjectV2StatusUpdate` (added 2026-04-24)
+
+The GitHub Docs UI page above does not document the GraphQL mutation. The correct mutation name is **`createProjectV2StatusUpdate`** — NOT `addProjectV2StatusUpdate` (that name does not exist in the schema).
+
+### Mutation
+
+```graphql
+mutation {
+  createProjectV2StatusUpdate(input: {
+    projectId: "PVT_kwHODNwyZM4BVh2a"
+    status: ON_TRACK
+    startDate: "2026-04-24"
+    targetDate: "2026-05-15"
+    body: "Status update body (Markdown supported)"
+  }) {
+    statusUpdate {
+      id
+      status
+      body
+      startDate
+      targetDate
+      createdAt
+    }
+  }
+}
+```
+
+> **Note (verified 2026-04-24):** The return payload field is `statusUpdate`, NOT `projectV2StatusUpdate`. The original plan had the wrong field name — using `projectV2StatusUpdate` returns an `undefinedField` error.
+
+### Status enum values
+
+`ON_TRACK | AT_RISK | OFF_TRACK | COMPLETE | INACTIVE`
+
+### CLI invocation (OpenDeck pattern)
+
+```bash
+gh api graphql -f query='mutation {
+  createProjectV2StatusUpdate(input: {
+    projectId: "PVT_kwHODNwyZM4BVh2a"
+    status: ON_TRACK
+    startDate: "2026-04-24"
+    targetDate: "2026-05-15"
+    body: "## Status: ON_TRACK\n\nUpdate body here."
+  }) { statusUpdate { id status createdAt } }
+}'
+```
+
+### Required permissions
+
+PAT must have the `project` write scope. A `GITHUB_TOKEN` in Actions is repo-scoped and **cannot** access Projects API — use a GitHub App token or a PAT stored as a secret.
+
+### Status updates via Actions (bi-weekly cron)
+
+The `status-update.yml` workflow fires on `cron: "0 9 1,15 * *"` (1st + 15th at 09:00 UTC). It computes milestone progress and posts via this mutation. See `.github/workflows/status-update.yml`.

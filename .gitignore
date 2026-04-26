@@ -21,3 +21,7 @@ originals/
 .env
 .env.local
 .DS_Store
+
+# Graphify knowledge graph output (regenerate with: npm run brain:build)
+graphify-out/
+.gh-views-debug/

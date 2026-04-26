@@ -50,6 +50,7 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 - Profile generation workflow: `.claude/skills/generate-profile/SKILL.md`
 - Capture reference profile (all action types): `.claude/skills/capture-streamdeck-reference/SKILL.md`
 - Drive Windows GUI (Stream Deck app): `.claude/skills/drive-windows-gui/SKILL.md`
+- GitHub project management (`/gh-project-manage`): `.claude/skills/gh-project-manage/SKILL.md`
 
 ## MCP Server
 
@@ -76,3 +77,21 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 When writing or editing any `.md` file with YAML frontmatter, call `get_current_time` first and use the returned `datetime` value for the `lastmod` field. Set `created` only on first creation; never modify it afterward. Fallback: `date -u +%Y-%m-%dT%H:%M:%SZ`.
 
 Files that carry frontmatter in this repo: `CHANGELOG.md`, `README.md`, `CLAUDE.md`, `.claude/skills/<name>/SKILL.md`.
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
+- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+
+## GitHub Project Management
+
+See `.claude/agents/gh-project-manager.md` for all project anchors, field IDs, canonical views, playbook index, and the 6-point health-audit checklist.
+
+**Knowledge brain:** `knowledge/github/` — 75 fetched docs + 13 playbooks, indexed by graphify.
+- Query: `npm run brain:query "<question>"` or `/graphify query "<question>"`
+- Rebuild: `/graphify knowledge/github` (the `brain:build` npm script is a stub — run the skill instead)

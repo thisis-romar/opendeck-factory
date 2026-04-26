@@ -1,0 +1,74 @@
+name: Project Status Update
+
+on:
+  schedule:
+    # 1st and 15th of each month at 09:00 UTC
+    - cron: "0 9 1,15 * *"
+  workflow_dispatch:
+    inputs:
+      status:
+        description: "Project status"
+        required: true
+        default: ON_TRACK
+        type: choice
+        options: [ON_TRACK, AT_RISK, OFF_TRACK, COMPLETE, INACTIVE]
+      body:
+        description: "Status update message (Markdown)"
+        required: false
+
+jobs:
+  status-update:
+    name: Post project status update
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PROJECT_SYNC_APP_ID }}
+          private-key: ${{ secrets.PROJECT_SYNC_APP_KEY }}
+          owner: thisis-romar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Compute milestone progress
+        id: progress
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          node -e "
+          const { execSync } = require('child_process');
+          const milestones = JSON.parse(
+            execSync('gh api repos/thisis-romar/opendeck-factory/milestones --jq \".[] | select(.state == \\\"open\\\")\"', { encoding: 'utf8' })
+              .trim().split('\n').filter(Boolean).map(l => JSON.parse(l))
+              .reduce((acc, m) => { acc.push(m); return acc; }, [])
+              .map(m => JSON.stringify(m)).join('\n') || '[]'
+          );
+          " 2>/dev/null || true
+
+      - name: Post status update
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PROJECT_ID: PVT_kwHODNwyZM4BVh2a
+          STATUS: ${{ github.event.inputs.status || 'ON_TRACK' }}
+          BODY: ${{ github.event.inputs.body || '' }}
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          TARGET=$(date -u -d '+21 days' +%Y-%m-%d 2>/dev/null || date -u -v+21d +%Y-%m-%d)
+
+          BODY="${BODY:-## Status: ${STATUS}\n\nBi-weekly automated status update. See [roadmap](https://github.com/users/thisis-romar/projects/4) for details.}"
+
+          gh api graphql -f query="mutation {
+            createProjectV2StatusUpdate(input: {
+              projectId: \"${PROJECT_ID}\"
+              status: ${STATUS}
+              startDate: \"${TODAY}\"
+              targetDate: \"${TARGET}\"
+              body: \"${BODY}\"
+            }) { statusUpdate { id status createdAt } }
+          }"
