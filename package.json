@@ -39,13 +39,16 @@
     "prepare": "make install-hooks",
     "brain:build": "echo 'Run /graphify knowledge/github in Claude Code to rebuild the graph'",
     "brain:query": "python -m graphify query",
-    "autoresearch:score": "node scripts/autoresearch/score.mjs"
+    "autoresearch:score": "node scripts/autoresearch/score.mjs",
+    "autoresearch:run": "node scripts/autoresearch/loop.mjs",
+    "autoresearch:dry": "node scripts/autoresearch/loop.mjs --dry-run"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "adm-zip": "^0.5.17"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "husky": "^9.1.7",
