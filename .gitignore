@@ -36,3 +36,6 @@ autoresearch/snapshot/
 autoresearch/best/
 autoresearch/*.jsonl
 autoresearch/score.json
+autoresearch/checkpoints.log
+autoresearch/screenshot-*.png
+autoresearch/visual-reference/

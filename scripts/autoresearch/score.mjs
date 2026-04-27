@@ -103,13 +103,23 @@ for (const cat of categories) {
 }
 const coherence = categories.length > 0 ? intactCategories / categories.length : 1.0;
 
-const score = 0.40 * coverage + 0.35 * p1Density + 0.25 * coherence;
+// visualScore: optional, injected by visual-score.mjs after a Tier 3 run.
+// When present it shifts weights: coverage 35% + p1Density 30% + coherence 20% + visual 15%.
+const existingVisual = (() => {
+  if (!existsSync('autoresearch/score.json')) return null;
+  try { return JSON.parse(readFileSync('autoresearch/score.json', 'utf8')).visualScore ?? null; } catch { return null; }
+})();
+
+const score = existingVisual !== null
+  ? 0.35 * coverage + 0.30 * p1Density + 0.20 * coherence + 0.15 * existingVisual
+  : 0.40 * coverage + 0.35 * p1Density + 0.25 * coherence;
 
 const result = {
   score: parseFloat(score.toFixed(4)),
   coverage: parseFloat(coverage.toFixed(4)),
   p1Density: parseFloat(p1Density.toFixed(4)),
   coherence: parseFloat(coherence.toFixed(4)),
+  visualScore: existingVisual,
   placed,
   total,
   p1Total,

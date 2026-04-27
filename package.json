@@ -41,7 +41,11 @@
     "brain:query": "python -m graphify query",
     "autoresearch:score": "node scripts/autoresearch/score.mjs",
     "autoresearch:run": "node scripts/autoresearch/loop.mjs",
-    "autoresearch:dry": "node scripts/autoresearch/loop.mjs --dry-run"
+    "autoresearch:dry": "node scripts/autoresearch/loop.mjs --dry-run",
+    "autoresearch:loop-c": "node scripts/autoresearch/loop-c.mjs",
+    "autoresearch:harness": "node scripts/autoresearch/eval-harness.mjs",
+    "autoresearch:visual": "node scripts/autoresearch/visual-score.mjs",
+    "generate:icons:animated": "node scripts/generate-icons-animated.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
