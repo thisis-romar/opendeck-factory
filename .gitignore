@@ -35,3 +35,4 @@ graphify-out/
 autoresearch/snapshot/
 autoresearch/best/
 autoresearch/*.jsonl
+autoresearch/score.json

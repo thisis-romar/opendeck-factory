@@ -129,6 +129,17 @@
     "labels": ["epic", "area:docs"]
   },
   {
+    "title": "Autoresearch loop — profile layout optimizer",
+    "reuse_existing_issue": 124,
+    "area": "Engine",
+    "priority": "P2-Normal",
+    "target": "v2.4.0",
+    "size": "M",
+    "revenue_impact": "Indirect",
+    "milestone_name": "v2.4.0",
+    "labels": ["epic", "area:engine"]
+  },
+  {
     "title": "Licensing — FSL + trademark",
     "body": "Epic tracking licensing obligations: FSL-1.1-ALv2 annual review, NOTICE file upkeep, and 2-year OSS conversion automation to Apache 2.0.",
     "area": "Licensing",
