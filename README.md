@@ -1,6 +1,7 @@
 # OpenDeck Factory
 
 ![Version](https://img.shields.io/badge/Version-2.2.0-blue) ![License](https://img.shields.io/badge/License-FSL--1.1--ALv2-orange)
+[![SafeSkill 75/100](https://img.shields.io/badge/SafeSkill-75%2F100_Passes%20with%20Notes-yellow)](https://safeskill.dev/scan/thisis-romar-opendeck-factory)
 
 Open-source engine for programmatically creating, editing, and repacking Elgato Stream Deck `.streamDeckProfile` files. Define your shortcuts in JSON, generate icons, and produce ready-to-import profiles — no manual button-by-button setup required.
 
