@@ -26,6 +26,7 @@
     "dates:backfill": "node scripts/gh-set-milestone-dates.mjs",
     "dates:dry": "node scripts/gh-set-milestone-dates.mjs --dry-run",
     "workflows:toggle": "node scripts/gh-toggle-workflows.mjs --headed",
+    "autoadd:probe": "node scripts/gh-toggle-workflows.mjs --headed --probe-autoadd",
     "epics:dry": "node scripts/gh-link-subissues.mjs --dry-run",
     "epics:link": "node scripts/gh-link-subissues.mjs",
     "insights:probe": "node scripts/gh-create-insights.mjs --probe",
@@ -33,6 +34,8 @@
     "sprint:dry": "node scripts/gh-set-sprint.mjs --dry-run",
     "sprint:assign": "node scripts/gh-set-sprint.mjs",
     "triage": "node scripts/gh-triage-new-issue.mjs",
+    "pr-status:dry": "node scripts/gh-sync-pr-status.mjs --dry-run",
+    "reopen:dry": "node scripts/gh-sync-reopen.mjs --dry-run",
     "prepare": "make install-hooks",
     "brain:build": "echo 'Run /graphify knowledge/github in Claude Code to rebuild the graph'",
     "brain:query": "python -m graphify query"

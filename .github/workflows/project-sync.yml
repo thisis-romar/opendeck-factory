@@ -4,7 +4,7 @@ on:
   issues:
     types: [opened, reopened, labeled, unlabeled, closed]
   pull_request:
-    types: [opened, reopened, labeled, unlabeled, closed]
+    types: [opened, reopened, labeled, unlabeled, closed, ready_for_review, converted_to_draft]
   schedule:
     # Sweep every 6 hours to catch items that slipped through event triggers
     - cron: "0 */6 * * *"
@@ -72,3 +72,64 @@ jobs:
           PROJECT_NUMBER: "4"
           PROJECT_OWNER: thisis-romar
         run: node scripts/gh-project-sync.js
+
+  # ── Sync PR-linked issues to In Review (non-draft) or In Progress (draft)
+  pr-status:
+    name: Sync PR-linked issue status
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    permissions:
+      issues: write
+      pull-requests: read
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PROJECT_SYNC_APP_ID }}
+          private-key: ${{ secrets.PROJECT_SYNC_APP_KEY }}
+          owner: thisis-romar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Sync PR status
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node scripts/gh-sync-pr-status.mjs
+
+  # ── Revert reopened issues from Done back to Todo
+  issue-reopened:
+    name: Revert reopened issue from Done to Todo
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'reopened'
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PROJECT_SYNC_APP_ID }}
+          private-key: ${{ secrets.PROJECT_SYNC_APP_KEY }}
+          owner: thisis-romar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Revert status
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/gh-sync-reopen.mjs

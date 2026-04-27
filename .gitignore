@@ -24,4 +24,9 @@ originals/
 
 # Graphify knowledge graph output (regenerate with: npm run brain:build)
 graphify-out/
+
+# Playwright CDP debug screenshots (auto-generated, not source)
 .gh-views-debug/
+.gh-workflows-debug/
+.gh-insights-debug/
+.gh-column-debug/

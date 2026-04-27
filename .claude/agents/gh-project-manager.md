@@ -60,6 +60,7 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 | `knowledge/github/playbooks/workflow-management.md` | 8 enabled workflows; Auto-add filter; `npm run workflows:toggle` |
 | `knowledge/audit/2026-04-26-views-and-subissues-audit.md` | View state (9/9 correct), date-field gotcha, sub-issue hierarchy (14 epics, 79 children) |
 | `knowledge/audit/2026-04-26-dates-and-insights.md` | Milestone date backfill (99 items, 7 bands), 3 Insights charts, workflow state, views:fix chain |
+| `knowledge/audit/2026-04-27-pr-status-automation.md` | PR automation gaps closed: pr-status job, issue-reopened job, coverage matrix |
 
 ## House conventions
 
@@ -149,12 +150,15 @@ Specifically:
 |---|---|
 | `npm run views` / `views:headed` | Create missing views (Playwright) |
 | `npm run views:fix` | Re-apply view settings + auto-repair roadmap date fields |
-| `npm run workflows:toggle` | Enable Auto-archive + Auto-add workflows |
+| `npm run workflows:toggle` | Enable Auto-archive + Auto-add workflows; creates extra Auto-add for catalog/planning (blocked on free plan — requires billing upgrade) |
+| `npm run autoadd:probe` | Screenshot the repo dropdown + kebab menu in Auto-add view without saving (verify plan limit status) |
 | `npm run epics:dry` / `epics:link` | Create epics + link sub-issues |
 | `npm run dates:dry` / `dates:backfill` | Preview / apply milestone dates on open items |
 | `npm run insights:probe` / `insights` | Probe Insights DOM / create 3 canonical charts |
 | `npm run columns:probe` / `columns:add` | Probe / add Sub-issues progress column to views |
 | `npm run sprint:dry` / `sprint:assign` | Preview / assign Sprint field to In Progress items |
+| `npm run pr-status:dry` | Dry-run `gh-sync-pr-status.mjs` against a PR (set `GH_PR_NUMBER` or pass as arg) |
+| `npm run reopen:dry` | Dry-run `gh-sync-reopen.mjs` against an issue (set `GH_ISSUE_NUMBER` or pass as arg) |
 | `npm run brain:query` | Query the graphify knowledge graph |
 
 ## Refuses
