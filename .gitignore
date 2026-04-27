@@ -30,3 +30,8 @@ graphify-out/
 .gh-workflows-debug/
 .gh-insights-debug/
 .gh-column-debug/
+
+# Autoresearch runtime artifacts (regenerable, not source)
+autoresearch/snapshot/
+autoresearch/best/
+autoresearch/*.jsonl

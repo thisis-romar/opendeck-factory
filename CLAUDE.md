@@ -51,6 +51,20 @@ auto-converts to Apache 2.0 two years after each release. See LICENSE and NOTICE
 - Capture reference profile (all action types): `.claude/skills/capture-streamdeck-reference/SKILL.md`
 - Drive Windows GUI (Stream Deck app): `.claude/skills/drive-windows-gui/SKILL.md`
 - GitHub project management (`/gh-project-manage`): `.claude/skills/gh-project-manage/SKILL.md`
+- Autoresearch loop (`/autoresearch profile <app> [--max-iter N]`): `.claude/skills/autoresearch/SKILL.md`
+
+## Autoresearch
+
+`/autoresearch profile <app-name>` — iteratively improves a built profile using the subagent loop:
+
+1. Subagent (`.claude/agents/autoresearch-driver.md`) makes one targeted change per iteration using the MCP server
+2. `scripts/autoresearch/score.mjs` scores the result (coverage 40% + P1-density 35% + coherence 25%)
+3. Improvements are kept; regressions revert via snapshot
+4. `live_test_profile` fires every 5th iteration for real-device validation
+
+**Locked evaluator** (never modify): `scripts/quality-gate.js`, `scripts/autoresearch/score.mjs`  
+**Research strategy**: `autoresearch/program.md`  
+**Score baseline**: `npm run autoresearch:score profiles/<app> data/shortcuts/<app>.json`
 
 ## MCP Server
 

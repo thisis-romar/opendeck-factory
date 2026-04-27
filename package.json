@@ -38,7 +38,8 @@
     "reopen:dry": "node scripts/gh-sync-reopen.mjs --dry-run",
     "prepare": "make install-hooks",
     "brain:build": "echo 'Run /graphify knowledge/github in Claude Code to rebuild the graph'",
-    "brain:query": "python -m graphify query"
+    "brain:query": "python -m graphify query",
+    "autoresearch:score": "node scripts/autoresearch/score.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
