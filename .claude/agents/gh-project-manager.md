@@ -74,10 +74,11 @@ Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 | 14 | Revenue — By Impact | Table | grouped by Revenue Impact |
 | 15 | Current Sprint | Board | filter `sprint:@current`, grouped by Status |
 | 16 | Blocked | Table | filter `status:Blocked` |
-| 18 | Licensing | Table | created 2026-04-26 |
-| 19 | Distribution | Table | created 2026-04-26 |
+| 18 | Licensing | Table | filter `area:Licensing` |
+| 19 | Distribution | Table | filter `area:Distribution` |
 
 Note: `Roadmap — By Target` (old view #7, grouped by Target field) was deleted; replaced by #13 (date-based).
+Views #18 and #19 are intentional area-specific views, confirmed by `filter` fields in GraphQL.
 
 **Label taxonomy:** `enhancement`, `bug`, `research`, `devops`, `distribution`
 
