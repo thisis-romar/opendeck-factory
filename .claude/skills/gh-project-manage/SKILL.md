@@ -7,6 +7,14 @@ created: 2026-04-24T17:52:03Z
 lastmod: 2026-04-24T17:52:03Z
 ---
 
+> **DEPRECATED for core project ops (2026-07-17).** Core GitHub Projects operations
+> (create / field / item / view / status / sub-issue) are now provided by the shared, cross-project
+> **`gh-projects-mcp`** MCP server + global `gh-project-manage` skill (canonical:
+> [EMBLEM-NLP/gh-projects-mcp](https://github.com/EMBLEM-NLP/gh-projects-mcp)). Prefer those for
+> generic work. This repo's OpenDeck-specific scripts stay — the shared MCP has **no parity** yet for
+> Insights charts, workflow toggling, milestone-date backfill, or sprint/iteration assignment (the
+> parity backlog; see `.claude/agents/gh-project-manager.md`). Use the local scripts for those four.
+
 ## Charter
 
 Invoke this skill when you need to interact with the OpenDeck GitHub project (#4). It preflights the project anchors, routes the request to the right playbook, and delegates heavy execution to the `gh-project-manager` subagent. The skill itself never mutates the project directly — all mutations go through the subagent.
