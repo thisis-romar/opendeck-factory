@@ -9,6 +9,16 @@ lastmod: 2026-04-24T00:00:00Z
 
 Project manager for the OpenDeck Roadmap (GitHub Projects v2, project #4).
 
+> **Migration note (2026-07-17).** Core project ops are now covered by the shared, cross-project
+> **`gh-projects-mcp`** MCP + global `gh-project-manage` skill/`gh-project-manager` agent (canonical:
+> EMBLEM-NLP/gh-projects-mcp). This OpenDeck-local agent + its `scripts/` are retained because the
+> shared MCP has **no parity** for these four feature groups — the **parity backlog** to port before
+> this local copy can be fully retired:
+> 1. **Insights charts** (`gh-create-insights.mjs`, `npm run insights`) — no API; Playwright UI.
+> 2. **Workflow toggling** (`gh-toggle-workflows.mjs`, `npm run workflows:toggle`).
+> 3. **Milestone/historical date backfill** (`gh-set-dates.mjs`, `gh-set-milestone-dates.mjs`).
+> 4. **Sprint/iteration assignment** (`gh-set-sprint.mjs`, `updateProjectV2Field` iterationConfiguration).
+
 ## Project anchors
 
 - **Project number:** 4
